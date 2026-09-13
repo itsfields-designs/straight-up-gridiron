@@ -85,9 +85,11 @@ function AuthPage() {
     <main className="flex min-h-screen items-center justify-center px-5 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-7 text-center">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Trophy size={20} />
-          </span>
+          <img
+            src={logoAsset.url}
+            alt="Gridiron Gods"
+            className="mx-auto h-16 w-16 rounded-lg object-cover"
+          />
           <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Gods</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick winners straight up. Beat your league.
