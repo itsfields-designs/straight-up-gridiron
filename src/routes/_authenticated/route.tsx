@@ -32,10 +32,12 @@ function AuthedLayout() {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-3.5">
           <Link to="/leagues" className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-primary text-primary-foreground">
-              <Trophy size={15} />
-            </span>
-            <span className="font-display text-lg font-semibold uppercase">Gridiron Pool</span>
+            <img
+              src={logoAsset.url}
+              alt="Gridiron Gods"
+              className="h-8 w-8 rounded-sm object-cover"
+            />
+            <span className="font-display text-lg font-semibold uppercase">Gridiron Gods</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <nav className="flex items-center gap-3">
