@@ -4,16 +4,17 @@ import { AlertCircle, Trophy } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): { mode?: "login" | "signup" } =>
     search['mode'] === "login" ? { mode: "login" } : {},
   head: () => ({
     meta: [
-      { title: "Log in — Gridiron Pool" },
-      { name: "description", content: "Log in or create your Gridiron Pool account." },
-      { property: "og:title", content: "Log in — Gridiron Pool" },
-      { property: "og:description", content: "Log in or create your Gridiron Pool account." },
+      { title: "Log in — Gridiron Gods" },
+      { name: "description", content: "Log in or create your Gridiron Gods account." },
+      { property: "og:title", content: "Log in — Gridiron Gods" },
+      { property: "og:description", content: "Log in or create your Gridiron Gods account." },
     ],
   }),
   component: AuthPage,
@@ -84,10 +85,12 @@ function AuthPage() {
     <main className="flex min-h-screen items-center justify-center px-5 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-7 text-center">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Trophy size={20} />
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Pool</h1>
+          <img
+            src={logoAsset.url}
+            alt="Gridiron Gods"
+            className="mx-auto h-16 w-16 rounded-lg object-cover"
+          />
+          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Gods</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick winners straight up. Beat your league.
           </p>

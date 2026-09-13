@@ -30,9 +30,9 @@ import { BankPanel } from "@/components/pool/BankPanel";
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   head: () => ({
     meta: [
-      { title: "League — Gridiron Pool" },
+      { title: "League — Gridiron Gods" },
       { name: "description", content: "Make your weekly picks and check the league standings." },
-      { property: "og:title", content: "League — Gridiron Pool" },
+      { property: "og:title", content: "League — Gridiron Gods" },
       {
         property: "og:description",
         content: "Make your weekly picks and check the league standings.",
