@@ -75,6 +75,18 @@ function LeaderboardPage() {
     enabled: !!activeId,
   });
 
+  const payouts = useQuery({
+    queryKey: ["payouts", activeId],
+    queryFn: () => fetchPayouts(activeId!),
+    enabled: !!activeId,
+  });
+
+  const wonBy = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of payouts.data ?? []) map.set(p.userId, (map.get(p.userId) ?? 0) + p.amount);
+    return map;
+  }, [payouts.data]);
+
   const players = useMemo(() => {
     const rows = season.data ?? [];
     return rows.slice(0, 6).map((r, i) => ({
