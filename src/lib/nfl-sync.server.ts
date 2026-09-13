@@ -44,13 +44,22 @@ function teamName(c: EspnCompetitor): string {
   return c.team.shortDisplayName || c.team.displayName || c.team.abbreviation || "TBD";
 }
 
-async function fetchWeek(season: number, week: number): Promise<EspnEvent[]> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function fetchWeek(season: number, week: number, attempt = 0): Promise<EspnEvent[]> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${season}&seasontype=2&week=${week}`;
   const res = await fetch(url, { headers: { accept: "application/json" } });
-  if (!res.ok) throw new Error(`NFL feed returned ${res.status} for week ${week}`);
+  if (!res.ok) {
+    if (attempt < 3) {
+      await sleep(500 * (attempt + 1));
+      return fetchWeek(season, week, attempt + 1);
+    }
+    throw new Error(`NFL feed returned ${res.status} for week ${week}`);
+  }
   const json = (await res.json()) as { events?: EspnEvent[] };
   return json.events ?? [];
 }
+
 
 /**
  * Syncs the given weeks (default: the whole 18-week regular season).
