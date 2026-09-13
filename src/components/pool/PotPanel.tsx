@@ -50,6 +50,7 @@ export function PotPanel({
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["payouts", league.id] });
     queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
+    queryClient.invalidateQueries({ queryKey: ["bank", league.id] });
   };
 
   const create = useMutation({

@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Banknote,
   ClipboardList,
+  Landmark,
   MessageSquare,
   Settings,
   Trophy,
@@ -23,6 +24,7 @@ import { SchedulePanel } from "@/components/pool/SchedulePanel";
 import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
 import { ChatPanel } from "@/components/pool/ChatPanel";
+import { BankPanel } from "@/components/pool/BankPanel";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
