@@ -11,7 +11,10 @@ export type Game = {
   sort_order: number;
   away_score: number | null;
   home_score: number | null;
+  kickoff: string | null;
+  state: string;
 };
+
 
 export type Week = {
   week_num: number;
