@@ -314,3 +314,145 @@ export async function fetchWeeklyStandings(leagueId: string): Promise<WeeklyStan
     updatedAt: r.updated_at,
   }));
 }
+
+// ---- money: payouts & cash pool --------------------------------------------
+export type Payout = {
+  id: string;
+  userId: string;
+  username: string;
+  potType: "weekly" | "season";
+  weekNum: number | null;
+  amount: number;
+  note: string;
+  createdAt: string;
+};
+
+export type CashTxn = {
+  id: string;
+  userId: string;
+  username: string;
+  kind: "deposit" | "withdrawal";
+  amount: number;
+  note: string;
+  createdAt: string;
+};
+
+export function money(v: number | string | null | undefined) {
+  return `$${Number(v || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+async function usernames(ids: string[]): Promise<Map<string, string>> {
+  if (!ids.length) return new Map();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", Array.from(new Set(ids)));
+  if (error) throw error;
+  return new Map((data ?? []).map((p) => [p.id, p.username]));
+}
+
+export async function fetchPayouts(leagueId: string): Promise<Payout[]> {
+  const { data, error } = await supabase
+    .from("payouts")
+    .select("id, user_id, pot_type, week_num, amount, note, created_at")
+    .eq("league_id", leagueId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = data ?? [];
+  const names = await usernames(rows.map((r) => r.user_id));
+  return rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    username: names.get(r.user_id) ?? "Unknown player",
+    potType: r.pot_type as "weekly" | "season",
+    weekNum: r.week_num,
+    amount: Number(r.amount),
+    note: r.note,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function addPayout(args: {
+  leagueId: string;
+  userId: string;
+  createdBy: string;
+  potType: "weekly" | "season";
+  weekNum: number | null;
+  amount: number;
+  note: string;
+}) {
+  const { error } = await supabase.from("payouts").insert({
+    league_id: args.leagueId,
+    user_id: args.userId,
+    created_by: args.createdBy,
+    pot_type: args.potType,
+    week_num: args.potType === "weekly" ? args.weekNum : null,
+    amount: args.amount,
+    note: args.note,
+  });
+  if (error) throw error;
+}
+
+export async function deletePayout(id: string) {
+  const { error } = await supabase.from("payouts").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function fetchCashTxns(leagueId: string): Promise<CashTxn[]> {
+  const { data, error } = await supabase
+    .from("cash_transactions")
+    .select("id, user_id, kind, amount, note, created_at")
+    .eq("league_id", leagueId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = data ?? [];
+  const names = await usernames(rows.map((r) => r.user_id));
+  return rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    username: names.get(r.user_id) ?? "Unknown player",
+    kind: r.kind as "deposit" | "withdrawal",
+    amount: Number(r.amount),
+    note: r.note,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function addCashTxn(args: {
+  leagueId: string;
+  userId: string;
+  kind: "deposit" | "withdrawal";
+  amount: number;
+  note: string;
+}) {
+  const { error } = await supabase.from("cash_transactions").insert({
+    league_id: args.leagueId,
+    user_id: args.userId,
+    kind: args.kind,
+    amount: args.amount,
+    note: args.note,
+  });
+  if (error) throw error;
+}
+
+export async function deleteCashTxn(id: string) {
+  const { error } = await supabase.from("cash_transactions").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Net balance per member: deposits - withdrawals + payouts received. */
+export function cashBalances(txns: CashTxn[], payouts: Payout[]) {
+  const map = new Map<string, { deposited: number; withdrawn: number; won: number }>();
+  const get = (id: string) =>
+    map.get(id) ?? (map.set(id, { deposited: 0, withdrawn: 0, won: 0 }), map.get(id)!);
+  for (const t of txns) {
+    const row = get(t.userId);
+    if (t.kind === "deposit") row.deposited += t.amount;
+    else row.withdrawn += t.amount;
+  }
+  for (const p of payouts) get(p.userId).won += p.amount;
+  return map;
+}

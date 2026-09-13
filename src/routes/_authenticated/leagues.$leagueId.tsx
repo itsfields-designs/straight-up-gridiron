@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ClipboardList, Settings, Trophy, Users } from "lucide-react";
+import { ArrowLeft, Banknote, ClipboardList, Settings, Trophy, Users, Wallet } from "lucide-react";
 
 import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
 import { refreshNfl } from "@/lib/nfl.functions";
@@ -11,6 +11,8 @@ import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";
 import { MembersPanel } from "@/components/pool/MembersPanel";
 import { SchedulePanel } from "@/components/pool/SchedulePanel";
+import { PotPanel } from "@/components/pool/PotPanel";
+import { CashPanel } from "@/components/pool/CashPanel";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
@@ -28,11 +30,13 @@ export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   component: LeaguePage,
 });
 
-type Tab = "picks" | "standings" | "members" | "schedule";
+type Tab = "picks" | "standings" | "pot" | "cash" | "members" | "schedule";
 
 const TABS: { id: Tab; label: string; icon: typeof Trophy }[] = [
   { id: "picks", label: "Make picks", icon: ClipboardList },
   { id: "standings", label: "Standings", icon: Trophy },
+  { id: "pot", label: "Pot & payouts", icon: Banknote },
+  { id: "cash", label: "Cash pool", icon: Wallet },
   { id: "members", label: "Members", icon: Users },
   { id: "schedule", label: "Schedule & results", icon: Settings },
 ];
@@ -128,7 +132,19 @@ function LeaguePage() {
 
       {tab === "picks" && <PicksPanel leagueId={leagueId} week={activeWeek} userId={user.id} />}
       {tab === "standings" && (
-        <StandingsPanel leagueId={leagueId} week={activeWeek} />
+        <StandingsPanel leagueId={leagueId} week={activeWeek} league={league.data} />
+      )}
+      {tab === "pot" && (
+        <PotPanel
+          league={league.data}
+          members={members.data ?? []}
+          isOwner={isOwner}
+          currentUserId={user.id}
+          week={activeWeek}
+        />
+      )}
+      {tab === "cash" && (
+        <CashPanel league={league.data} members={members.data ?? []} currentUserId={user.id} />
       )}
       {tab === "members" && (
         <MembersPanel

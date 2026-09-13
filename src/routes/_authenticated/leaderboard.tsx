@@ -13,7 +13,13 @@ import {
   YAxis,
 } from "recharts";
 
-import { fetchMyLeagues, fetchStandings, fetchWeeklyStandings } from "@/lib/pool";
+import {
+  fetchMyLeagues,
+  fetchPayouts,
+  fetchStandings,
+  fetchWeeklyStandings,
+  money,
+} from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
@@ -69,6 +75,18 @@ function LeaderboardPage() {
     enabled: !!activeId,
   });
 
+  const payouts = useQuery({
+    queryKey: ["payouts", activeId],
+    queryFn: () => fetchPayouts(activeId!),
+    enabled: !!activeId,
+  });
+
+  const wonBy = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of payouts.data ?? []) map.set(p.userId, (map.get(p.userId) ?? 0) + p.amount);
+    return map;
+  }, [payouts.data]);
+
   const players = useMemo(() => {
     const rows = season.data ?? [];
     return rows.slice(0, 6).map((r, i) => ({
@@ -109,6 +127,7 @@ function LeaderboardPage() {
     );
 
   const top = (season.data ?? []).slice(0, 3);
+  const activeLeague = leagues.data.find((l) => l.id === activeId);
 
   return (
     <div>
@@ -138,6 +157,21 @@ function LeaderboardPage() {
         </div>
       </div>
 
+      {activeLeague && (
+        <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          {[
+            { label: "Entry fee", value: activeLeague.entry_fee },
+            { label: "Weekly pot", value: activeLeague.weekly_pot },
+            { label: "Season pot", value: activeLeague.season_pot },
+          ].map((c) => (
+            <div key={c.label} className="rounded-lg border border-border bg-card p-3.5">
+              <div className="text-xs text-faint">{c.label}</div>
+              <div className="font-display text-lg font-medium">{money(c.value)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-6 grid gap-2.5 sm:grid-cols-3">
         {PODIUM.map((slot, i) => {
           const row = top[i];
@@ -151,6 +185,11 @@ function LeaderboardPage() {
               <div className="text-sm text-muted-foreground tabular-nums">
                 {row ? `${row.correct}-${row.missed} this season` : "No results yet"}
               </div>
+              {row && (
+                <div className="text-sm tabular-nums text-accent-soft-foreground">
+                  {money(wonBy.get(row.userId) ?? 0)} won
+                </div>
+              )}
             </div>
           );
         })}
