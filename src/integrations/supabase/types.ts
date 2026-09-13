@@ -21,8 +21,10 @@ export type Database = {
           home: string
           home_score: number | null
           id: string
+          kickoff: string | null
           slot: string
           sort_order: number
+          state: string
           week_num: number
         }
         Insert: {
@@ -31,8 +33,10 @@ export type Database = {
           home: string
           home_score?: number | null
           id: string
+          kickoff?: string | null
           slot?: string
           sort_order?: number
+          state?: string
           week_num: number
         }
         Update: {
@@ -41,8 +45,10 @@ export type Database = {
           home?: string
           home_score?: number | null
           id?: string
+          kickoff?: string | null
           slot?: string
           sort_order?: number
+          state?: string
           week_num?: number
         }
         Relationships: [
@@ -77,6 +83,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "league_members_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      league_standings: {
+        Row: {
+          correct: number
+          id: string
+          league_id: string
+          missed: number
+          rank: number
+          submitted: boolean
+          tb_diff: number | null
+          updated_at: string
+          user_id: string
+          week_num: number
+        }
+        Insert: {
+          correct?: number
+          id?: string
+          league_id: string
+          missed?: number
+          rank?: number
+          submitted?: boolean
+          tb_diff?: number | null
+          updated_at?: string
+          user_id: string
+          week_num: number
+        }
+        Update: {
+          correct?: number
+          id?: string
+          league_id?: string
+          missed?: number
+          rank?: number
+          submitted?: boolean
+          tb_diff?: number | null
+          updated_at?: string
+          user_id?: string
+          week_num?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_standings_league_id_fkey"
             columns: ["league_id"]
             isOneToOne: false
             referencedRelation: "leagues"
@@ -207,6 +260,11 @@ export type Database = {
         Returns: boolean
       }
       join_league_by_code: { Args: { _code: string }; Returns: string }
+      recompute_all_league_standings: { Args: never; Returns: number }
+      recompute_league_standings: {
+        Args: { _league_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

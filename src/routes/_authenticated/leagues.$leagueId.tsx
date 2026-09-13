@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ClipboardList, Settings, Trophy, Users } from "lucide-react";
 
-import { fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { refreshNfl } from "@/lib/nfl.functions";
 import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";
 import { MembersPanel } from "@/components/pool/MembersPanel";
 import { SchedulePanel } from "@/components/pool/SchedulePanel";
+
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   head: () => ({
@@ -36,8 +39,34 @@ const TABS: { id: Tab; label: string; icon: typeof Trophy }[] = [
 function LeaguePage() {
   const { leagueId } = Route.useParams();
   const { user } = Route.useRouteContext();
+  const queryClient = useQueryClient();
+  const refresh = useServerFn(refreshNfl);
   const [tab, setTab] = useState<Tab>("picks");
-  const [week, setWeek] = useState(1);
+  const [week, setWeek] = useState<number | null>(null);
+
+  // Keep the real NFL schedule, scores and standings fresh in the background.
+  const sync = useQuery({
+    queryKey: ["nfl-sync"],
+    queryFn: () => refresh({ data: {} }),
+    staleTime: 120_000,
+    refetchInterval: 120_000,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!sync.dataUpdatedAt) return;
+    queryClient.invalidateQueries({ queryKey: ["week"] });
+    queryClient.invalidateQueries({ queryKey: ["all-weeks"] });
+    queryClient.invalidateQueries({ queryKey: ["standings"] });
+  }, [sync.dataUpdatedAt, queryClient]);
+
+  const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+
+  useEffect(() => {
+    if (week == null && currentWeek.data) setWeek(currentWeek.data);
+  }, [currentWeek.data, week]);
+
+  const activeWeek = week ?? currentWeek.data ?? 1;
 
   const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
   const members = useQuery({
@@ -68,7 +97,7 @@ function LeaguePage() {
           </label>
           <select
             id="week"
-            value={week}
+            value={activeWeek}
             onChange={(e) => setWeek(Number(e.target.value))}
             className="w-28 rounded-md border border-input bg-card px-3 py-2.5 text-sm"
           >
@@ -95,9 +124,9 @@ function LeaguePage() {
         ))}
       </div>
 
-      {tab === "picks" && <PicksPanel leagueId={leagueId} week={week} userId={user.id} />}
+      {tab === "picks" && <PicksPanel leagueId={leagueId} week={activeWeek} userId={user.id} />}
       {tab === "standings" && (
-        <StandingsPanel leagueId={leagueId} week={week} members={members.data ?? []} />
+        <StandingsPanel leagueId={leagueId} week={activeWeek} />
       )}
       {tab === "members" && (
         <MembersPanel
@@ -107,7 +136,7 @@ function LeaguePage() {
           currentUserId={user.id}
         />
       )}
-      {tab === "schedule" && <SchedulePanel week={week} />}
+      {tab === "schedule" && <SchedulePanel week={activeWeek} />}
     </div>
   );
 }

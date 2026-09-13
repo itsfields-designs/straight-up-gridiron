@@ -11,7 +11,10 @@ export type Game = {
   sort_order: number;
   away_score: number | null;
   home_score: number | null;
+  kickoff: string | null;
+  state: string;
 };
+
 
 export type Week = {
   week_num: number;
@@ -100,7 +103,7 @@ export async function fetchWeek(weekNum: number): Promise<{ week: Week | null; g
   if (!week) return { week: null, games: [] };
   const { data: games, error: ge } = await supabase
     .from("games")
-    .select("id, week_num, away, home, slot, sort_order, away_score, home_score")
+    .select("id, week_num, away, home, slot, sort_order, away_score, home_score, kickoff, state")
     .eq("week_num", weekNum)
     .order("sort_order", { ascending: true });
   if (ge) throw ge;
@@ -112,7 +115,7 @@ export async function fetchAllWeeks(): Promise<{ weeks: Week[]; games: Game[] }>
     supabase.from("weeks").select("week_num, label, tiebreaker_game_id, locked").order("week_num"),
     supabase
       .from("games")
-      .select("id, week_num, away, home, slot, sort_order, away_score, home_score")
+      .select("id, week_num, away, home, slot, sort_order, away_score, home_score, kickoff, state")
       .order("sort_order"),
   ]);
   if (we) throw we;
@@ -219,4 +222,60 @@ export function computeStandings(
     return a.username.localeCompare(b.username);
   });
   return rows;
+}
+
+// ---- stored standings ------------------------------------------------------
+export type StoredStanding = {
+  userId: string;
+  username: string;
+  rank: number;
+  correct: number;
+  missed: number;
+  tbDiff: number | null;
+  submitted: boolean;
+  updatedAt: string;
+};
+
+/** Reads pre-calculated standings. weekNum 0 = season total. */
+export async function fetchStandings(
+  leagueId: string,
+  weekNum: number,
+): Promise<StoredStanding[]> {
+  const { data, error } = await supabase
+    .from("league_standings")
+    .select("user_id, rank, correct, missed, tb_diff, submitted, updated_at")
+    .eq("league_id", leagueId)
+    .eq("week_num", weekNum)
+    .order("rank", { ascending: true });
+  if (error) throw error;
+  const rows = data ?? [];
+  if (!rows.length) return [];
+  const { data: profiles, error: pe } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", rows.map((r) => r.user_id));
+  if (pe) throw pe;
+  const byId = new Map((profiles ?? []).map((p) => [p.id, p.username]));
+  return rows.map((r) => ({
+    userId: r.user_id,
+    username: byId.get(r.user_id) ?? "Unknown player",
+    rank: r.rank,
+    correct: r.correct,
+    missed: r.missed,
+    tbDiff: r.tb_diff,
+    submitted: r.submitted,
+    updatedAt: r.updated_at,
+  }));
+}
+
+/** The earliest week that still has an unfinished game (defaults to week 1). */
+export async function fetchCurrentWeek(): Promise<number> {
+  const { data, error } = await supabase
+    .from("games")
+    .select("week_num, state")
+    .neq("state", "post")
+    .order("week_num", { ascending: true })
+    .limit(1);
+  if (error) throw error;
+  return data?.[0]?.week_num ?? TOTAL_WEEKS;
 }
