@@ -33,16 +33,12 @@ function LeagueHub() {
   const [code, setCode] = useState("");
 
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
+  const createLeagueFn = useServerFn(createLeague);
+  const joinLeagueFn = useServerFn(joinLeague);
 
   const create = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("create_league", {
-        _name: name.trim(),
-        _rules: rules.trim(),
-      });
-      if (error) throw error;
-      return data as string;
-    },
+    mutationFn: async () =>
+      await createLeagueFn({ data: { name: name.trim(), rules: rules.trim() } }),
     onSuccess: (id) => {
       setPanel("none");
       setName("");
