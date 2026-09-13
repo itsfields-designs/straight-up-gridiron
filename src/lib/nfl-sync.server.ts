@@ -48,7 +48,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function fetchWeek(season: number, week: number, attempt = 0): Promise<EspnEvent[]> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${season}&seasontype=2&week=${week}`;
-  const res = await fetch(url, { headers: { accept: "application/json" } });
+  const res = await fetch(url, { headers: { accept: "application/json", "user-agent": "Mozilla/5.0 (compatible; GridironPool/1.0)" } });
   if (!res.ok) {
     if (attempt < 3) {
       await sleep(500 * (attempt + 1));
