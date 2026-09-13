@@ -157,6 +157,21 @@ function LeaderboardPage() {
         </div>
       </div>
 
+      {activeLeague && (
+        <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          {[
+            { label: "Entry fee", value: activeLeague.entry_fee },
+            { label: "Weekly pot", value: activeLeague.weekly_pot },
+            { label: "Season pot", value: activeLeague.season_pot },
+          ].map((c) => (
+            <div key={c.label} className="rounded-lg border border-border bg-card p-3.5">
+              <div className="text-xs text-faint">{c.label}</div>
+              <div className="font-display text-lg font-medium">{money(c.value)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-6 grid gap-2.5 sm:grid-cols-3">
         {PODIUM.map((slot, i) => {
           const row = top[i];
