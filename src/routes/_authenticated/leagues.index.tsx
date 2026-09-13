@@ -4,7 +4,9 @@ import { useState } from "react";
 import { ChevronRight, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+
+import { createLeague, joinLeague } from "@/lib/leagues.functions";
 import { fetchMyLeagues } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/leagues/")({
