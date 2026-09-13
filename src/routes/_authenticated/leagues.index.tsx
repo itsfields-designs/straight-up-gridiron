@@ -49,11 +49,7 @@ function LeagueHub() {
   });
 
   const join = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("join_league_by_code", { _code: code.trim() });
-      if (error) throw error;
-      return data as string;
-    },
+    mutationFn: async () => await joinLeagueFn({ data: { code: code.trim() } }),
     onSuccess: (id) => {
       setPanel("none");
       setCode("");
