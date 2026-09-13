@@ -141,7 +141,7 @@ export function MembersPanel({
       {isOwner ? (
         <div>
           <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-            <Shield size={14} /> League rules
+            <Shield size={14} /> Commissioner settings
           </h2>
           <textarea
             rows={3}
@@ -149,11 +149,32 @@ export function MembersPanel({
             onChange={(e) => setRules(e.target.value)}
             className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { label: "Entry fee", value: entryFee, set: setEntryFee },
+              { label: "Weekly pot", value: weeklyPot, set: setWeeklyPot },
+              { label: "Season pot", value: seasonPot, set: setSeasonPot },
+            ].map((f) => (
+              <label key={f.label} className="block">
+                <span className="mb-1 block text-xs text-faint">{f.label} ($)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={f.value}
+                  onChange={(e) => f.set(e.target.value)}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </label>
+            ))}
+          </div>
           <button
             onClick={() => saveRules.mutate()}
-            className="mt-2 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+            disabled={saveRules.isPending}
+            className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
-            Save rules
+            {saveRules.isPending ? "Saving…" : "Save settings"}
           </button>
         </div>
       ) : (
