@@ -2,7 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Banknote, ClipboardList, Settings, Trophy, Users, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  Banknote,
+  ClipboardList,
+  MessageSquare,
+  Settings,
+  Trophy,
+  Users,
+  Wallet,
+} from "lucide-react";
 
 import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
 import { refreshNfl } from "@/lib/nfl.functions";
@@ -13,6 +22,7 @@ import { MembersPanel } from "@/components/pool/MembersPanel";
 import { SchedulePanel } from "@/components/pool/SchedulePanel";
 import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
+import { ChatPanel } from "@/components/pool/ChatPanel";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
@@ -30,13 +40,14 @@ export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   component: LeaguePage,
 });
 
-type Tab = "picks" | "standings" | "pot" | "cash" | "members" | "schedule";
+type Tab = "picks" | "standings" | "pot" | "cash" | "chat" | "members" | "schedule";
 
 const TABS: { id: Tab; label: string; icon: typeof Trophy }[] = [
   { id: "picks", label: "Make picks", icon: ClipboardList },
   { id: "standings", label: "Standings", icon: Trophy },
   { id: "pot", label: "Pot & payouts", icon: Banknote },
   { id: "cash", label: "Cash pool", icon: Wallet },
+  { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "members", label: "Members", icon: Users },
   { id: "schedule", label: "Schedule & results", icon: Settings },
 ];
@@ -145,6 +156,9 @@ function LeaguePage() {
       )}
       {tab === "cash" && (
         <CashPanel league={league.data} members={members.data ?? []} currentUserId={user.id} />
+      )}
+      {tab === "chat" && (
+        <ChatPanel league={league.data} isOwner={isOwner} currentUserId={user.id} />
       )}
       {tab === "members" && (
         <MembersPanel

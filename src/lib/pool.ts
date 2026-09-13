@@ -39,6 +39,7 @@ export type League = {
   entry_fee: number;
   weekly_pot: number;
   season_pot: number;
+  chat_locked: boolean;
 };
 
 export type Member = { user_id: string; username: string };
@@ -60,7 +61,7 @@ export async function fetchMyLeagues(): Promise<League[]> {
   if (!ids.length) return [];
   const { data, error } = await supabase
     .from("leagues")
-    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot")
+    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot, chat_locked")
     .in("id", ids)
     .order("created_at", { ascending: true });
   if (error) throw error;
@@ -70,7 +71,7 @@ export async function fetchMyLeagues(): Promise<League[]> {
 export async function fetchLeague(leagueId: string): Promise<League> {
   const { data, error } = await supabase
     .from("leagues")
-    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot")
+    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot, chat_locked")
     .eq("id", leagueId)
     .maybeSingle();
   if (error) throw error;
@@ -455,4 +456,61 @@ export function cashBalances(txns: CashTxn[], payouts: Payout[]) {
   }
   for (const p of payouts) get(p.userId).won += p.amount;
   return map;
+}
+
+// ---- league chat -----------------------------------------------------------
+export type ChatMessage = {
+  id: string;
+  userId: string;
+  username: string;
+  body: string;
+  pinned: boolean;
+  createdAt: string;
+};
+
+export async function fetchMessages(leagueId: string): Promise<ChatMessage[]> {
+  const { data, error } = await supabase
+    .from("league_messages")
+    .select("id, user_id, body, pinned, created_at")
+    .eq("league_id", leagueId)
+    .order("created_at", { ascending: true })
+    .limit(500);
+  if (error) throw error;
+  const rows = data ?? [];
+  const names = await usernames(rows.map((r) => r.user_id));
+  return rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    username: names.get(r.user_id) ?? "Unknown player",
+    body: r.body,
+    pinned: r.pinned,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function sendMessage(args: { leagueId: string; userId: string; body: string }) {
+  const { error } = await supabase.from("league_messages").insert({
+    league_id: args.leagueId,
+    user_id: args.userId,
+    body: args.body,
+  });
+  if (error) throw error;
+}
+
+export async function deleteMessage(id: string) {
+  const { error } = await supabase.from("league_messages").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function setMessagePinned(id: string, pinned: boolean) {
+  const { error } = await supabase.from("league_messages").update({ pinned }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function setChatLocked(leagueId: string, locked: boolean) {
+  const { error } = await supabase
+    .from("leagues")
+    .update({ chat_locked: locked })
+    .eq("id", leagueId);
+  if (error) throw error;
 }
