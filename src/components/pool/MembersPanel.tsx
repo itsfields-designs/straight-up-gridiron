@@ -96,6 +96,19 @@ export function MembersPanel({
         </button>
       </div>
 
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Entry fee", value: league.entry_fee },
+          { label: "Weekly pot", value: league.weekly_pot },
+          { label: "Season pot", value: league.season_pot },
+        ].map((item) => (
+          <div key={item.label} className="rounded-lg border border-border bg-card p-4">
+            <div className="text-xs text-faint">{item.label}</div>
+            <div className="font-display text-lg font-medium">{money(item.value ?? 0)}</div>
+          </div>
+        ))}
+      </div>
+
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">
           Members ({members.length})
