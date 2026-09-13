@@ -26,22 +26,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const navigate = useNavigate();
-  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/leagues", replace: true });
-      else setChecking(false);
     });
   }, [navigate]);
 
-  if (checking) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
-        Loading…
-      </div>
-    );
-  }
 
   return (
     <main className="min-h-screen">
