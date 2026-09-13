@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ClipboardList, Settings, Trophy, Users } from "lucide-react";
 
-import { fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { refreshNfl } from "@/lib/nfl.functions";
 import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";
 import { MembersPanel } from "@/components/pool/MembersPanel";
 import { SchedulePanel } from "@/components/pool/SchedulePanel";
+
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   head: () => ({
