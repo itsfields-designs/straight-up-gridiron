@@ -8,13 +8,13 @@ import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Gridiron Pool — weekly NFL pick'em for your league" },
+      { title: "Gridiron Gods — weekly NFL pick'em for your league" },
       {
         name: "description",
         content:
           "Create a league, invite friends with a code, pick every NFL game straight up and watch the standings settle it.",
       },
-      { property: "og:title", content: "Gridiron Pool — weekly NFL pick'em for your league" },
+      { property: "og:title", content: "Gridiron Gods — weekly NFL pick'em for your league" },
       {
         property: "og:description",
         content:
