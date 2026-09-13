@@ -255,6 +255,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_create_league: {
+        Args: { _name: string; _rules: string; _user_id: string }
+        Returns: string
+      }
+      admin_join_league_by_code: {
+        Args: { _code: string; _user_id: string }
+        Returns: string
+      }
       generate_league_code: { Args: never; Returns: string }
       recompute_all_league_standings: { Args: never; Returns: number }
       recompute_league_standings: {
