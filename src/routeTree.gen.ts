@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
@@ -30,6 +32,17 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeaguesIndexRoute =
   AuthenticatedLeaguesIndexRouteImport.update({
     id: '/leagues/',
@@ -51,6 +64,8 @@ const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -58,6 +73,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
@@ -67,6 +84,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -74,14 +93,29 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/leagues/$leagueId' | '/api/public/nfl-sync' | '/leagues/'
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/leaderboard'
+    | '/leagues/$leagueId'
+    | '/api/public/nfl-sync'
+    | '/leagues/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/leagues/$leagueId' | '/api/public/nfl-sync' | '/leagues'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/leaderboard'
+    | '/leagues/$leagueId'
+    | '/api/public/nfl-sync'
+    | '/leagues'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/leaderboard'
     | '/_authenticated/leagues/$leagueId'
     | '/api/public/nfl-sync'
     | '/_authenticated/leagues/'
@@ -117,6 +151,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leagues/': {
       id: '/_authenticated/leagues/'
       path: '/leagues'
@@ -142,11 +190,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedLeaguesLeagueIdRoute: typeof AuthenticatedLeaguesLeagueIdRoute
   AuthenticatedLeaguesIndexRoute: typeof AuthenticatedLeaguesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedLeaguesLeagueIdRoute: AuthenticatedLeaguesLeagueIdRoute,
   AuthenticatedLeaguesIndexRoute: AuthenticatedLeaguesIndexRoute,
 }

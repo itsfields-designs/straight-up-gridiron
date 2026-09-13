@@ -87,7 +87,14 @@
   --sidebar-accent-foreground: oklch(0.43 0.09 70);
   --sidebar-border: oklch(0.884 0.019 95);
   --sidebar-ring: oklch(0.585 0.125 70);
+  --chart-1: oklch(0.585 0.125 70);
+  --chart-2: oklch(0.4 0.077 160);
+  --chart-3: oklch(0.55 0.11 30);
+  --chart-4: oklch(0.52 0.09 250);
+  --chart-5: oklch(0.55 0.1 320);
+  --chart-6: oklch(0.5 0.1 200);
 }
+
 
 @layer base {
   * {
