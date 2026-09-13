@@ -255,28 +255,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_league: {
-        Args: { _name: string; _rules: string }
+      admin_create_league: {
+        Args: { _name: string; _rules: string; _user_id: string }
+        Returns: string
+      }
+      admin_join_league_by_code: {
+        Args: { _code: string; _user_id: string }
         Returns: string
       }
       generate_league_code: { Args: never; Returns: string }
-      is_league_member: {
-        Args: { _league_id: string; _user_id: string }
-        Returns: boolean
-      }
-      is_league_owner: {
-        Args: { _league_id: string; _user_id: string }
-        Returns: boolean
-      }
-      join_league_by_code: { Args: { _code: string }; Returns: string }
       recompute_all_league_standings: { Args: never; Returns: number }
       recompute_league_standings: {
         Args: { _league_id: string }
         Returns: undefined
-      }
-      shares_league_with_me: {
-        Args: { _other_user_id: string }
-        Returns: boolean
       }
     }
     Enums: {

@@ -4,7 +4,9 @@ import { useState } from "react";
 import { ChevronRight, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+
+import { createLeague, joinLeague } from "@/lib/leagues.functions";
 import { fetchMyLeagues } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/leagues/")({
@@ -31,16 +33,12 @@ function LeagueHub() {
   const [code, setCode] = useState("");
 
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
+  const createLeagueFn = useServerFn(createLeague);
+  const joinLeagueFn = useServerFn(joinLeague);
 
   const create = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("create_league", {
-        _name: name.trim(),
-        _rules: rules.trim(),
-      });
-      if (error) throw error;
-      return data as string;
-    },
+    mutationFn: async () =>
+      await createLeagueFn({ data: { name: name.trim(), rules: rules.trim() } }),
     onSuccess: (id) => {
       setPanel("none");
       setName("");
@@ -51,11 +49,7 @@ function LeagueHub() {
   });
 
   const join = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("join_league_by_code", { _code: code.trim() });
-      if (error) throw error;
-      return data as string;
-    },
+    mutationFn: async () => await joinLeagueFn({ data: { code: code.trim() } }),
     onSuccess: (id) => {
       setPanel("none");
       setCode("");
