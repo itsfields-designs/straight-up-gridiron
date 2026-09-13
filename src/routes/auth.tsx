@@ -6,9 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    mode: search['mode'] === "login" ? ("login" as const) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "login" | "signup" } =>
+    search['mode'] === "login" ? { mode: "login" } : {},
   head: () => ({
     meta: [
       { title: "Log in — Gridiron Pool" },
