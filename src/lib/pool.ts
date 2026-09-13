@@ -279,3 +279,35 @@ export async function fetchCurrentWeek(): Promise<number> {
   if (error) throw error;
   return data?.[0]?.week_num ?? TOTAL_WEEKS;
 }
+
+export type WeeklyStanding = StoredStanding & { weekNum: number };
+
+/** Every stored weekly row for a league (week 1+), with usernames attached. */
+export async function fetchWeeklyStandings(leagueId: string): Promise<WeeklyStanding[]> {
+  const { data, error } = await supabase
+    .from("league_standings")
+    .select("user_id, week_num, rank, correct, missed, tb_diff, submitted, updated_at")
+    .eq("league_id", leagueId)
+    .gt("week_num", 0)
+    .order("week_num", { ascending: true });
+  if (error) throw error;
+  const rows = data ?? [];
+  if (!rows.length) return [];
+  const { data: profiles, error: pe } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", Array.from(new Set(rows.map((r) => r.user_id))));
+  if (pe) throw pe;
+  const byId = new Map((profiles ?? []).map((p) => [p.id, p.username]));
+  return rows.map((r) => ({
+    userId: r.user_id,
+    username: byId.get(r.user_id) ?? "Unknown player",
+    weekNum: r.week_num,
+    rank: r.rank,
+    correct: r.correct,
+    missed: r.missed,
+    tbDiff: r.tb_diff,
+    submitted: r.submitted,
+    updatedAt: r.updated_at,
+  }));
+}
