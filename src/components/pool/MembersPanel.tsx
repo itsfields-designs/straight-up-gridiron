@@ -52,14 +52,24 @@ export function MembersPanel({
 
   const saveRules = useMutation({
     mutationFn: async () => {
+      const num = (v: string) => {
+        const n = Number(v);
+        if (!Number.isFinite(n) || n < 0) throw new Error("Amounts must be zero or more");
+        return Math.round(n * 100) / 100;
+      };
       const { error } = await supabase
         .from("leagues")
-        .update({ rules })
+        .update({
+          rules,
+          entry_fee: num(entryFee),
+          weekly_pot: num(weeklyPot),
+          season_pot: num(seasonPot),
+        })
         .eq("id", league.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Rules updated");
+      toast.success("League settings updated");
       queryClient.invalidateQueries({ queryKey: ["league", league.id] });
     },
     onError: (e: Error) => toast.error(e.message),
