@@ -6,6 +6,7 @@ import { ArrowLeft, ClipboardList, Settings, Trophy, Users } from "lucide-react"
 
 import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
 import { refreshNfl } from "@/lib/nfl.functions";
+import { useLiveScores } from "@/hooks/useLiveScores";
 import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";
 import { MembersPanel } from "@/components/pool/MembersPanel";
@@ -44,12 +45,13 @@ function LeaguePage() {
   const [tab, setTab] = useState<Tab>("picks");
   const [week, setWeek] = useState<number | null>(null);
 
-  // Keep the real NFL schedule, scores and standings fresh in the background.
+  // Scores stream in live; this is just a backstop pull when someone opens the page.
+  useLiveScores();
   const sync = useQuery({
     queryKey: ["nfl-sync"],
     queryFn: () => refresh({ data: {} }),
-    staleTime: 120_000,
-    refetchInterval: 120_000,
+    staleTime: 300_000,
+    refetchInterval: 300_000,
     retry: false,
   });
 
