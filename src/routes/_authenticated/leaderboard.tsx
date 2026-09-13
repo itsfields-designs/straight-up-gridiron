@@ -13,7 +13,13 @@ import {
   YAxis,
 } from "recharts";
 
-import { fetchMyLeagues, fetchStandings, fetchWeeklyStandings } from "@/lib/pool";
+import {
+  fetchMyLeagues,
+  fetchPayouts,
+  fetchStandings,
+  fetchWeeklyStandings,
+  money,
+} from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
