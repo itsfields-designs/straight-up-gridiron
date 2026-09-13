@@ -265,6 +265,10 @@ export type Database = {
         Args: { _league_id: string }
         Returns: undefined
       }
+      shares_league_with_me: {
+        Args: { _other_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
