@@ -73,9 +73,17 @@ export async function syncNflSchedule(weekNums?: number[]): Promise<SyncResult> 
     ? weekNums
     : Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1);
 
-  const results = await Promise.all(
-    weeks.map(async (w) => ({ week: w, events: await fetchWeek(season, w) })),
-  );
+  // Fetched in small batches so the public feed doesn't rate-limit us.
+  const results: { week: number; events: EspnEvent[] }[] = [];
+  for (let i = 0; i < weeks.length; i += 3) {
+    const batch = weeks.slice(i, i + 3);
+    results.push(
+      ...(await Promise.all(
+        batch.map(async (w) => ({ week: w, events: await fetchWeek(season, w) })),
+      )),
+    );
+  }
+
 
   let gameCount = 0;
 
