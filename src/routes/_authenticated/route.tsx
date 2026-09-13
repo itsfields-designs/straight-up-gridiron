@@ -61,6 +61,7 @@ function AuthedLayout() {
               </Link>
             </nav>
             <span className="hidden text-muted-foreground sm:inline">{user.email}</span>
+            <button
 
               onClick={signOut}
               className="flex items-center gap-1.5 rounded-md border border-border-strong px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary"
