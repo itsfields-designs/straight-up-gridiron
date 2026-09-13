@@ -131,6 +131,44 @@ export type Database = {
           },
         ]
       }
+      league_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          league_id: string
+          pinned: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          league_id: string
+          pinned?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          league_id?: string
+          pinned?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_messages_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       league_standings: {
         Row: {
           correct: number
@@ -180,6 +218,7 @@ export type Database = {
       }
       leagues: {
         Row: {
+          chat_locked: boolean
           code: string
           created_at: string
           entry_fee: number
@@ -191,6 +230,7 @@ export type Database = {
           weekly_pot: number
         }
         Insert: {
+          chat_locked?: boolean
           code: string
           created_at?: string
           entry_fee?: number
@@ -202,6 +242,7 @@ export type Database = {
           weekly_pot?: number
         }
         Update: {
+          chat_locked?: boolean
           code?: string
           created_at?: string
           entry_fee?: number
