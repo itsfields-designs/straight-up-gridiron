@@ -185,6 +185,11 @@ function LeaderboardPage() {
               <div className="text-sm text-muted-foreground tabular-nums">
                 {row ? `${row.correct}-${row.missed} this season` : "No results yet"}
               </div>
+              {row && (
+                <div className="text-sm tabular-nums text-accent-soft-foreground">
+                  {money(wonBy.get(row.userId) ?? 0)} won
+                </div>
+              )}
             </div>
           );
         })}
