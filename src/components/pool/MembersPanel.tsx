@@ -22,6 +22,12 @@ export function MembersPanel({
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [rules, setRules] = useState(league.rules);
+  const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
+  const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
+  const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
+
+  const money = (v: number | string) =>
+    `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const remove = useMutation({
     mutationFn: async (userId: string) => {
