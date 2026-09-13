@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Trophy, ClipboardList, Users } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
