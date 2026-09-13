@@ -514,3 +514,71 @@ export async function setChatLocked(leagueId: string, locked: boolean) {
     .eq("id", leagueId);
   if (error) throw error;
 }
+
+// ---- league bank -----------------------------------------------------------
+export type BankDeposit = {
+  id: string;
+  amount: number;
+  note: string;
+  createdBy: string;
+  createdByName: string;
+  createdAt: string;
+};
+
+export async function fetchBankDeposits(leagueId: string): Promise<BankDeposit[]> {
+  const { data, error } = await supabase
+    .from("league_bank_deposits")
+    .select("id, amount, note, created_by, created_at")
+    .eq("league_id", leagueId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = data ?? [];
+  const names = await usernames(rows.map((r) => r.created_by));
+  return rows.map((r) => ({
+    id: r.id,
+    amount: Number(r.amount),
+    note: r.note,
+    createdBy: r.created_by,
+    createdByName: names.get(r.created_by) ?? "Commissioner",
+    createdAt: r.created_at,
+  }));
+}
+
+export async function addBankDeposit(args: {
+  leagueId: string;
+  createdBy: string;
+  amount: number;
+  note: string;
+}) {
+  const { error } = await supabase.from("league_bank_deposits").insert({
+    league_id: args.leagueId,
+    created_by: args.createdBy,
+    amount: args.amount,
+    note: args.note,
+  });
+  if (error) throw error;
+}
+
+export async function deleteBankDeposit(id: string) {
+  const { error } = await supabase.from("league_bank_deposits").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Money the league bank holds: commissioner + member deposits − withdrawals − payouts. */
+export function bankSummary(deposits: BankDeposit[], txns: CashTxn[], payouts: Payout[]) {
+  const commissioner = deposits.reduce((s, d) => s + d.amount, 0);
+  const memberDeposits = txns
+    .filter((t) => t.kind === "deposit")
+    .reduce((s, t) => s + t.amount, 0);
+  const withdrawals = txns
+    .filter((t) => t.kind === "withdrawal")
+    .reduce((s, t) => s + t.amount, 0);
+  const paid = payouts.reduce((s, p) => s + p.amount, 0);
+  return {
+    commissioner,
+    memberDeposits,
+    withdrawals,
+    paid,
+    balance: commissioner + memberDeposits - withdrawals - paid,
+  };
+}

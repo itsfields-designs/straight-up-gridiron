@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Banknote,
   ClipboardList,
+  Landmark,
   MessageSquare,
   Settings,
   Trophy,
@@ -23,6 +24,7 @@ import { SchedulePanel } from "@/components/pool/SchedulePanel";
 import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
 import { ChatPanel } from "@/components/pool/ChatPanel";
+import { BankPanel } from "@/components/pool/BankPanel";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
@@ -40,13 +42,14 @@ export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
   component: LeaguePage,
 });
 
-type Tab = "picks" | "standings" | "pot" | "cash" | "chat" | "members" | "schedule";
+type Tab = "picks" | "standings" | "pot" | "cash" | "bank" | "chat" | "members" | "schedule";
 
 const TABS: { id: Tab; label: string; icon: typeof Trophy }[] = [
   { id: "picks", label: "Make picks", icon: ClipboardList },
   { id: "standings", label: "Standings", icon: Trophy },
   { id: "pot", label: "Pot & payouts", icon: Banknote },
   { id: "cash", label: "Cash pool", icon: Wallet },
+  { id: "bank", label: "League bank", icon: Landmark },
   { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "members", label: "Members", icon: Users },
   { id: "schedule", label: "Schedule & results", icon: Settings },
@@ -156,6 +159,9 @@ function LeaguePage() {
       )}
       {tab === "cash" && (
         <CashPanel league={league.data} members={members.data ?? []} currentUserId={user.id} />
+      )}
+      {tab === "bank" && (
+        <BankPanel league={league.data} isOwner={isOwner} currentUserId={user.id} />
       )}
       {tab === "chat" && (
         <ChatPanel league={league.data} isOwner={isOwner} currentUserId={user.id} />

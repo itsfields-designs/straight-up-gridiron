@@ -44,7 +44,10 @@ export function CashPanel({
   const balances = cashBalances(allTxns, allPayouts);
   const rankOf = new Map((standings.data ?? []).map((s) => [s.userId, s]));
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
+    queryClient.invalidateQueries({ queryKey: ["bank", league.id] });
+  };
 
   const create = useMutation({
     mutationFn: async () => {

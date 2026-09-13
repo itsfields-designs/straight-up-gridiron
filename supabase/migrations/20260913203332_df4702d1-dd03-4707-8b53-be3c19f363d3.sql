@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.tg_bank_guard() FROM PUBLIC, anon, authenticated;
