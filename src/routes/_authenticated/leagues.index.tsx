@@ -12,9 +12,9 @@ import { fetchMyLeagues } from "@/lib/pool";
 export const Route = createFileRoute("/_authenticated/leagues/")({
   head: () => ({
     meta: [
-      { title: "Your leagues — Gridiron Pool" },
+      { title: "Your leagues — Gridiron Gods" },
       { name: "description", content: "Your NFL pick'em leagues and invites." },
-      { property: "og:title", content: "Your leagues — Gridiron Pool" },
+      { property: "og:title", content: "Your leagues — Gridiron Gods" },
       { property: "og:description", content: "Your NFL pick'em leagues and invites." },
     ],
   }),

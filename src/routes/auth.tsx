@@ -10,10 +10,10 @@ export const Route = createFileRoute("/auth")({
     search['mode'] === "login" ? { mode: "login" } : {},
   head: () => ({
     meta: [
-      { title: "Log in — Gridiron Pool" },
-      { name: "description", content: "Log in or create your Gridiron Pool account." },
-      { property: "og:title", content: "Log in — Gridiron Pool" },
-      { property: "og:description", content: "Log in or create your Gridiron Pool account." },
+      { title: "Log in — Gridiron Gods" },
+      { name: "description", content: "Log in or create your Gridiron Gods account." },
+      { property: "og:title", content: "Log in — Gridiron Gods" },
+      { property: "og:description", content: "Log in or create your Gridiron Gods account." },
     ],
   }),
   component: AuthPage,
@@ -87,7 +87,7 @@ function AuthPage() {
           <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Trophy size={20} />
           </span>
-          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Pool</h1>
+          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Gods</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick winners straight up. Beat your league.
           </p>

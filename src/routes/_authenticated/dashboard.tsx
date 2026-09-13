@@ -8,12 +8,12 @@ import { useLiveScores } from "@/hooks/useLiveScores";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Gridiron Pool" },
+      { title: "Dashboard — Gridiron Gods" },
       {
         name: "description",
         content: "All your NFL pick'em leagues, the current week, and standings at a glance.",
       },
-      { property: "og:title", content: "Dashboard — Gridiron Pool" },
+      { property: "og:title", content: "Dashboard — Gridiron Gods" },
       {
         property: "og:description",
         content: "All your NFL pick'em leagues, the current week, and standings at a glance.",
