@@ -1,41 +1,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  computeStandings,
-  fetchAllWeeks,
-  fetchPickEntries,
-  type Member,
-} from "@/lib/pool";
+import { fetchStandings } from "@/lib/pool";
 
-export function StandingsPanel({
-  leagueId,
-  week,
-  members,
-}: {
-  leagueId: string;
-  week: number;
-  members: Member[];
-}) {
+export function StandingsPanel({ leagueId, week }: { leagueId: string; week: number }) {
   const [mode, setMode] = useState<"season" | "week">("season");
+  const weekNum = mode === "season" ? 0 : week;
 
-  const schedule = useQuery({ queryKey: ["all-weeks"], queryFn: fetchAllWeeks });
-  const entries = useQuery({
-    queryKey: ["picks", leagueId, "all"],
-    queryFn: () => fetchPickEntries(leagueId),
+  const standings = useQuery({
+    queryKey: ["standings", leagueId, weekNum],
+    queryFn: () => fetchStandings(leagueId, weekNum),
   });
 
-  const loading = schedule.isLoading || entries.isLoading;
-
-  const weeks = (schedule.data?.weeks ?? []).filter((w) =>
-    mode === "week" ? w.week_num === week : true,
-  );
-  const games = (schedule.data?.games ?? []).filter((g) =>
-    mode === "week" ? g.week_num === week : true,
-  );
-  const rows = loading
-    ? []
-    : computeStandings(members, weeks, games, entries.data ?? []);
+  const rows = standings.data ?? [];
+  const updatedAt = rows[0]?.updatedAt;
 
   return (
     <div>
@@ -53,8 +31,8 @@ export function StandingsPanel({
         ))}
       </div>
 
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Calculating standings…</p>
+      {standings.isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading standings…</p>
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <table className="w-full text-sm">
@@ -67,9 +45,9 @@ export function StandingsPanel({
               </tr>
             </thead>
             <tbody>
-              {rows.map((r, i) => (
+              {rows.map((r) => (
                 <tr key={r.userId} className="border-t border-border">
-                  <td className="px-4 py-2.5 text-muted-foreground">{i + 1}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{r.rank}</td>
                   <td className="px-4 py-2.5 font-medium">{r.username}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums">
                     {r.correct}-{r.missed}
@@ -91,8 +69,9 @@ export function StandingsPanel({
         </div>
       )}
       <p className="mt-3 text-xs text-faint">
-        Ranked by most correct picks; the total-points guess on the tiebreaker game (smallest
-        difference from the actual combined score) breaks ties.
+        Standings update on their own as final scores come in. Ranked by most correct picks; the
+        total-points guess on the tiebreaker game breaks ties.
+        {updatedAt ? ` Last updated ${new Date(updatedAt).toLocaleString()}.` : ""}
       </p>
     </div>
   );
