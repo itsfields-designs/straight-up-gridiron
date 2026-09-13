@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
+import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,17 +42,24 @@ const AuthenticatedLeaguesLeagueIdRoute =
     path: '/leagues/$leagueId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
+  id: '/api/public/nfl-sync',
+  path: '/api/public/nfl-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRoutesById {
@@ -60,19 +68,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/leagues/$leagueId' | '/leagues/'
+  fullPaths:
+    '/' | '/auth' | '/leagues/$leagueId' | '/api/public/nfl-sync' | '/leagues/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/leagues/$leagueId' | '/leagues'
+  to: '/' | '/auth' | '/leagues/$leagueId' | '/api/public/nfl-sync' | '/leagues'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/leagues/$leagueId'
+    | '/api/public/nfl-sync'
     | '/_authenticated/leagues/'
   fileRoutesById: FileRoutesById
 }
@@ -80,6 +91,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -119,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaguesLeagueIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/nfl-sync': {
+      id: '/api/public/nfl-sync'
+      path: '/api/public/nfl-sync'
+      fullPath: '/api/public/nfl-sync'
+      preLoaderRoute: typeof ApiPublicNflSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -139,6 +158,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
