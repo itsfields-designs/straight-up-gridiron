@@ -37,8 +37,31 @@ function AuthedLayout() {
             <span className="font-display text-lg font-semibold uppercase">Gridiron Pool</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
+            <nav className="flex items-center gap-3">
+              <Link
+                to="/dashboard"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-foreground font-medium" }}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/leagues"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-foreground font-medium" }}
+              >
+                Leagues
+              </Link>
+              <Link
+                to="/leaderboard"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-foreground font-medium" }}
+              >
+                Leaderboard
+              </Link>
+            </nav>
             <span className="hidden text-muted-foreground sm:inline">{user.email}</span>
-            <button
+
               onClick={signOut}
               className="flex items-center gap-1.5 rounded-md border border-border-strong px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary"
             >
