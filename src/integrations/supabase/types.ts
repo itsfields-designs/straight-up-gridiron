@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      cash_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          league_id: string
+          note: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          kind: string
+          league_id: string
+          note?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          league_id?: string
+          note?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_transactions_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           away: string
@@ -172,6 +213,53 @@ export type Database = {
           weekly_pot?: number
         }
         Relationships: []
+      }
+      payouts: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          id: string
+          league_id: string
+          note: string
+          pot_type: string
+          updated_at: string
+          user_id: string
+          week_num: number | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          id?: string
+          league_id: string
+          note?: string
+          pot_type: string
+          updated_at?: string
+          user_id: string
+          week_num?: number | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          league_id?: string
+          note?: string
+          pot_type?: string
+          updated_at?: string
+          user_id?: string
+          week_num?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payouts_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pick_entries: {
         Row: {
