@@ -36,6 +36,9 @@ export type League = {
   rules: string;
   code: string;
   owner_id: string;
+  entry_fee: number;
+  weekly_pot: number;
+  season_pot: number;
 };
 
 export type Member = { user_id: string; username: string };
