@@ -22,6 +22,12 @@ export function MembersPanel({
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [rules, setRules] = useState(league.rules);
+  const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
+  const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
+  const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
+
+  const money = (v: number | string) =>
+    `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const remove = useMutation({
     mutationFn: async (userId: string) => {
@@ -46,14 +52,24 @@ export function MembersPanel({
 
   const saveRules = useMutation({
     mutationFn: async () => {
+      const num = (v: string) => {
+        const n = Number(v);
+        if (!Number.isFinite(n) || n < 0) throw new Error("Amounts must be zero or more");
+        return Math.round(n * 100) / 100;
+      };
       const { error } = await supabase
         .from("leagues")
-        .update({ rules })
+        .update({
+          rules,
+          entry_fee: num(entryFee),
+          weekly_pot: num(weeklyPot),
+          season_pot: num(seasonPot),
+        })
         .eq("id", league.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Rules updated");
+      toast.success("League settings updated");
       queryClient.invalidateQueries({ queryKey: ["league", league.id] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -78,6 +94,19 @@ export function MembersPanel({
         >
           <Copy size={14} /> {copied ? "Copied" : "Copy code"}
         </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Entry fee", value: league.entry_fee },
+          { label: "Weekly pot", value: league.weekly_pot },
+          { label: "Season pot", value: league.season_pot },
+        ].map((item) => (
+          <div key={item.label} className="rounded-lg border border-border bg-card p-4">
+            <div className="text-xs text-faint">{item.label}</div>
+            <div className="font-display text-lg font-medium">{money(item.value ?? 0)}</div>
+          </div>
+        ))}
       </div>
 
       <div>
@@ -112,7 +141,7 @@ export function MembersPanel({
       {isOwner ? (
         <div>
           <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-            <Shield size={14} /> League rules
+            <Shield size={14} /> Commissioner settings
           </h2>
           <textarea
             rows={3}
@@ -120,11 +149,32 @@ export function MembersPanel({
             onChange={(e) => setRules(e.target.value)}
             className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { label: "Entry fee", value: entryFee, set: setEntryFee },
+              { label: "Weekly pot", value: weeklyPot, set: setWeeklyPot },
+              { label: "Season pot", value: seasonPot, set: setSeasonPot },
+            ].map((f) => (
+              <label key={f.label} className="block">
+                <span className="mb-1 block text-xs text-faint">{f.label} ($)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={f.value}
+                  onChange={(e) => f.set(e.target.value)}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </label>
+            ))}
+          </div>
           <button
             onClick={() => saveRules.mutate()}
-            className="mt-2 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+            disabled={saveRules.isPending}
+            className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
-            Save rules
+            {saveRules.isPending ? "Saving…" : "Save settings"}
           </button>
         </div>
       ) : (

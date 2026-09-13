@@ -1,0 +1,4 @@
+ALTER TABLE public.leagues
+  ADD COLUMN IF NOT EXISTS entry_fee numeric(10,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS weekly_pot numeric(10,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS season_pot numeric(10,2) NOT NULL DEFAULT 0;

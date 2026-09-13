@@ -141,26 +141,35 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          entry_fee: number
           id: string
           name: string
           owner_id: string
           rules: string
+          season_pot: number
+          weekly_pot: number
         }
         Insert: {
           code: string
           created_at?: string
+          entry_fee?: number
           id?: string
           name: string
           owner_id: string
           rules?: string
+          season_pot?: number
+          weekly_pot?: number
         }
         Update: {
           code?: string
           created_at?: string
+          entry_fee?: number
           id?: string
           name?: string
           owner_id?: string
           rules?: string
+          season_pot?: number
+          weekly_pot?: number
         }
         Relationships: []
       }
