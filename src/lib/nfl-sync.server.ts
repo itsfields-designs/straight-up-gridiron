@@ -62,6 +62,36 @@ async function fetchWeek(season: number, week: number, attempt = 0): Promise<Esp
 
 
 /**
+ * The weeks worth polling right now: any week that still has a game which is
+ * in progress or kicks off within the next few hours, plus the next unplayed
+ * week so newly released schedule details land. Keeps the scheduled refresh
+ * cheap instead of re-fetching all 18 weeks every two minutes.
+ */
+export async function currentLiveWeeks(): Promise<number[]> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const now = Date.now();
+  const { data, error } = await supabaseAdmin
+    .from("games")
+    .select("week_num, kickoff, state")
+    .order("week_num", { ascending: true });
+  if (error) throw error;
+
+  const weeks = new Set<number>();
+  let nextUpcoming: number | null = null;
+  for (const g of data ?? []) {
+    const t = g.kickoff ? new Date(g.kickoff).getTime() : null;
+    if (g.state === "in") weeks.add(g.week_num);
+    else if (t != null && t <= now + 6 * 3600_000 && t >= now - 6 * 3600_000)
+      weeks.add(g.week_num);
+    else if (g.state !== "post" && t != null && t > now) {
+      if (nextUpcoming == null || g.week_num < nextUpcoming) nextUpcoming = g.week_num;
+    }
+  }
+  if (nextUpcoming != null) weeks.add(nextUpcoming);
+  return [...weeks].sort((a, b) => a - b);
+}
+
+/**
  * Syncs the given weeks (default: the whole 18-week regular season).
  * Scores are only stored once a game is final; in-progress games keep a live
  * score in `state` terms but stay ungraded.
