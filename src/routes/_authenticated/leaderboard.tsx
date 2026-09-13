@@ -127,6 +127,7 @@ function LeaderboardPage() {
     );
 
   const top = (season.data ?? []).slice(0, 3);
+  const activeLeague = leagues.data.find((l) => l.id === activeId);
 
   return (
     <div>
