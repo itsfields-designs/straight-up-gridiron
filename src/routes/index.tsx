@@ -38,11 +38,16 @@ function Index() {
   return (
     <main className="min-h-screen">
       <section className="mx-auto max-w-3xl px-5 py-20 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-soft-foreground">
+        <img
+          src={logoAsset.url}
+          alt="Gridiron Gods"
+          className="mx-auto h-28 w-28 rounded-lg object-cover shadow-lg sm:h-32 sm:w-32"
+        />
+        <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-soft-foreground">
           <Trophy size={14} /> 2026 season
         </span>
         <h1 className="mt-6 text-5xl font-semibold uppercase tracking-tight sm:text-6xl">
-          Gridiron Pool
+          Gridiron Gods
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
           Pick winners straight up every week. Beat your league. No spreads, no points — just who
