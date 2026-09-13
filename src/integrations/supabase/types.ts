@@ -14,13 +14,199 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      games: {
+        Row: {
+          away: string
+          away_score: number | null
+          home: string
+          home_score: number | null
+          id: string
+          slot: string
+          sort_order: number
+          week_num: number
+        }
+        Insert: {
+          away: string
+          away_score?: number | null
+          home: string
+          home_score?: number | null
+          id: string
+          slot?: string
+          sort_order?: number
+          week_num: number
+        }
+        Update: {
+          away?: string
+          away_score?: number | null
+          home?: string
+          home_score?: number | null
+          id?: string
+          slot?: string
+          sort_order?: number
+          week_num?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "games_week_num_fkey"
+            columns: ["week_num"]
+            isOneToOne: false
+            referencedRelation: "weeks"
+            referencedColumns: ["week_num"]
+          },
+        ]
+      }
+      league_members: {
+        Row: {
+          id: string
+          joined_at: string
+          league_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          league_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          league_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_members_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leagues: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          rules: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          rules?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          rules?: string
+        }
+        Relationships: []
+      }
+      pick_entries: {
+        Row: {
+          id: string
+          league_id: string
+          picks: Json
+          tiebreaker: number | null
+          updated_at: string
+          user_id: string
+          week_num: number
+        }
+        Insert: {
+          id?: string
+          league_id: string
+          picks?: Json
+          tiebreaker?: number | null
+          updated_at?: string
+          user_id: string
+          week_num: number
+        }
+        Update: {
+          id?: string
+          league_id?: string
+          picks?: Json
+          tiebreaker?: number | null
+          updated_at?: string
+          user_id?: string
+          week_num?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pick_entries_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      weeks: {
+        Row: {
+          label: string
+          locked: boolean
+          tiebreaker_game_id: string | null
+          week_num: number
+        }
+        Insert: {
+          label: string
+          locked?: boolean
+          tiebreaker_game_id?: string | null
+          week_num: number
+        }
+        Update: {
+          label?: string
+          locked?: boolean
+          tiebreaker_game_id?: string | null
+          week_num?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_league: {
+        Args: { _name: string; _rules: string }
+        Returns: string
+      }
+      generate_league_code: { Args: never; Returns: string }
+      is_league_member: {
+        Args: { _league_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_league_owner: {
+        Args: { _league_id: string; _user_id: string }
+        Returns: boolean
+      }
+      join_league_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
