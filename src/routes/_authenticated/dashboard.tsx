@@ -5,6 +5,7 @@ import { ChevronRight, Plus } from "lucide-react";
 import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { UsernameEditor } from "@/components/UsernameEditor";
+import { MembershipCard } from "@/components/MembershipCard";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -47,7 +48,8 @@ function DashboardPage() {
           : "Here's where you stand in every league."}
       </p>
 
-      <div className="mt-5">
+      <div className="mt-5 grid gap-3">
+        <MembershipCard />
         <UsernameEditor userId={user.id} />
       </div>
 
