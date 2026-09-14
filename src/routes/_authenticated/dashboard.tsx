@@ -47,6 +47,10 @@ function DashboardPage() {
           : "Here's where you stand in every league."}
       </p>
 
+      <div className="mt-5">
+        <UsernameEditor userId={user.id} />
+      </div>
+
       {leagues.isLoading && <p className="mt-6 text-sm text-muted-foreground">Loading…</p>}
 
       {leagues.data?.length === 0 && (
