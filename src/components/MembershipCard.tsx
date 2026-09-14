@@ -33,7 +33,7 @@ export function MembershipCard() {
     setError("");
     setBusy(kind);
     try {
-      const { url } = kind === "checkout" ? await checkout({ data: {} }) : await portal({ data: {} });
+      const { url } = kind === "checkout" ? await checkout() : await portal();
       window.open(url, "_blank", "noopener");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");

@@ -14,7 +14,7 @@ async function stripeClient() {
   const key = process.env["STRIPE_SECRET_KEY"];
   if (!key) throw new Error("Stripe is not connected yet");
   const { default: Stripe } = await import("stripe");
-  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
+  return new Stripe(key);
 }
 
 function origin(): string {
@@ -49,9 +49,10 @@ export const checkMembership = createServerFn({ method: "GET" })
     });
     const sub = subs.data[0];
     if (!sub) return { subscribed: false, subscriptionEnd: null };
+    const periodEnd = sub.items.data[0]?.current_period_end;
     return {
       subscribed: true,
-      subscriptionEnd: new Date(sub.items.data[0]?.current_period_end * 1000).toISOString(),
+      subscriptionEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     };
   });
 
@@ -64,8 +65,7 @@ export const createSznCheckout = createServerFn({ method: "POST" })
     const customer = customers.data[0];
 
     const session = await stripe.checkout.sessions.create({
-      customer: customer?.id,
-      customer_email: customer ? undefined : email,
+      ...(customer ? { customer: customer.id } : { customer_email: email }),
       line_items: [{ price: SZN_PASS.priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${origin()}/dashboard?membership=success`,
