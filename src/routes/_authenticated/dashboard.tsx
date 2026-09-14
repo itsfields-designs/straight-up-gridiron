@@ -4,6 +4,7 @@ import { ChevronRight, Plus } from "lucide-react";
 
 import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
+import { UsernameEditor } from "@/components/UsernameEditor";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -45,6 +46,10 @@ function DashboardPage() {
           ? `Week ${currentWeek.data} is on the clock. Here's where you stand everywhere.`
           : "Here's where you stand in every league."}
       </p>
+
+      <div className="mt-5">
+        <UsernameEditor userId={user.id} />
+      </div>
 
       {leagues.isLoading && <p className="mt-6 text-sm text-muted-foreground">Loading…</p>}
 
