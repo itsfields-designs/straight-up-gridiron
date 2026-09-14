@@ -4,6 +4,7 @@ import { ChevronRight, Plus } from "lucide-react";
 
 import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
+import { UsernameEditor } from "@/components/UsernameEditor";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
