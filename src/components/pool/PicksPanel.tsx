@@ -185,18 +185,18 @@ export function PicksPanel({
                       key={side}
                       disabled={weekData.locked}
                       onClick={() => setPicks((p) => ({ ...p, [game.id]: side }))}
-                      className={`flex items-center justify-between rounded-md border px-3 py-2.5 text-left text-sm font-medium ${
+                      className={`flex min-h-12 items-center justify-between gap-1 rounded-md border px-3 py-2.5 text-left text-sm font-medium ${
                         chosen
                           ? "border-accent bg-accent-soft text-foreground"
                           : "border-border bg-card text-muted-foreground"
                       }`}
                     >
-                      <span>
+                      <span className="min-w-0 truncate">
                         {game[side]}
                         {side === "home" && <span className="font-normal text-faint"> (home)</span>}
                       </span>
-                      {isWinner && <Check size={15} className="text-success" />}
-                      {wrong && <X size={15} className="text-destructive" />}
+                      {isWinner && <Check size={15} className="shrink-0 text-success" />}
+                      {wrong && <X size={15} className="shrink-0 text-destructive" />}
                     </button>
                   );
                 })}
@@ -213,13 +213,23 @@ export function PicksPanel({
                     value={tiebreaker}
                     onChange={(e) => setTiebreaker(e.target.value)}
                     placeholder="33"
-                    className="w-24 rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    className="min-h-11 w-24 rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
               )}
             </div>
           );
         })}
+      </div>
+
+      <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 md:static md:bottom-auto">
+        <button
+          onClick={() => save.mutate()}
+          disabled={!canSubmit || weekData.locked || save.isPending}
+          className="min-h-12 w-full rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-lg transition-opacity hover:opacity-85 disabled:opacity-40 md:w-auto md:shadow-none"
+        >
+          {save.isPending ? "Saving…" : `Save set ${activeEntry} · ${picked}/${games.length}`}
+        </button>
       </div>
     </div>
   );
