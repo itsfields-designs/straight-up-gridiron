@@ -72,6 +72,8 @@ export function PicksPanel({
     onSuccess: () => {
       toast.success(activeEntry > 1 ? `Set ${activeEntry} saved` : "Picks saved");
       setDraftSets((d) => d.filter((n) => n !== activeEntry));
+      setSavedPicks(picks);
+      setSavedTiebreaker(tiebreaker);
       queryClient.invalidateQueries({ queryKey: ["picks", leagueId] });
       queryClient.invalidateQueries({ queryKey: ["standings"] });
     },
