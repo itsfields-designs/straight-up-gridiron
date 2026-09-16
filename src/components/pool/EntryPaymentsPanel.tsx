@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   autoPots,
   fetchEntryPayments,
+  fetchPickEntries,
   money,
   saveLeaguePots,
   setEntryPaid,
@@ -31,6 +32,10 @@ export function EntryPaymentsPanel({
     queryKey: ["entry-payments", league.id],
     queryFn: () => fetchEntryPayments(league.id),
   });
+  const picks = useQuery({
+    queryKey: ["picks", league.id, week],
+    queryFn: () => fetchPickEntries(league.id, week),
+  });
 
   const rows = payments.data ?? [];
   const auto = autoPots(rows, league, week);
@@ -39,12 +44,16 @@ export function EntryPaymentsPanel({
   const [manualWeekly, setManualWeekly] = useState(String(league.weekly_pot ?? 0));
   const [manualSeason, setManualSeason] = useState(String(league.season_pot ?? 0));
   const [share, setShare] = useState(String(league.season_pot_pct ?? 0));
+  // Extra payable sets the commissioner has opened up by hand, per member.
+  const [extraSets, setExtraSets] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setManualWeekly(String(league.weekly_pot ?? 0));
     setManualSeason(String(league.season_pot ?? 0));
     setShare(String(league.season_pot_pct ?? 0));
   }, [league.weekly_pot, league.season_pot, league.season_pot_pct]);
+
+  useEffect(() => setExtraSets({}), [week, league.id]);
 
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["entry-payments", league.id] });
@@ -53,19 +62,30 @@ export function EntryPaymentsPanel({
   };
 
   const toggle = useMutation({
-    mutationFn: async ({ userId, paid }: { userId: string; paid: boolean }) => {
+    mutationFn: async ({
+      userId,
+      entryNo,
+      paid,
+    }: {
+      userId: string;
+      entryNo: number;
+      paid: boolean;
+    }) => {
       await setEntryPaid({
         leagueId: league.id,
         weekNum: week,
         userId,
+        entryNo,
         markedBy: currentUserId,
         amount: fee,
         paid,
       });
       if (league.pots_auto) {
         const next = paid
-          ? [...rows, { id: "tmp", weekNum: week, userId, amount: fee }]
-          : rows.filter((p) => !(p.weekNum === week && p.userId === userId));
+          ? [...rows, { id: "tmp", weekNum: week, userId, entryNo, amount: fee }]
+          : rows.filter(
+              (p) => !(p.weekNum === week && p.userId === userId && p.entryNo === entryNo),
+            );
         const pots = autoPots(next, league, week);
         await saveLeaguePots({
           leagueId: league.id,
@@ -115,9 +135,27 @@ export function EntryPaymentsPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const paidSet = new Set(
-    rows.filter((p) => p.weekNum === week).map((p) => p.userId),
-  );
+  const weekPayments = rows.filter((p) => p.weekNum === week);
+  const weekPicks = picks.data ?? [];
+
+  /** Sets shown for a member: however many they submitted or paid for, at least one. */
+  const setsFor = (userId: string) => {
+    const paidMax = Math.max(
+      0,
+      ...weekPayments.filter((p) => p.userId === userId).map((p) => p.entryNo),
+    );
+    const pickedMax = Math.max(
+      0,
+      ...weekPicks.filter((p) => p.user_id === userId).map((p) => p.entry_no),
+    );
+    const count = Math.max(1, paidMax, pickedMax, extraSets[userId] ?? 0);
+    return Array.from({ length: count }, (_, i) => i + 1);
+  };
+
+  const isPaid = (userId: string, entryNo: number) =>
+    weekPayments.some((p) => p.userId === userId && p.entryNo === entryNo);
+
+  const totalSets = members.reduce((s, m) => s + setsFor(m.user_id).length, 0);
 
   return (
     <div className="space-y-4 rounded-lg border border-border bg-card p-4">
@@ -126,31 +164,59 @@ export function EntryPaymentsPanel({
           <CheckCircle2 size={15} /> Week {week} entry payments
         </h2>
         <div className="text-xs text-faint">
-          {auto.weekPaid} of {members.length} paid · {money(auto.weekPaid * fee)} collected
+          {auto.weekPaid} of {totalSets} sets paid · {money(auto.weekPaid * fee)} collected
         </div>
       </div>
 
       <div className="overflow-hidden rounded-md border border-border">
-        {members.map((m, i) => (
-          <label
-            key={m.user_id}
-            className={`flex cursor-pointer items-center justify-between gap-3 px-4 py-2.5 ${
-              i > 0 ? "border-t border-border" : ""
-            }`}
-          >
-            <span className="text-sm font-medium">{m.username}</span>
-            <span className="flex items-center gap-2 text-xs text-faint">
-              {paidSet.has(m.user_id) ? `Paid ${money(fee)}` : "Not paid"}
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-[hsl(var(--accent))]"
-                checked={paidSet.has(m.user_id)}
-                disabled={!isOwner || toggle.isPending}
-                onChange={(e) => toggle.mutate({ userId: m.user_id, paid: e.target.checked })}
-              />
-            </span>
-          </label>
-        ))}
+        {members.map((m, i) => {
+          const sets = setsFor(m.user_id);
+          return (
+            <div
+              key={m.user_id}
+              className={`px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm font-medium">{m.username}</span>
+                <span className="text-xs text-faint">
+                  {sets.filter((n) => isPaid(m.user_id, n)).length} of {sets.length} sets paid
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                {sets.map((n) => (
+                  <label
+                    key={n}
+                    className="flex cursor-pointer items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 accent-[hsl(var(--accent))]"
+                      checked={isPaid(m.user_id, n)}
+                      disabled={!isOwner || toggle.isPending}
+                      onChange={(e) =>
+                        toggle.mutate({ userId: m.user_id, entryNo: n, paid: e.target.checked })
+                      }
+                    />
+                    Set {n}
+                    <span className="text-faint">
+                      {isPaid(m.user_id, n) ? money(fee) : "unpaid"}
+                    </span>
+                  </label>
+                ))}
+                {isOwner && (
+                  <button
+                    onClick={() =>
+                      setExtraSets((s) => ({ ...s, [m.user_id]: sets.length + 1 }))
+                    }
+                    className="flex items-center gap-1 text-xs text-muted-foreground"
+                  >
+                    <Plus size={13} /> Add set
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
         {members.length === 0 && (
           <p className="px-4 py-6 text-center text-sm text-faint">No members yet.</p>
         )}

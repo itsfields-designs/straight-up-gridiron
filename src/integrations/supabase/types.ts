@@ -59,6 +59,7 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          entry_no: number
           id: string
           league_id: string
           marked_by: string
@@ -69,6 +70,7 @@ export type Database = {
         Insert: {
           amount?: number
           created_at?: string
+          entry_no?: number
           id?: string
           league_id: string
           marked_by: string
@@ -79,6 +81,7 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          entry_no?: number
           id?: string
           league_id?: string
           marked_by?: string
@@ -251,6 +254,7 @@ export type Database = {
       league_standings: {
         Row: {
           correct: number
+          entry_no: number
           id: string
           league_id: string
           missed: number
@@ -263,6 +267,7 @@ export type Database = {
         }
         Insert: {
           correct?: number
+          entry_no?: number
           id?: string
           league_id: string
           missed?: number
@@ -275,6 +280,7 @@ export type Database = {
         }
         Update: {
           correct?: number
+          entry_no?: number
           id?: string
           league_id?: string
           missed?: number
@@ -389,6 +395,7 @@ export type Database = {
       }
       pick_entries: {
         Row: {
+          entry_no: number
           id: string
           league_id: string
           picks: Json
@@ -398,6 +405,7 @@ export type Database = {
           week_num: number
         }
         Insert: {
+          entry_no?: number
           id?: string
           league_id: string
           picks?: Json
@@ -407,6 +415,7 @@ export type Database = {
           week_num: number
         }
         Update: {
+          entry_no?: number
           id?: string
           league_id?: string
           picks?: Json

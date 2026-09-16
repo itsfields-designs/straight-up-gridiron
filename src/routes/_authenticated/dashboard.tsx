@@ -72,6 +72,7 @@ function DashboardPage() {
           const rows = standings[i]?.data ?? [];
           const me = rows.find((r) => r.userId === user.id);
           const top = rows.slice(0, 3);
+          const mySets = rows.filter((r) => r.userId === user.id).length;
           return (
             <div key={league.id} className="rounded-lg border border-border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -85,7 +86,8 @@ function DashboardPage() {
                   </Link>
                   <div className="mt-0.5 text-xs text-faint">
                     Week {currentWeek.data ?? "—"} · {rows.length || "No"}{" "}
-                    {rows.length === 1 ? "member" : "members"} ranked
+                    {rows.length === 1 ? "set of picks" : "sets of picks"} ranked
+                    {mySets > 1 ? ` · ${mySets} of them yours` : ""}
                   </div>
                 </div>
                 <div className="rounded-md bg-secondary px-3 py-1.5 text-xs">
@@ -103,7 +105,7 @@ function DashboardPage() {
                 <ul className="mt-3 grid gap-1.5">
                   {top.map((r) => (
                     <li
-                      key={r.userId}
+                      key={`${r.userId}-${r.entryNo}`}
                       className={`flex items-center justify-between rounded-md px-3 py-2 text-sm ${
                         r.userId === user.id ? "bg-accent-soft text-accent-soft-foreground" : "bg-secondary"
                       }`}

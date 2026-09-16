@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, X } from "lucide-react";
+import { Check, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { fetchPickEntries, fetchWeek, gradeGame, savePicks, type Side } from "@/lib/pool";
+import {
+  deletePickEntry,
+  fetchPickEntries,
+  fetchWeek,
+  gradeGame,
+  savePicks,
+  type Side,
+} from "@/lib/pool";
 
 export function PicksPanel({
   leagueId,
@@ -23,12 +30,27 @@ export function PicksPanel({
 
   const [picks, setPicks] = useState<Record<string, Side>>({});
   const [tiebreaker, setTiebreaker] = useState("");
+  const [activeEntry, setActiveEntry] = useState(1);
+  const [draftSets, setDraftSets] = useState<number[]>([]);
 
-  const mine = entriesQuery.data?.find((e) => e.user_id === userId);
+  const myEntries = (entriesQuery.data ?? [])
+    .filter((e) => e.user_id === userId)
+    .sort((a, b) => a.entry_no - b.entry_no);
+
+  const entryNos = Array.from(
+    new Set([1, ...myEntries.map((e) => e.entry_no), ...draftSets]),
+  ).sort((a, b) => a - b);
+
+  useEffect(() => {
+    setActiveEntry(1);
+    setDraftSets([]);
+  }, [week, leagueId]);
+
+  const mine = myEntries.find((e) => e.entry_no === activeEntry);
   useEffect(() => {
     setPicks(mine?.picks ?? {});
     setTiebreaker(mine?.tiebreaker != null ? String(mine.tiebreaker) : "");
-  }, [mine, week]);
+  }, [mine, week, activeEntry]);
 
   const save = useMutation({
     mutationFn: () =>
@@ -36,12 +58,28 @@ export function PicksPanel({
         leagueId,
         weekNum: week,
         userId,
+        entryNo: activeEntry,
         picks,
         tiebreaker: tiebreaker === "" ? null : Number(tiebreaker),
       }),
     onSuccess: () => {
-      toast.success("Picks saved");
+      toast.success(activeEntry > 1 ? `Set ${activeEntry} saved` : "Picks saved");
+      setDraftSets((d) => d.filter((n) => n !== activeEntry));
       queryClient.invalidateQueries({ queryKey: ["picks", leagueId] });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (entryNo: number) =>
+      deletePickEntry({ leagueId, weekNum: week, userId, entryNo }),
+    onSuccess: (_d, entryNo) => {
+      toast.success(`Set ${entryNo} removed`);
+      setDraftSets((d) => d.filter((n) => n !== entryNo));
+      setActiveEntry(1);
+      queryClient.invalidateQueries({ queryKey: ["picks", leagueId] });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -65,11 +103,52 @@ export function PicksPanel({
   const picked = Object.keys(picks).length;
   const canSubmit = picked === games.length && tiebreaker !== "" && !isNaN(Number(tiebreaker));
 
+  const addSet = () => {
+    const next = Math.max(...entryNos) + 1;
+    setDraftSets((d) => [...d, next]);
+    setActiveEntry(next);
+    setPicks({});
+    setTiebreaker("");
+  };
+
   return (
     <div>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap gap-1 rounded-md bg-secondary p-1">
+          {entryNos.map((n) => (
+            <button
+              key={n}
+              onClick={() => setActiveEntry(n)}
+              className={`rounded px-3 py-1.5 text-sm font-medium ${
+                activeEntry === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              Set {n}
+              {myEntries.some((e) => e.entry_no === n) ? "" : " ·"}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={addSet}
+          disabled={weekData.locked}
+          className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground disabled:opacity-40"
+        >
+          <Plus size={14} /> Add another set
+        </button>
+        {activeEntry > 1 && (
+          <button
+            onClick={() => remove.mutate(activeEntry)}
+            disabled={weekData.locked || remove.isPending}
+            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-destructive disabled:opacity-40"
+          >
+            <Trash2 size={14} /> Remove set {activeEntry}
+          </button>
+        )}
+      </div>
+
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-muted-foreground">
-          {picked} of {games.length} games picked
+          Set {activeEntry} · {picked} of {games.length} games picked
           {weekData.locked && (
             <span className="ml-2 text-destructive">· picks are locked for this week</span>
           )}
@@ -79,9 +158,13 @@ export function PicksPanel({
           disabled={!canSubmit || weekData.locked || save.isPending}
           className="rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
         >
-          Save my picks
+          Save set {activeEntry}
         </button>
       </div>
+
+      <p className="mb-4 text-xs text-faint">
+        Each set of picks stands on its own in the standings and costs one entry fee.
+      </p>
 
       <div className="space-y-2.5">
         {games.map((game) => {
