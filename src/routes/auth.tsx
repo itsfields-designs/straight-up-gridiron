@@ -289,7 +289,7 @@ function AuthPage() {
               disabled={busy}
               className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
             >
-              {mode === "login" ? "Log in" : "Create account"}
+              {awaitingCode ? "Confirm code" : mode === "login" ? "Log in" : "Create account"}
             </button>
           </form>
 
