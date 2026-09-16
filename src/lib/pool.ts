@@ -25,10 +25,16 @@ export type Week = {
 
 export type PickEntry = {
   user_id: string;
+  entry_no: number;
   week_num: number;
   picks: Record<string, Side>;
   tiebreaker: number | null;
 };
+
+/** "Ana" for their first set of picks, "Ana #2" for extra sets. */
+export function entryLabel(username: string, entryNo: number) {
+  return entryNo > 1 ? `${username} #${entryNo}` : username;
+}
 
 export type League = {
   id: string;
@@ -135,13 +141,15 @@ export async function fetchAllWeeks(): Promise<{ weeks: Week[]; games: Game[] }>
 export async function fetchPickEntries(leagueId: string, weekNum?: number): Promise<PickEntry[]> {
   let query = supabase
     .from("pick_entries")
-    .select("user_id, week_num, picks, tiebreaker")
-    .eq("league_id", leagueId);
+    .select("user_id, entry_no, week_num, picks, tiebreaker")
+    .eq("league_id", leagueId)
+    .order("entry_no", { ascending: true });
   if (weekNum != null) query = query.eq("week_num", weekNum);
   const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map((row) => ({
     user_id: row.user_id,
+    entry_no: row.entry_no ?? 1,
     week_num: row.week_num,
     picks: (row.picks ?? {}) as Record<string, Side>,
     tiebreaker: row.tiebreaker,
@@ -152,6 +160,7 @@ export async function savePicks(args: {
   leagueId: string;
   weekNum: number;
   userId: string;
+  entryNo?: number;
   picks: Record<string, Side>;
   tiebreaker: number | null;
 }) {
@@ -160,12 +169,30 @@ export async function savePicks(args: {
       league_id: args.leagueId,
       week_num: args.weekNum,
       user_id: args.userId,
+      entry_no: args.entryNo ?? 1,
       picks: args.picks,
       tiebreaker: args.tiebreaker,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "league_id,week_num,user_id" },
+    { onConflict: "league_id,week_num,user_id,entry_no" },
   );
+  if (error) throw error;
+}
+
+/** Removes one set of picks for a week. */
+export async function deletePickEntry(args: {
+  leagueId: string;
+  weekNum: number;
+  userId: string;
+  entryNo: number;
+}) {
+  const { error } = await supabase
+    .from("pick_entries")
+    .delete()
+    .eq("league_id", args.leagueId)
+    .eq("week_num", args.weekNum)
+    .eq("user_id", args.userId)
+    .eq("entry_no", args.entryNo);
   if (error) throw error;
 }
 
@@ -236,6 +263,7 @@ export function computeStandings(
 // ---- stored standings ------------------------------------------------------
 export type StoredStanding = {
   userId: string;
+  entryNo: number;
   username: string;
   rank: number;
   correct: number;
@@ -252,10 +280,11 @@ export async function fetchStandings(
 ): Promise<StoredStanding[]> {
   const { data, error } = await supabase
     .from("league_standings")
-    .select("user_id, rank, correct, missed, tb_diff, submitted, updated_at")
+    .select("user_id, entry_no, rank, correct, missed, tb_diff, submitted, updated_at")
     .eq("league_id", leagueId)
     .eq("week_num", weekNum)
-    .order("rank", { ascending: true });
+    .order("rank", { ascending: true })
+    .order("entry_no", { ascending: true });
   if (error) throw error;
   const rows = data ?? [];
   if (!rows.length) return [];
@@ -267,7 +296,8 @@ export async function fetchStandings(
   const byId = new Map((profiles ?? []).map((p) => [p.id, p.username]));
   return rows.map((r) => ({
     userId: r.user_id,
-    username: byId.get(r.user_id) ?? "Unknown player",
+    entryNo: r.entry_no ?? 1,
+    username: entryLabel(byId.get(r.user_id) ?? "Unknown player", r.entry_no ?? 1),
     rank: r.rank,
     correct: r.correct,
     missed: r.missed,
