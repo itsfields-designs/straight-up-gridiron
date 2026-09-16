@@ -31,30 +31,64 @@ function userEmail(claims: Record<string, unknown>): string {
 export type MembershipStatus = {
   subscribed: boolean;
   subscriptionEnd: string | null;
+  /** Account existed before The SZN Pass was required — keeps full access. */
+  exempt: boolean;
+  /** Allowed to create or join leagues. */
+  entitled: boolean;
 };
+
+async function isExempt(userId: string): Promise<boolean> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("profiles")
+    .select("membership_exempt")
+    .eq("id", userId)
+    .maybeSingle();
+  return data?.membership_exempt === true;
+}
+
+async function membershipStatus(
+  userId: string,
+  claims: Record<string, unknown>,
+): Promise<MembershipStatus> {
+  const exempt = await isExempt(userId);
+  if (exempt) return { subscribed: false, subscriptionEnd: null, exempt: true, entitled: true };
+
+  const stripe = await stripeClient();
+  const email = userEmail(claims);
+  const customers = await stripe.customers.list({ email, limit: 1 });
+  const customer = customers.data[0];
+  const none = { subscribed: false, subscriptionEnd: null, exempt: false, entitled: false };
+  if (!customer) return none;
+
+  const subs = await stripe.subscriptions.list({
+    customer: customer.id,
+    status: "active",
+    limit: 1,
+  });
+  const sub = subs.data[0];
+  if (!sub) return none;
+  const periodEnd = sub.items.data[0]?.current_period_end;
+  return {
+    subscribed: true,
+    subscriptionEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    exempt: false,
+    entitled: true,
+  };
+}
+
+/** Throws unless the user may create or join leagues. */
+export async function assertEntitled(userId: string, claims: Record<string, unknown>) {
+  const status = await membershipStatus(userId, claims);
+  if (!status.entitled)
+    throw new Error("The SZN Pass is required before you can create or join a league.");
+}
 
 export const checkMembership = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<MembershipStatus> => {
-    const stripe = await stripeClient();
-    const email = userEmail(context.claims as Record<string, unknown>);
-    const customers = await stripe.customers.list({ email, limit: 1 });
-    const customer = customers.data[0];
-    if (!customer) return { subscribed: false, subscriptionEnd: null };
-
-    const subs = await stripe.subscriptions.list({
-      customer: customer.id,
-      status: "active",
-      limit: 1,
-    });
-    const sub = subs.data[0];
-    if (!sub) return { subscribed: false, subscriptionEnd: null };
-    const periodEnd = sub.items.data[0]?.current_period_end;
-    return {
-      subscribed: true,
-      subscriptionEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-    };
-  });
+  .handler(({ context }): Promise<MembershipStatus> =>
+    membershipStatus(context.userId, context.claims as Record<string, unknown>),
+  );
 
 export const createSznCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

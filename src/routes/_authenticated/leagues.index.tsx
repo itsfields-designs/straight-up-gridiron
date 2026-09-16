@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronRight, Plus, Users } from "lucide-react";
+import { ChevronRight, Lock, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { useServerFn } from "@tanstack/react-start";
 
 import { createLeague, joinLeague } from "@/lib/leagues.functions";
+import { checkMembership, createSznCheckout, SZN_PASS } from "@/lib/membership.functions";
 import { fetchMyLeagues } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/leagues/")({
@@ -35,6 +36,17 @@ function LeagueHub() {
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
   const createLeagueFn = useServerFn(createLeague);
   const joinLeagueFn = useServerFn(joinLeague);
+
+  const checkMembershipFn = useServerFn(checkMembership);
+  const checkoutFn = useServerFn(createSznCheckout);
+  const membership = useQuery({ queryKey: ["membership"], queryFn: () => checkMembershipFn() });
+  const locked = membership.data ? !membership.data.entitled : false;
+
+  const startCheckout = useMutation({
+    mutationFn: async () => await checkoutFn(),
+    onSuccess: ({ url }) => window.open(url, "_blank", "noopener"),
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const create = useMutation({
     mutationFn: async () =>
@@ -92,22 +104,50 @@ function LeagueHub() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
-        <button
-          onClick={() => setPanel(panel === "create" ? "none" : "create")}
-          className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-        >
-          <Plus size={15} /> Create a league
-        </button>
-        <button
-          onClick={() => setPanel(panel === "join" ? "none" : "join")}
-          className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
-        >
-          Join with a code
-        </button>
-      </div>
+      {locked ? (
+        <div className="mt-6 rounded-lg border border-accent bg-accent-soft p-5">
+          <div className="flex items-center gap-2">
+            <Lock size={15} />
+            <h2 className="text-sm font-semibold">{SZN_PASS.name} required</h2>
+          </div>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Grab {SZN_PASS.name} for {SZN_PASS.priceLabel} to create or join a league. Your access
+            unlocks as soon as payment goes through.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => startCheckout.mutate()}
+              disabled={startCheckout.isPending}
+              className="min-h-12 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground disabled:opacity-40"
+            >
+              Get {SZN_PASS.name}
+            </button>
+            <button
+              onClick={() => membership.refetch()}
+              className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
+            >
+              I've paid — refresh
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
+          <button
+            onClick={() => setPanel(panel === "create" ? "none" : "create")}
+            className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+          >
+            <Plus size={15} /> Create a league
+          </button>
+          <button
+            onClick={() => setPanel(panel === "join" ? "none" : "join")}
+            className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
+          >
+            Join with a code
+          </button>
+        </div>
+      )}
 
-      {panel === "create" && (
+      {!locked && panel === "create" && (
         <form
           className="mt-5 max-w-md rounded-lg border border-border bg-card p-5"
           onSubmit={(e) => {
@@ -140,7 +180,7 @@ function LeagueHub() {
         </form>
       )}
 
-      {panel === "join" && (
+      {!locked && panel === "join" && (
         <form
           className="mt-5 max-w-md rounded-lg border border-border bg-card p-5"
           onSubmit={(e) => {

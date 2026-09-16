@@ -43,6 +43,25 @@ export function MembershipCard() {
   }
 
   const subscribed = status.data?.subscribed;
+  const exempt = status.data?.exempt;
+
+  if (exempt) {
+    return (
+      <div className="rounded-lg border border-accent bg-accent-soft p-4">
+        <p className="field-label">Membership</p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">Founding member</span>
+          <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
+            <BadgeCheck size={11} /> Full access
+          </span>
+        </div>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {SZN_PASS.name} isn't needed on your account — you keep creating and joining leagues for
+          free.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div

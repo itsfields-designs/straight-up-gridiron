@@ -438,16 +438,19 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          membership_exempt: boolean
           username: string
         }
         Insert: {
           created_at?: string
           id: string
+          membership_exempt?: boolean
           username: string
         }
         Update: {
           created_at?: string
           id?: string
+          membership_exempt?: boolean
           username?: string
         }
         Relationships: []
