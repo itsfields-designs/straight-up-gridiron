@@ -76,7 +76,7 @@ export async function fetchMyLeagues(): Promise<League[]> {
 export async function fetchLeague(leagueId: string): Promise<League> {
   const { data, error } = await supabase
     .from("leagues")
-    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot, chat_locked")
+    .select(LEAGUE_COLS)
     .eq("id", leagueId)
     .maybeSingle();
   if (error) throw error;
