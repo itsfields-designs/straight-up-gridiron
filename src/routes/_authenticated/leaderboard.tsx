@@ -150,7 +150,7 @@ function LeaderboardPage() {
             id="league"
             value={activeId ?? ""}
             onChange={(e) => setLeagueId(e.target.value)}
-            className="rounded-md border border-input bg-card px-3 py-2.5 text-sm"
+            className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm sm:w-auto"
           >
             {leagues.data.map((l) => (
               <option key={l.id} value={l.id}>
@@ -162,15 +162,15 @@ function LeaderboardPage() {
       </div>
 
       {activeLeague && (
-        <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-2.5">
           {[
             { label: "Entry fee", value: activeLeague.entry_fee },
             { label: "Weekly pot", value: activeLeague.weekly_pot },
             { label: "Season pot", value: activeLeague.season_pot },
           ].map((c) => (
-            <div key={c.label} className="rounded-lg border border-border bg-card p-3.5">
-              <div className="text-xs text-faint">{c.label}</div>
-              <div className="font-display text-lg font-medium">{money(c.value)}</div>
+            <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
+              <div className="text-[0.7rem] text-faint sm:text-xs">{c.label}</div>
+              <div className="font-display text-base font-medium sm:text-lg">{money(c.value)}</div>
             </div>
           ))}
         </div>
@@ -226,7 +226,7 @@ function LeaderboardPage() {
             Once picks are graded, the weekly chart shows up here.
           </p>
         ) : (
-          <div className="h-72 w-full">
+          <div className="h-60 w-full sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 0, left: -20 }}>
                 <CartesianGrid stroke="var(--border)" vertical={false} />
