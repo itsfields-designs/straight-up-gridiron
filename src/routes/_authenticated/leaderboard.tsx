@@ -85,6 +85,14 @@ function LeaderboardPage() {
     enabled: !!activeId,
   });
 
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", activeId],
+    queryFn: () => fetchEntryPayments(activeId!),
+    enabled: !!activeId,
+  });
+
+  const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+
   const wonBy = useMemo(() => {
     const map = new Map<string, number>();
     for (const p of payouts.data ?? []) map.set(p.userId, (map.get(p.userId) ?? 0) + p.amount);
