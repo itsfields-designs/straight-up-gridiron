@@ -251,7 +251,8 @@ export function CashPanel({
           {allTxns.map((t, i) => (
             <div
               key={t.id}
-              className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 || allEntryPayments.length > 0 ? "border-t border-border" : ""}`}
+
             >
               <div className="min-w-0">
                 <div className="text-sm font-medium">{t.username}</div>
