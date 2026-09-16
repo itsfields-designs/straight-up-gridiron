@@ -668,12 +668,14 @@ export async function saveLeaguePots(args: {
   potsAuto?: boolean;
   seasonPotPct?: number;
 }) {
-  const patch: Record<string, number | boolean> = {
-    weekly_pot: args.weeklyPot,
-    season_pot: args.seasonPot,
-  };
-  if (args.potsAuto !== undefined) patch['pots_auto'] = args.potsAuto;
-  if (args.seasonPotPct !== undefined) patch['season_pot_pct'] = args.seasonPotPct;
-  const { error } = await supabase.from("leagues").update(patch).eq("id", args.leagueId);
+  const { error } = await supabase
+    .from("leagues")
+    .update({
+      weekly_pot: args.weeklyPot,
+      season_pot: args.seasonPot,
+      ...(args.potsAuto === undefined ? {} : { pots_auto: args.potsAuto }),
+      ...(args.seasonPotPct === undefined ? {} : { season_pot_pct: args.seasonPotPct }),
+    })
+    .eq("id", args.leagueId);
   if (error) throw error;
 }
