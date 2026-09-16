@@ -31,6 +31,8 @@ export function PicksPanel({
 
   const [picks, setPicks] = useState<Record<string, Side>>({});
   const [tiebreaker, setTiebreaker] = useState("");
+  const [savedPicks, setSavedPicks] = useState<Record<string, Side>>({});
+  const [savedTiebreaker, setSavedTiebreaker] = useState("");
   const [activeEntry, setActiveEntry] = useState(1);
   const [draftSets, setDraftSets] = useState<number[]>([]);
 
@@ -49,8 +51,12 @@ export function PicksPanel({
 
   const mine = myEntries.find((e) => e.entry_no === activeEntry);
   useEffect(() => {
-    setPicks(mine?.picks ?? {});
-    setTiebreaker(mine?.tiebreaker != null ? String(mine.tiebreaker) : "");
+    const p = mine?.picks ?? {};
+    const t = mine?.tiebreaker != null ? String(mine.tiebreaker) : "";
+    setPicks(p);
+    setTiebreaker(t);
+    setSavedPicks(p);
+    setSavedTiebreaker(t);
   }, [mine, week, activeEntry]);
 
   const save = useMutation({
@@ -66,6 +72,8 @@ export function PicksPanel({
     onSuccess: () => {
       toast.success(activeEntry > 1 ? `Set ${activeEntry} saved` : "Picks saved");
       setDraftSets((d) => d.filter((n) => n !== activeEntry));
+      setSavedPicks(picks);
+      setSavedTiebreaker(tiebreaker);
       queryClient.invalidateQueries({ queryKey: ["picks", leagueId] });
       queryClient.invalidateQueries({ queryKey: ["standings"] });
     },
@@ -104,13 +112,17 @@ export function PicksPanel({
   const picked = Object.keys(picks).length;
   const canSubmit = picked === games.length && tiebreaker !== "" && !isNaN(Number(tiebreaker));
   const remaining = Math.max(games.length - picked, 0);
+  const isDirty =
+    JSON.stringify(picks) !== JSON.stringify(savedPicks) || tiebreaker !== savedTiebreaker;
   const saveHint = weekData.locked
     ? "Picks are locked for this week."
     : remaining > 0
       ? `${remaining} ${remaining === 1 ? "pick" : "picks"} remaining.`
       : tiebreaker === ""
         ? "Enter the tiebreaker score to save."
-        : "Your set is ready to save.";
+        : isDirty
+          ? "Your set is ready to save."
+          : "Your set is saved.";
 
   const addSet = () => {
     const next = Math.max(...entryNos) + 1;
@@ -118,6 +130,8 @@ export function PicksPanel({
     setActiveEntry(next);
     setPicks({});
     setTiebreaker("");
+    setSavedPicks({});
+    setSavedTiebreaker("");
   };
 
   return (
@@ -243,10 +257,18 @@ export function PicksPanel({
       <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-lg bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
         <button
           onClick={() => save.mutate()}
-          disabled={!canSubmit || weekData.locked || save.isPending}
-          className="min-h-12 w-full rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-lg transition-opacity hover:opacity-85 disabled:opacity-40 md:w-auto md:shadow-none"
+          disabled={!canSubmit || weekData.locked || save.isPending || !isDirty}
+          className={`min-h-12 w-full rounded-md px-4 text-sm font-semibold shadow-lg transition-opacity md:w-auto ${
+            isDirty && canSubmit && !weekData.locked
+              ? "bg-accent text-accent-foreground hover:opacity-85 md:shadow-none"
+              : "bg-secondary text-muted-foreground md:shadow-none"
+          } ${save.isPending || !canSubmit || !isDirty || weekData.locked ? "opacity-60" : ""}`}
         >
-          {save.isPending ? "Saving…" : `Save set ${activeEntry} · ${picked}/${games.length}`}
+          {save.isPending
+            ? "Saving…"
+            : !isDirty && canSubmit
+              ? `Set ${activeEntry} saved`
+              : `Save set ${activeEntry} · ${picked}/${games.length}`}
         </button>
         <p className="mt-1.5 text-center text-xs text-muted-foreground md:text-left" aria-live="polite">{saveHint}</p>
       </div>
