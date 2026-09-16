@@ -123,7 +123,7 @@ function LeaderboardPage() {
   if (!leagues.data?.length)
     return (
       <div>
-        <h1 className="text-2xl font-semibold">Leaderboard</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Leaderboard</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Join or create a league and the leaderboard will fill in here.
         </p>
@@ -137,7 +137,7 @@ function LeaderboardPage() {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Leaderboard</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">Leaderboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Top performers and how many games each of them has called right per week.
           </p>

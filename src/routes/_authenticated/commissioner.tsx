@@ -117,7 +117,7 @@ function CommissionerPage() {
   if (!owned.length)
     return (
       <div>
-        <h1 className="text-2xl font-semibold">Commissioner</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Commissioner</h1>
         <div className="mt-5 rounded-lg border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted-foreground">
             You don't run a league yet. Start one and this page becomes your control room.
