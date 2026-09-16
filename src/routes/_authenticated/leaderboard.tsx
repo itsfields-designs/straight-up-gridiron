@@ -135,8 +135,8 @@ function LeaderboardPage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-xl font-semibold sm:text-2xl">Leaderboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Top performers and how many games each of them has called right per week.
