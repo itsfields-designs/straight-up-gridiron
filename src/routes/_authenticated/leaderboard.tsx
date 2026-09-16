@@ -90,7 +90,9 @@ function LeaderboardPage() {
   const players = useMemo(() => {
     const rows = season.data ?? [];
     return rows.slice(0, 6).map((r, i) => ({
+      key: `${r.userId}-${r.entryNo}`,
       userId: r.userId,
+      entryNo: r.entryNo,
       username: r.username,
       color: LINE_COLORS[i % LINE_COLORS.length],
     }));
@@ -104,10 +106,12 @@ function LeaderboardPage() {
     return weeks.map((w) => {
       const point: Record<string, number | string> = { week: `W${w}` };
       for (const p of players) {
-        const row = rows.find((r) => r.weekNum === w && r.userId === p.userId);
+        const row = rows.find(
+          (r) => r.weekNum === w && r.userId === p.userId && r.entryNo === p.entryNo,
+        );
         const pts = row?.correct ?? 0;
-        const total = (running.get(p.userId) ?? 0) + pts;
-        running.set(p.userId, total);
+        const total = (running.get(p.key) ?? 0) + pts;
+        running.set(p.key, total);
         point[p.username] = cumulative ? total : pts;
       }
       return point;
