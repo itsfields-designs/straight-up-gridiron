@@ -257,10 +257,18 @@ export function PicksPanel({
       <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-lg bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
         <button
           onClick={() => save.mutate()}
-          disabled={!canSubmit || weekData.locked || save.isPending}
-          className="min-h-12 w-full rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-lg transition-opacity hover:opacity-85 disabled:opacity-40 md:w-auto md:shadow-none"
+          disabled={!canSubmit || weekData.locked || save.isPending || !isDirty}
+          className={`min-h-12 w-full rounded-md px-4 text-sm font-semibold shadow-lg transition-opacity md:w-auto ${
+            isDirty && canSubmit && !weekData.locked
+              ? "bg-accent text-accent-foreground hover:opacity-85 md:shadow-none"
+              : "bg-secondary text-muted-foreground md:shadow-none"
+          } ${save.isPending || !canSubmit || !isDirty || weekData.locked ? "opacity-60" : ""}`}
         >
-          {save.isPending ? "Saving…" : `Save set ${activeEntry} · ${picked}/${games.length}`}
+          {save.isPending
+            ? "Saving…"
+            : !isDirty && canSubmit
+              ? `Set ${activeEntry} saved`
+              : `Save set ${activeEntry} · ${picked}/${games.length}`}
         </button>
         <p className="mt-1.5 text-center text-xs text-muted-foreground md:text-left" aria-live="polite">{saveHint}</p>
       </div>
