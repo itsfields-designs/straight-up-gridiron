@@ -56,6 +56,13 @@ function AuthedLayout() {
                 Leagues
               </Link>
               <Link
+                to="/commissioner"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-foreground font-medium" }}
+              >
+                Commish
+              </Link>
+              <Link
                 to="/leaderboard"
                 className="text-muted-foreground transition-colors hover:text-foreground"
                 activeProps={{ className: "text-foreground font-medium" }}

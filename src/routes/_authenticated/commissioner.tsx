@@ -136,7 +136,7 @@ function CommissionerPage() {
 
   const memberList = members.data ?? [];
   const paidRows = (payments.data ?? []).filter((p) => p.weekNum === activeWeek);
-  const takeIn = collected(payments.data ?? [], activeWeek, Number(league.entry_fee) || 0);
+  const takeIn = collected(payments.data ?? [], activeWeek, Number(league.entry_fee) || 0).week;
   const bank = bankSummary(deposits.data ?? [], cash.data ?? [], payouts.data ?? []);
 
   const stats = [
