@@ -76,7 +76,7 @@ function CommissionerPage() {
   const [section, setSection] = useState<Section>("members");
 
   useEffect(() => {
-    if (!leagueId && owned.length) setLeagueId(owned[0].id);
+    if (!leagueId && owned[0]) setLeagueId(owned[0].id);
   }, [owned, leagueId]);
 
   useEffect(() => {
