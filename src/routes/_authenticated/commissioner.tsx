@@ -138,6 +138,7 @@ function CommissionerPage() {
 
   const memberList = members.data ?? [];
   const paidRows = (payments.data ?? []).filter((p) => p.weekNum === activeWeek);
+  const paidMembers = new Set(paidRows.map((p) => p.userId)).size;
   const takeIn = collected(payments.data ?? [], activeWeek, Number(league.entry_fee) || 0).week;
   const bank = bankSummary(deposits.data ?? [], cash.data ?? [], payouts.data ?? []);
 
@@ -145,7 +146,7 @@ function CommissionerPage() {
     { label: "Members", value: String(memberList.length) },
     {
       label: `Week ${activeWeek} paid`,
-      value: `${paidRows.length} of ${memberList.length}`,
+      value: `${Math.min(paidMembers, memberList.length)} of ${memberList.length}`,
       hint: `${money(takeIn)} collected`,
     },
     {
