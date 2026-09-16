@@ -27,8 +27,6 @@ function AuthPage() {
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [awaitingCode, setAwaitingCode] = useState(false);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -41,13 +39,12 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  /** Turns "(415) 555 0134" into "+14155550134" so the SMS actually sends. */
-  function normalizePhone(value: string) {
-    const digits = value.replace(/[^\d+]/g, "");
-    const e164 = digits.startsWith("+") ? digits : `+${digits}`;
-    if (!/^\+[1-9]\d{7,14}$/.test(e164))
-      throw new Error("Enter your phone number with country code, like +14155550134.");
-    return e164;
+  /** Phone numbers become a stable internal address so no text message is needed. */
+  function phoneAccountEmail(value: string) {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length < 7 || digits.length > 15)
+      throw new Error("Enter your phone number with country code, like +1 415 555 0134.");
+    return `${digits}@phone.gridirongods.app`;
   }
 
   async function submit(e: React.FormEvent) {
@@ -56,17 +53,9 @@ function AuthPage() {
     setNotice("");
     setBusy(true);
     try {
-      if (method === "phone") {
-        const tel = normalizePhone(phone);
-        if (awaitingCode) {
-          const { error: err } = await supabase.auth.verifyOtp({
-            phone: tel,
-            token: code.trim(),
-            type: "sms",
-          });
-          if (err) throw err;
-          navigate({ to: "/leagues", replace: true });
-        } else if (mode === "login") {
+      const identifier = method === "phone" ? phoneAccountEmail(phone) : email;
+      if (mode === "login") {
+
           const { error: err } = await supabase.auth.signInWithPassword({
             phone: tel,
             password,
