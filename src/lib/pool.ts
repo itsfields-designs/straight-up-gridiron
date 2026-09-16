@@ -587,3 +587,93 @@ export function bankSummary(deposits: BankDeposit[], txns: CashTxn[], payouts: P
     balance: commissioner + memberDeposits - withdrawals - paid,
   };
 }
+
+// ---- weekly entry payments -------------------------------------------------
+export type EntryPayment = {
+  id: string;
+  weekNum: number;
+  userId: string;
+  amount: number;
+};
+
+export async function fetchEntryPayments(leagueId: string): Promise<EntryPayment[]> {
+  const { data, error } = await supabase
+    .from("entry_payments")
+    .select("id, week_num, user_id, amount")
+    .eq("league_id", leagueId);
+  if (error) throw error;
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    weekNum: r.week_num,
+    userId: r.user_id,
+    amount: Number(r.amount),
+  }));
+}
+
+export async function setEntryPaid(args: {
+  leagueId: string;
+  weekNum: number;
+  userId: string;
+  markedBy: string;
+  amount: number;
+  paid: boolean;
+}) {
+  if (args.paid) {
+    const { error } = await supabase.from("entry_payments").upsert(
+      {
+        league_id: args.leagueId,
+        week_num: args.weekNum,
+        user_id: args.userId,
+        marked_by: args.markedBy,
+        amount: args.amount,
+      },
+      { onConflict: "league_id,week_num,user_id" },
+    );
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from("entry_payments")
+      .delete()
+      .eq("league_id", args.leagueId)
+      .eq("week_num", args.weekNum)
+      .eq("user_id", args.userId);
+    if (error) throw error;
+  }
+}
+
+/** Money collected for a given week and across the whole season. */
+export function collected(payments: EntryPayment[], weekNum: number, entryFee: number) {
+  const week = payments.filter((p) => p.weekNum === weekNum);
+  const amt = (rows: EntryPayment[]) =>
+    rows.reduce((s, p) => s + (p.amount > 0 ? p.amount : entryFee), 0);
+  return { weekPaid: week.length, week: amt(week), season: amt(payments) };
+}
+
+/** Pot amounts implied by the payments received. */
+export function autoPots(payments: EntryPayment[], league: League, weekNum: number) {
+  const c = collected(payments, weekNum, Number(league.entry_fee));
+  const share = Math.min(Math.max(Number(league.season_pot_pct) || 0, 0), 100) / 100;
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    weekPaid: c.weekPaid,
+    weekly: round(c.week * (1 - share)),
+    season: round(c.season * share),
+  };
+}
+
+export async function saveLeaguePots(args: {
+  leagueId: string;
+  weeklyPot: number;
+  seasonPot: number;
+  potsAuto?: boolean;
+  seasonPotPct?: number;
+}) {
+  const patch: Record<string, number | boolean> = {
+    weekly_pot: args.weeklyPot,
+    season_pot: args.seasonPot,
+  };
+  if (args.potsAuto !== undefined) patch['pots_auto'] = args.potsAuto;
+  if (args.seasonPotPct !== undefined) patch['season_pot_pct'] = args.seasonPotPct;
+  const { error } = await supabase.from("leagues").update(patch).eq("id", args.leagueId);
+  if (error) throw error;
+}
