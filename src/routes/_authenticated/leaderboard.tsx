@@ -177,8 +177,15 @@ function LeaderboardPage() {
         <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-2.5">
           {[
             { label: "Entry fee", value: activeLeague.entry_fee },
-            { label: "Weekly pot", value: activeLeague.weekly_pot },
-            { label: "Season pot", value: activeLeague.season_pot },
+            {
+              label: `Week ${currentWeek.data ?? 1} pot`,
+              value: weeklyPotFor(
+                activeLeague,
+                entryPayments.data ?? [],
+                currentWeek.data ?? 1,
+              ),
+            },
+            { label: "Season pot", value: seasonPotFor(activeLeague, entryPayments.data ?? []) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
               <div className="text-[0.7rem] text-faint sm:text-xs">{c.label}</div>
