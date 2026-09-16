@@ -600,6 +600,54 @@ export async function deleteBankDeposit(id: string) {
   if (error) throw error;
 }
 
+/** The league bank holds the season pot, so each week's season share is banked here. */
+export const seasonPotNote = (weekNum: number) => `Season pot · Week ${weekNum}`;
+
+/** Keeps one bank deposit per week matching the season-pot money collected that week. */
+export async function syncSeasonPotDeposit(args: {
+  leagueId: string;
+  weekNum: number;
+  amount: number;
+  createdBy: string;
+}) {
+  const note = seasonPotNote(args.weekNum);
+  const amount = Math.round(args.amount * 100) / 100;
+  const { data: existing, error } = await supabase
+    .from("league_bank_deposits")
+    .select("id, amount")
+    .eq("league_id", args.leagueId)
+    .eq("note", note)
+    .maybeSingle();
+  if (error) throw error;
+
+  if (!existing) {
+    if (amount <= 0) return;
+    const { error: ie } = await supabase.from("league_bank_deposits").insert({
+      league_id: args.leagueId,
+      created_by: args.createdBy,
+      amount,
+      note,
+    });
+    if (ie) throw ie;
+    return;
+  }
+  if (Number(existing.amount) === amount) return;
+  if (amount <= 0) {
+    const { error: de } = await supabase
+      .from("league_bank_deposits")
+      .delete()
+      .eq("id", existing.id);
+    if (de) throw de;
+    return;
+  }
+  const { error: ue } = await supabase
+    .from("league_bank_deposits")
+    .update({ amount })
+    .eq("id", existing.id);
+  if (ue) throw ue;
+}
+
+
 /** Money the league bank holds: commissioner + member deposits − withdrawals − payouts. */
 export function bankSummary(deposits: BankDeposit[], txns: CashTxn[], payouts: Payout[]) {
   const commissioner = deposits.reduce((s, d) => s + d.amount, 0);
