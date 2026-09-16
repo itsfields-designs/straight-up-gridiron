@@ -55,45 +55,29 @@ function AuthPage() {
     try {
       const identifier = method === "phone" ? phoneAccountEmail(phone) : email;
       if (mode === "login") {
-
-          const { error: err } = await supabase.auth.signInWithPassword({
-            phone: tel,
-            password,
-          });
-          if (err) throw err;
-          navigate({ to: "/leagues", replace: true });
-        } else {
-          if (username.trim().length < 3)
-            throw new Error("Username must be at least 3 characters.");
-          const { data, error: err } = await supabase.auth.signUp({
-            phone: tel,
-            password,
-            options: { data: { username: username.trim() } },
-          });
-          if (err) throw err;
-          if (data.session) {
-            navigate({ to: "/leagues", replace: true });
-          } else {
-            setAwaitingCode(true);
-            setNotice("We texted you a 6-digit code. Enter it below to finish signing up.");
-          }
-        }
-      } else if (mode === "login") {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+        const { error: err } = await supabase.auth.signInWithPassword({
+          email: identifier,
+          password,
+        });
         if (err) throw err;
         navigate({ to: "/leagues", replace: true });
       } else {
         if (username.trim().length < 3) throw new Error("Username must be at least 3 characters.");
         const { data, error: err } = await supabase.auth.signUp({
-          email,
+          email: identifier,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { username: username.trim() },
+            data: {
+              username: username.trim(),
+              ...(method === "phone" ? { phone_number: phone.trim() } : {}),
+            },
           },
         });
         if (err) throw err;
         if (data.session) navigate({ to: "/leagues", replace: true });
+        else if (method === "phone")
+          setNotice("Account created. Log in with your phone number and password.");
         else setNotice("Check your email to confirm your account, then log in.");
       }
     } catch (err) {
