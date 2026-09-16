@@ -180,7 +180,7 @@ function LeagueHub() {
         </form>
       )}
 
-      {panel === "join" && (
+      {!locked && panel === "join" && (
         <form
           className="mt-5 max-w-md rounded-lg border border-border bg-card p-5"
           onSubmit={(e) => {
