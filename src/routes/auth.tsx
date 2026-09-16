@@ -130,7 +130,7 @@ function AuthPage() {
                   setMode(m);
                   resetFlow();
                 }}
-                className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
+                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
                   mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
@@ -148,7 +148,7 @@ function AuthPage() {
                   setMethod(m);
                   resetFlow();
                 }}
-                className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
+                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
                   method === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
