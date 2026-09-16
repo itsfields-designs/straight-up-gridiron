@@ -112,13 +112,17 @@ export function PicksPanel({
   const picked = Object.keys(picks).length;
   const canSubmit = picked === games.length && tiebreaker !== "" && !isNaN(Number(tiebreaker));
   const remaining = Math.max(games.length - picked, 0);
+  const isDirty =
+    JSON.stringify(picks) !== JSON.stringify(savedPicks) || tiebreaker !== savedTiebreaker;
   const saveHint = weekData.locked
     ? "Picks are locked for this week."
     : remaining > 0
       ? `${remaining} ${remaining === 1 ? "pick" : "picks"} remaining.`
       : tiebreaker === ""
         ? "Enter the tiebreaker score to save."
-        : "Your set is ready to save.";
+        : isDirty
+          ? "Your set is ready to save."
+          : "Your set is saved.";
 
   const addSet = () => {
     const next = Math.max(...entryNos) + 1;
@@ -126,6 +130,8 @@ export function PicksPanel({
     setActiveEntry(next);
     setPicks({});
     setTiebreaker("");
+    setSavedPicks({});
+    setSavedTiebreaker("");
   };
 
   return (
