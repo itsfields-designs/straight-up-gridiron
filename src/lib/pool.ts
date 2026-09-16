@@ -674,12 +674,13 @@ export type EntryPayment = {
   userId: string;
   entryNo: number;
   amount: number;
+  createdAt: string;
 };
 
 export async function fetchEntryPayments(leagueId: string): Promise<EntryPayment[]> {
   const { data, error } = await supabase
     .from("entry_payments")
-    .select("id, week_num, user_id, entry_no, amount")
+    .select("id, week_num, user_id, entry_no, amount, created_at")
     .eq("league_id", leagueId);
   if (error) throw error;
   return (data ?? []).map((r) => ({
@@ -688,8 +689,20 @@ export async function fetchEntryPayments(leagueId: string): Promise<EntryPayment
     userId: r.user_id,
     entryNo: r.entry_no ?? 1,
     amount: Number(r.amount),
+    createdAt: r.created_at,
   }));
 }
+
+/** Entry fees a commissioner has ticked off count as that member's deposits. */
+export function entryFeeDeposits(payments: EntryPayment[], entryFee: number) {
+  const map = new Map<string, number>();
+  for (const p of payments) {
+    const amt = p.amount > 0 ? p.amount : entryFee;
+    map.set(p.userId, (map.get(p.userId) ?? 0) + amt);
+  }
+  return map;
+}
+
 
 export async function setEntryPaid(args: {
   leagueId: string;

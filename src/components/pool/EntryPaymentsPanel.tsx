@@ -92,7 +92,18 @@ export function EntryPaymentsPanel({
       });
       if (league.pots_auto) {
         const next = paid
-          ? [...rows, { id: "tmp", weekNum: week, userId, entryNo, amount: fee }]
+          ? [
+              ...rows,
+              {
+                id: "tmp",
+                weekNum: week,
+                userId,
+                entryNo,
+                amount: fee,
+                createdAt: new Date().toISOString(),
+              },
+            ]
+
           : rows.filter(
               (p) => !(p.weekNum === week && p.userId === userId && p.entryNo === entryNo),
             );

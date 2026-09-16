@@ -8,6 +8,7 @@ import {
   cashBalances,
   collected,
   deleteCashTxn,
+  entryFeeDeposits,
   fetchCashTxns,
   fetchEntryPayments,
   fetchPayouts,
@@ -16,6 +17,7 @@ import {
   type League,
   type Member,
 } from "@/lib/pool";
+
 
 
 export function CashPanel({
@@ -49,8 +51,23 @@ export function CashPanel({
 
   const allTxns = txns.data ?? [];
   const allPayouts = payouts.data ?? [];
-  const balances = cashBalances(allTxns, allPayouts);
+  const allEntryPayments = entryPayments.data ?? [];
+  const fee = Number(league.entry_fee) || 0;
+  const feePaid = entryFeeDeposits(allEntryPayments, fee);
+  const rawBalances = cashBalances(allTxns, allPayouts);
+  const balances = new Map(
+    members.map((m) => {
+      const b = rawBalances.get(m.user_id) ?? { deposited: 0, withdrawn: 0, won: 0 };
+      return [m.user_id, { ...b, deposited: b.deposited + (feePaid.get(m.user_id) ?? 0) }];
+    }),
+  );
+  for (const [id, b] of rawBalances) {
+    if (!balances.has(id)) balances.set(id, { ...b, deposited: b.deposited + (feePaid.get(id) ?? 0) });
+  }
   const rankOf = new Map((standings.data ?? []).map((s) => [s.userId, s]));
+  const nameOf = new Map(members.map((m) => [m.user_id, m.username]));
+
+
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
@@ -207,13 +224,37 @@ export function CashPanel({
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">History</h2>
         <div className="rounded-lg border border-border bg-card">
-          {allTxns.length === 0 && allPayouts.length === 0 && (
+          {allTxns.length === 0 && allPayouts.length === 0 && allEntryPayments.length === 0 && (
             <p className="px-4 py-6 text-center text-sm text-faint">Nothing recorded yet.</p>
           )}
+          {allEntryPayments
+            .slice()
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+            .map((p, i) => (
+              <div
+                key={p.id}
+                className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              >
+                <div className="min-w-0">
+                  <div className="text-sm font-medium">
+                    {nameOf.get(p.userId) ?? "Unknown player"}
+                    {p.entryNo > 1 ? ` #${p.entryNo}` : ""}
+                  </div>
+                  <div className="truncate text-xs text-faint">
+                    Entry fee · Week {p.weekNum} · {new Date(p.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <span className="tabular-nums text-sm font-medium">
+                  +{money(p.amount > 0 ? p.amount : fee)}
+                </span>
+              </div>
+            ))}
+
           {allTxns.map((t, i) => (
             <div
               key={t.id}
-              className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 || allEntryPayments.length > 0 ? "border-t border-border" : ""}`}
+
             >
               <div className="min-w-0">
                 <div className="text-sm font-medium">{t.username}</div>
