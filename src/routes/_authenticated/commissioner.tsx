@@ -22,6 +22,8 @@ import {
   fetchMyLeagues,
   fetchPayouts,
   money,
+  seasonPotFor,
+  weeklyPotFor,
   TOTAL_WEEKS,
 } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
@@ -146,8 +148,11 @@ function CommissionerPage() {
       value: `${paidRows.length} of ${memberList.length}`,
       hint: `${money(takeIn)} collected`,
     },
-    { label: "Weekly pot", value: money(league.weekly_pot) },
-    { label: "Season pot", value: money(league.season_pot) },
+    {
+      label: `Week ${activeWeek} pot`,
+      value: money(weeklyPotFor(league, payments.data ?? [], activeWeek)),
+    },
+    { label: "Season pot", value: money(seasonPotFor(league, payments.data ?? [])) },
     { label: "Bank balance", value: money(bank.balance) },
   ];
 

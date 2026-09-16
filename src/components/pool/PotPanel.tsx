@@ -6,8 +6,11 @@ import { toast } from "sonner";
 import {
   addPayout,
   deletePayout,
+  fetchEntryPayments,
   fetchPayouts,
   money,
+  seasonPotFor,
+  weeklyPotFor,
   TOTAL_WEEKS,
   type League,
   type Member,
@@ -32,6 +35,10 @@ export function PotPanel({
     queryKey: ["payouts", league.id],
     queryFn: () => fetchPayouts(league.id),
   });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
+  });
 
   const [userId, setUserId] = useState("");
   const [potType, setPotType] = useState<"weekly" | "season">("weekly");
@@ -40,7 +47,10 @@ export function PotPanel({
   const [note, setNote] = useState("");
 
   const rows = payouts.data ?? [];
-  const paidWeekly = rows.filter((p) => p.potType === "weekly").reduce((s, p) => s + p.amount, 0);
+  const fees = entryPayments.data ?? [];
+  const paidWeekly = rows
+    .filter((p) => p.potType === "weekly" && p.weekNum === week)
+    .reduce((s, p) => s + p.amount, 0);
   const paidSeason = rows.filter((p) => p.potType === "season").reduce((s, p) => s + p.amount, 0);
 
   const perMember = members.map((m) => ({
@@ -86,8 +96,16 @@ export function PotPanel({
 
   const cards = [
     { label: "Entry fee", value: league.entry_fee },
-    { label: "Weekly pot", value: league.weekly_pot, sub: `${money(paidWeekly)} paid out` },
-    { label: "Season pot", value: league.season_pot, sub: `${money(paidSeason)} paid out` },
+    {
+      label: `Week ${week} pot`,
+      value: weeklyPotFor(league, fees, week),
+      sub: `${money(paidWeekly)} paid out`,
+    },
+    {
+      label: "Season pot",
+      value: seasonPotFor(league, fees),
+      sub: `${money(paidSeason)} paid out`,
+    },
   ];
 
   return (

@@ -759,6 +759,18 @@ export function autoPots(payments: EntryPayment[], league: League, weekNum: numb
   };
 }
 
+/** Weekly pot for one specific week: auto leagues only count that week's payments. */
+export function weeklyPotFor(league: League, payments: EntryPayment[], weekNum: number) {
+  if (!league.pots_auto) return Number(league.weekly_pot) || 0;
+  return autoPots(payments, league, weekNum).weekly;
+}
+
+/** Season pot across all weeks (auto) or the manual amount. */
+export function seasonPotFor(league: League, payments: EntryPayment[]) {
+  if (!league.pots_auto) return Number(league.season_pot) || 0;
+  return autoPots(payments, league, 0).season;
+}
+
 export async function saveLeaguePots(args: {
   leagueId: string;
   weeklyPot: number;
