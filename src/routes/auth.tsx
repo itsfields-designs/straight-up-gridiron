@@ -27,8 +27,6 @@ function AuthPage() {
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [awaitingCode, setAwaitingCode] = useState(false);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -41,13 +39,12 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  /** Turns "(415) 555 0134" into "+14155550134" so the SMS actually sends. */
-  function normalizePhone(value: string) {
-    const digits = value.replace(/[^\d+]/g, "");
-    const e164 = digits.startsWith("+") ? digits : `+${digits}`;
-    if (!/^\+[1-9]\d{7,14}$/.test(e164))
-      throw new Error("Enter your phone number with country code, like +14155550134.");
-    return e164;
+  /** Phone numbers become a stable internal address so no text message is needed. */
+  function phoneAccountEmail(value: string) {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length < 7 || digits.length > 15)
+      throw new Error("Enter your phone number with country code, like +1 415 555 0134.");
+    return `${digits}@phone.gridirongods.app`;
   }
 
   async function submit(e: React.FormEvent) {
@@ -56,55 +53,31 @@ function AuthPage() {
     setNotice("");
     setBusy(true);
     try {
-      if (method === "phone") {
-        const tel = normalizePhone(phone);
-        if (awaitingCode) {
-          const { error: err } = await supabase.auth.verifyOtp({
-            phone: tel,
-            token: code.trim(),
-            type: "sms",
-          });
-          if (err) throw err;
-          navigate({ to: "/leagues", replace: true });
-        } else if (mode === "login") {
-          const { error: err } = await supabase.auth.signInWithPassword({
-            phone: tel,
-            password,
-          });
-          if (err) throw err;
-          navigate({ to: "/leagues", replace: true });
-        } else {
-          if (username.trim().length < 3)
-            throw new Error("Username must be at least 3 characters.");
-          const { data, error: err } = await supabase.auth.signUp({
-            phone: tel,
-            password,
-            options: { data: { username: username.trim() } },
-          });
-          if (err) throw err;
-          if (data.session) {
-            navigate({ to: "/leagues", replace: true });
-          } else {
-            setAwaitingCode(true);
-            setNotice("We texted you a 6-digit code. Enter it below to finish signing up.");
-          }
-        }
-      } else if (mode === "login") {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      const identifier = method === "phone" ? phoneAccountEmail(phone) : email;
+      if (mode === "login") {
+        const { error: err } = await supabase.auth.signInWithPassword({
+          email: identifier,
+          password,
+        });
         if (err) throw err;
         navigate({ to: "/leagues", replace: true });
       } else {
         if (username.trim().length < 3) throw new Error("Username must be at least 3 characters.");
         const { data, error: err } = await supabase.auth.signUp({
-          email,
+          email: identifier,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { username: username.trim() },
+            data: {
+              username: username.trim(),
+              ...(method === "phone" ? { phone_number: phone.trim() } : {}),
+            },
           },
         });
         if (err) throw err;
         if (data.session) navigate({ to: "/leagues", replace: true });
+        else if (method === "phone")
+          setNotice("Account created. Log in with your phone number and password.");
         else setNotice("Check your email to confirm your account, then log in.");
       }
     } catch (err) {
@@ -130,8 +103,6 @@ function AuthPage() {
   const resetFlow = () => {
     setError("");
     setNotice("");
-    setAwaitingCode(false);
-    setCode("");
   };
 
   return (
@@ -211,17 +182,16 @@ function AuthPage() {
                   id="phone"
                   type="tel"
                   required
-                  disabled={awaitingCode}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+1 415 555 0134"
-                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
-                <p className="mb-4 text-xs text-faint">Include your country code, like +1.</p>
+                <p className="mb-4 text-xs text-faint">Include your country code, like +1. No text message needed.</p>
               </>
             )}
 
-            {mode === "signup" && !awaitingCode && (
+            {mode === "signup" && (
               <>
                 <label className="field-label" htmlFor="username">
                   Username
@@ -236,40 +206,23 @@ function AuthPage() {
               </>
             )}
 
-            {!awaitingCode && (
-              <>
-                <label className="field-label" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </>
-            )}
+            <label className="field-label" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
 
-            {awaitingCode && (
-              <>
-                <label className="field-label" htmlFor="code">
-                  Text message code
-                </label>
-                <input
-                  id="code"
-                  inputMode="numeric"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="123456"
-                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </>
-            )}
+
+
+
 
 
             {error && (
@@ -289,7 +242,7 @@ function AuthPage() {
               disabled={busy}
               className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
             >
-              {awaitingCode ? "Confirm code" : mode === "login" ? "Log in" : "Create account"}
+              {mode === "login" ? "Log in" : "Create account"}
             </button>
           </form>
 
