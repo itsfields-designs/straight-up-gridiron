@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchPayouts, fetchStandings, money, type League } from "@/lib/pool";
+import {
+  fetchEntryPayments,
+  fetchPayouts,
+  fetchStandings,
+  money,
+  seasonPotFor,
+  weeklyPotFor,
+  type League,
+} from "@/lib/pool";
 
 export function StandingsPanel({ leagueId, week, league }: { leagueId: string; week: number; league?: League }) {
   const [mode, setMode] = useState<"season" | "week">("season");
@@ -12,6 +20,10 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
     queryFn: () => fetchStandings(leagueId, weekNum),
   });
   const payouts = useQuery({ queryKey: ["payouts", leagueId], queryFn: () => fetchPayouts(leagueId) });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", leagueId],
+    queryFn: () => fetchEntryPayments(leagueId),
+  });
 
   const rows = standings.data ?? [];
   const updatedAt = rows[0]?.updatedAt;
@@ -20,6 +32,7 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
     if (mode === "week" && !(p.potType === "weekly" && p.weekNum === week)) continue;
     wonBy.set(p.userId, (wonBy.get(p.userId) ?? 0) + p.amount);
   }
+  const fees = entryPayments.data ?? [];
 
   return (
     <div>
@@ -27,8 +40,8 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
         <div className="mb-5 grid grid-cols-3 gap-2 sm:gap-3">
           {[
             { label: "Entry fee", value: league.entry_fee },
-            { label: "Weekly pot", value: league.weekly_pot },
-            { label: "Season pot", value: league.season_pot },
+            { label: `Week ${week} pot`, value: weeklyPotFor(league, fees, week) },
+            { label: "Season pot", value: seasonPotFor(league, fees) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
               <div className="text-[0.7rem] text-faint sm:text-xs">{c.label}</div>
