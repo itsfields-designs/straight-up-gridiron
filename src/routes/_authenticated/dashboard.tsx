@@ -72,6 +72,7 @@ function DashboardPage() {
           const rows = standings[i]?.data ?? [];
           const me = rows.find((r) => r.userId === user.id);
           const top = rows.slice(0, 3);
+          const mySets = rows.filter((r) => r.userId === user.id).length;
           return (
             <div key={league.id} className="rounded-lg border border-border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">

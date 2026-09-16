@@ -68,7 +68,7 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.userId} className="border-t border-border">
+                <tr key={`${r.userId}-${r.entryNo}`} className="border-t border-border">
                   <td className="px-4 py-2.5 text-muted-foreground">{r.rank}</td>
                   <td className="px-4 py-2.5 font-medium">{r.username}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums">
