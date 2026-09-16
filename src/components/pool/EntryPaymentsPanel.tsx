@@ -224,7 +224,7 @@ export function EntryPaymentsPanel({
                 {sets.map((n) => (
                   <label
                     key={n}
-                    className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-border px-3 text-xs"
+                    className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-xs transition-opacity ${isPaid(m.user_id, n) ? "border-accent bg-accent-soft" : "border-border"} ${toggle.isPending ? "opacity-60" : ""}`}
                   >
                     <input
                       type="checkbox"
@@ -246,7 +246,7 @@ export function EntryPaymentsPanel({
                     onClick={() =>
                       setExtraSets((s) => ({ ...s, [m.user_id]: sets.length + 1 }))
                     }
-                    className="flex items-center gap-1 text-xs text-muted-foreground"
+                    className="flex min-h-11 items-center gap-1 px-2 text-xs font-medium text-muted-foreground"
                   >
                     <Plus size={13} /> Add set
                   </button>
@@ -262,10 +262,10 @@ export function EntryPaymentsPanel({
 
       {isOwner && (
         <div className="space-y-3 border-t border-border pt-4">
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex min-h-11 items-center gap-2 text-sm">
             <input
               type="checkbox"
-              className="h-4 w-4 accent-[hsl(var(--accent))]"
+              className="h-5 w-5 accent-[hsl(var(--accent))]"
               checked={league.pots_auto}
               onChange={(e) => setAuto.mutate(e.target.checked)}
             />

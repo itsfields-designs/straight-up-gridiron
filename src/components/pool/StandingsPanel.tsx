@@ -44,19 +44,22 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
             { label: "Season pot", value: seasonPotFor(league, fees) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
-              <div className="text-[0.7rem] text-faint sm:text-xs">{c.label}</div>
+              <div className="text-xs text-muted-foreground">{c.label}</div>
               <div className="font-display text-base font-medium sm:text-lg">{money(c.value)}</div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="mb-5 flex w-fit gap-1 rounded-md bg-secondary p-1">
+      <div className="mb-5 flex w-fit gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Standings period">
         {(["season", "week"] as const).map((m) => (
           <button
             key={m}
+            type="button"
+            role="tab"
+            aria-selected={mode === m}
             onClick={() => setMode(m)}
-            className={`rounded px-3.5 py-1.5 text-sm font-medium ${
+            className={`min-h-11 rounded px-3.5 text-sm font-medium ${
               mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
@@ -94,7 +97,7 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
             ))}
             {rows.length === 0 && (
               <li className="rounded-lg border border-dashed border-border-strong p-6 text-center text-sm text-faint">
-                No results yet.
+                Picks haven’t been graded for this period yet.
               </li>
             )}
           </ul>
@@ -129,7 +132,7 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
                 {rows.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-4 py-6 text-center text-faint">
-                      No results yet.
+                      Picks haven’t been graded for this period yet.
                     </td>
                   </tr>
                 )}

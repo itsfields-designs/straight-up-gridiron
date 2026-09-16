@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { LoadingState } from "@/components/ui/feedback";
 
 import {
   deletePickEntry,
@@ -84,7 +85,7 @@ export function PicksPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (weekQuery.isLoading) return <p className="text-sm text-muted-foreground">Loading matchups…</p>;
+  if (weekQuery.isLoading) return <LoadingState label="Loading matchups" />;
 
   const weekData = weekQuery.data?.week;
   const games = weekQuery.data?.games ?? [];
@@ -102,6 +103,14 @@ export function PicksPanel({
 
   const picked = Object.keys(picks).length;
   const canSubmit = picked === games.length && tiebreaker !== "" && !isNaN(Number(tiebreaker));
+  const remaining = Math.max(games.length - picked, 0);
+  const saveHint = weekData.locked
+    ? "Picks are locked for this week."
+    : remaining > 0
+      ? `${remaining} ${remaining === 1 ? "pick" : "picks"} remaining.`
+      : tiebreaker === ""
+        ? "Enter the tiebreaker score to save."
+        : "Your set is ready to save.";
 
   const addSet = () => {
     const next = Math.max(...entryNos) + 1;
@@ -114,12 +123,15 @@ export function PicksPanel({
   return (
     <div>
       <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
-        <div className="flex shrink-0 gap-1 rounded-md bg-secondary p-1">
+        <div className="flex shrink-0 gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Pick sets">
           {entryNos.map((n) => (
             <button
               key={n}
+              type="button"
+              role="tab"
+              aria-selected={activeEntry === n}
               onClick={() => setActiveEntry(n)}
-              className={`min-h-10 shrink-0 rounded px-3.5 text-sm font-medium ${
+              className={`min-h-11 shrink-0 rounded px-3.5 text-sm font-medium ${
                 activeEntry === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
               }`}
             >
@@ -131,7 +143,7 @@ export function PicksPanel({
         <button
           onClick={addSet}
           disabled={weekData.locked}
-          className="flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-muted-foreground disabled:opacity-40"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-muted-foreground disabled:opacity-40"
         >
           <Plus size={14} /> Add set
         </button>
@@ -139,14 +151,14 @@ export function PicksPanel({
           <button
             onClick={() => remove.mutate(activeEntry)}
             disabled={weekData.locked || remove.isPending}
-            className="flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-destructive disabled:opacity-40"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-destructive disabled:opacity-40"
           >
             <Trash2 size={14} /> Remove set {activeEntry}
           </button>
         )}
       </div>
 
-      <div className="mb-4 text-sm text-muted-foreground">
+      <div className="mb-4 text-sm text-muted-foreground" aria-live="polite">
         Set {activeEntry} · {picked} of {games.length} games picked
         {weekData.locked && (
           <span className="ml-2 text-destructive">· picks are locked for this week</span>
@@ -154,6 +166,9 @@ export function PicksPanel({
         <p className="mt-1 text-xs text-faint">
           Each set stands on its own in the standings and costs one entry fee.
         </p>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
+          <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${games.length ? (picked / games.length) * 100 : 0}%` }} />
+        </div>
       </div>
 
       <div className="space-y-2.5">
@@ -183,6 +198,9 @@ export function PicksPanel({
                   return (
                     <button
                       key={side}
+                      type="button"
+                      aria-pressed={chosen}
+                      aria-label={`Pick ${game[side]}${side === "home" ? ", home team" : ", away team"}`}
                       disabled={weekData.locked}
                       onClick={() => setPicks((p) => ({ ...p, [game.id]: side }))}
                       className={`flex min-h-12 items-center justify-between gap-1 rounded-md border px-3 py-2.5 text-left text-sm font-medium ${
@@ -222,7 +240,7 @@ export function PicksPanel({
         })}
       </div>
 
-      <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 md:static md:bottom-auto">
+      <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-lg bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
         <button
           onClick={() => save.mutate()}
           disabled={!canSubmit || weekData.locked || save.isPending}
@@ -230,6 +248,7 @@ export function PicksPanel({
         >
           {save.isPending ? "Saving…" : `Save set ${activeEntry} · ${picked}/${games.length}`}
         </button>
+        <p className="mt-1.5 text-center text-xs text-muted-foreground md:text-left" aria-live="polite">{saveHint}</p>
       </div>
     </div>
   );

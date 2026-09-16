@@ -105,6 +105,7 @@ export function MembersPanel({
         </div>
         <button
           onClick={copyCode}
+          aria-live="polite"
           className="flex items-center gap-1.5 rounded-md border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-secondary"
         >
           <Copy size={14} /> {copied ? "Copied" : "Copy code"}
@@ -143,7 +144,8 @@ export function MembersPanel({
               {isOwner && m.user_id !== league.owner_id && (
                 <button
                   onClick={() => remove.mutate(m.user_id)}
-                  className="flex items-center gap-1 text-xs text-destructive"
+                  className="flex min-h-11 items-center gap-1 rounded-md px-3 text-sm font-medium text-destructive hover:bg-destructive-soft"
+                  aria-label={`Remove ${m.username} from league`}
                 >
                   <X size={13} /> Remove
                 </button>
@@ -158,7 +160,9 @@ export function MembersPanel({
           <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
             <Shield size={14} /> Commissioner settings
           </h2>
+          <label className="field-label" htmlFor="league-house-rules">House rules</label>
           <textarea
+            id="league-house-rules"
             rows={3}
             value={rules}
             onChange={(e) => setRules(e.target.value)}

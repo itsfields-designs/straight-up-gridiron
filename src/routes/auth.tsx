@@ -121,16 +121,18 @@ function AuthPage() {
         </div>
 
         <div className="rounded-lg border border-border bg-card p-5">
-          <div className="mb-5 flex gap-1 rounded-md bg-secondary p-1">
+          <div className="mb-5 flex gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Account action">
             {(["login", "signup"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
+                role="tab"
+                aria-selected={mode === m}
                 onClick={() => {
                   setMode(m);
                   resetFlow();
                 }}
-                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
+                className={`min-h-11 flex-1 rounded text-sm font-medium transition-colors ${
                   mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
@@ -139,16 +141,18 @@ function AuthPage() {
             ))}
           </div>
 
-          <div className="mb-5 flex gap-1 rounded-md bg-secondary p-1">
+          <div className="mb-5 flex gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Sign-in method">
             {(["email", "phone"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
+                role="tab"
+                aria-selected={method === m}
                 onClick={() => {
                   setMethod(m);
                   resetFlow();
                 }}
-                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
+                className={`min-h-11 flex-1 rounded text-sm font-medium transition-colors ${
                   method === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
@@ -192,7 +196,9 @@ function AuthPage() {
                   placeholder="+1 415 555 0134"
                   className="mb-1 min-h-12 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
-                <p className="mb-4 text-xs text-faint">Include your country code, like +1. No text message needed.</p>
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Include your country code. You’ll use this number with your password—no text message is sent.
+                </p>
               </>
             )}
 
@@ -231,13 +237,13 @@ function AuthPage() {
 
 
             {error && (
-              <div className="mb-3 flex items-start gap-2 rounded-md bg-destructive-soft px-3 py-2 text-sm text-destructive">
+              <div role="alert" className="mb-3 flex items-start gap-2 rounded-md bg-destructive-soft px-3 py-2 text-sm text-destructive">
                 <AlertCircle size={15} className="mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
             {notice && (
-              <div className="mb-3 rounded-md bg-accent-soft px-3 py-2 text-sm text-accent-soft-foreground">
+              <div role="status" aria-live="polite" className="mb-3 rounded-md bg-accent-soft px-3 py-2 text-sm text-accent-soft-foreground">
                 {notice}
               </div>
             )}
@@ -247,7 +253,7 @@ function AuthPage() {
               disabled={busy}
               className="min-h-12 w-full rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
             >
-              {mode === "login" ? "Log in" : "Create account"}
+              {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
             </button>
           </form>
 

@@ -25,6 +25,7 @@ import {
   weeklyPotFor,
 } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
+import { LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
   head: () => ({
@@ -130,7 +131,7 @@ function LeaderboardPage() {
     });
   }, [weekly.data, players, cumulative]);
 
-  if (leagues.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (leagues.isLoading) return <LoadingState label="Loading leaderboard" />;
 
   if (!leagues.data?.length)
     return (
@@ -188,7 +189,7 @@ function LeaderboardPage() {
             { label: "Season pot", value: seasonPotFor(activeLeague, entryPayments.data ?? []) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
-              <div className="text-[0.7rem] text-faint sm:text-xs">{c.label}</div>
+              <div className="text-xs text-muted-foreground">{c.label}</div>
               <div className="font-display text-base font-medium sm:text-lg">{money(c.value)}</div>
             </div>
           ))}
@@ -223,12 +224,15 @@ function LeaderboardPage() {
           <h2 className="text-sm font-semibold">
             {cumulative ? "Running total of correct picks" : "Correct picks each week"}
           </h2>
-          <div className="flex gap-1 rounded-md bg-secondary p-1">
+          <div className="flex gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Chart view">
             {([true, false] as const).map((v) => (
               <button
                 key={String(v)}
+                type="button"
+                role="tab"
+                aria-selected={cumulative === v}
                 onClick={() => setCumulative(v)}
-                className={`rounded px-3 py-1.5 text-xs font-medium ${
+                className={`min-h-11 rounded px-3 text-xs font-medium ${
                   cumulative === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
