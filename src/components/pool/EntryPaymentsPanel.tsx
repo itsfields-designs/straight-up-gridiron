@@ -10,9 +10,11 @@ import {
   money,
   saveLeaguePots,
   setEntryPaid,
+  syncSeasonPotDeposit,
   type League,
   type Member,
 } from "@/lib/pool";
+
 
 export function EntryPaymentsPanel({
   league,
