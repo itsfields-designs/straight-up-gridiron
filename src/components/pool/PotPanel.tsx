@@ -12,6 +12,7 @@ import {
   type League,
   type Member,
 } from "@/lib/pool";
+import { EntryPaymentsPanel } from "@/components/pool/EntryPaymentsPanel";
 
 export function PotPanel({
   league,
