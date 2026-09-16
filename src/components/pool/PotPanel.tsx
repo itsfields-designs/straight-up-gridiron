@@ -96,8 +96,16 @@ export function PotPanel({
 
   const cards = [
     { label: "Entry fee", value: league.entry_fee },
-    { label: "Weekly pot", value: league.weekly_pot, sub: `${money(paidWeekly)} paid out` },
-    { label: "Season pot", value: league.season_pot, sub: `${money(paidSeason)} paid out` },
+    {
+      label: `Week ${week} pot`,
+      value: weeklyPotFor(league, fees, week),
+      sub: `${money(paidWeekly)} paid out`,
+    },
+    {
+      label: "Season pot",
+      value: seasonPotFor(league, fees),
+      sub: `${money(paidSeason)} paid out`,
+    },
   ];
 
   return (
