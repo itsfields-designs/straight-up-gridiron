@@ -269,7 +269,7 @@ function CommissionerPage() {
         <Link
           to="/leagues/$leagueId"
           params={{ leagueId: league.id }}
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
         >
           Open the full league page
         </Link>

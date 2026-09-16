@@ -65,6 +65,13 @@ export function MembersPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  function confirmRemoval(userId: string, username: string) {
+    if (!window.confirm(`Remove ${username} from ${league.name}? Their league access will end.`)) {
+      return;
+    }
+    remove.mutate(userId);
+  }
+
   const saveRules = useMutation({
     mutationFn: async () => {
       const num = (v: string) => {
@@ -104,9 +111,10 @@ export function MembersPanel({
           <div className="font-display text-lg font-medium tracking-widest">{league.code}</div>
         </div>
         <button
+          type="button"
           onClick={copyCode}
           aria-live="polite"
-          className="flex items-center gap-1.5 rounded-md border border-border-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-secondary"
+          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-secondary"
         >
           <Copy size={14} /> {copied ? "Copied" : "Copy code"}
         </button>
@@ -143,7 +151,9 @@ export function MembersPanel({
               </div>
               {isOwner && m.user_id !== league.owner_id && (
                 <button
-                  onClick={() => remove.mutate(m.user_id)}
+                  type="button"
+                  onClick={() => confirmRemoval(m.user_id, m.username)}
+                  disabled={remove.isPending}
                   className="flex min-h-11 items-center gap-1 rounded-md px-3 text-sm font-medium text-destructive hover:bg-destructive-soft"
                   aria-label={`Remove ${m.username} from league`}
                 >
@@ -166,7 +176,7 @@ export function MembersPanel({
             rows={3}
             value={rules}
             onChange={(e) => setRules(e.target.value)}
-            className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="min-h-11 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
@@ -183,23 +193,25 @@ export function MembersPanel({
                   inputMode="decimal"
                   value={f.value}
                   onChange={(e) => f.set(e.target.value)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
             ))}
           </div>
           <button
+            type="button"
             onClick={() => saveRules.mutate()}
             disabled={saveRules.isPending}
-            className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+            className="mt-3 min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
             {saveRules.isPending ? "Saving…" : "Save settings"}
           </button>
         </div>
       ) : (
         <button
+          type="button"
           onClick={() => remove.mutate(currentUserId)}
-          className="rounded-md bg-destructive-soft px-4 py-2.5 text-sm font-medium text-destructive"
+          className="min-h-11 rounded-md bg-destructive-soft px-4 text-sm font-medium text-destructive"
         >
           Leave league
         </button>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, ClipboardList, Plus } from "lucide-react";
 
 import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
@@ -116,6 +116,15 @@ function DashboardPage() {
                   ))}
                 </ul>
               )}
+
+              <Link
+                to="/leagues/$leagueId"
+                params={{ leagueId: league.id }}
+                className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary sm:ml-auto sm:w-fit"
+              >
+                <ClipboardList size={16} /> Open league
+                <ChevronRight size={15} className="text-faint" />
+              </Link>
             </div>
           );
         })}
