@@ -96,7 +96,7 @@ export function MembersPanel({
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {[
           { label: "Entry fee", value: league.entry_fee },
           { label: "Weekly pot", value: league.weekly_pot },

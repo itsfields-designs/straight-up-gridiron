@@ -192,8 +192,8 @@ export function PotPanel({
 
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">Won per member</h2>
-        <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full min-w-[26rem] text-sm">
             <thead>
               <tr className="bg-secondary text-xs text-muted-foreground">
                 <th className="px-4 py-2.5 text-left font-medium">Member</th>

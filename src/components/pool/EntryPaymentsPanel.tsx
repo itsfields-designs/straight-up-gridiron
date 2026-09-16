@@ -186,11 +186,11 @@ export function EntryPaymentsPanel({
                 {sets.map((n) => (
                   <label
                     key={n}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs"
+                    className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-border px-3 text-xs"
                   >
                     <input
                       type="checkbox"
-                      className="h-4 w-4 accent-[hsl(var(--accent))]"
+                      className="h-5 w-5 accent-[hsl(var(--accent))]"
                       checked={isPaid(m.user_id, n)}
                       disabled={!isOwner || toggle.isPending}
                       onChange={(e) =>

@@ -41,7 +41,7 @@ function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <h1 className="text-xl font-semibold sm:text-2xl">Dashboard</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {currentWeek.data
           ? `Week ${currentWeek.data} is on the clock. Here's where you stand everywhere.`

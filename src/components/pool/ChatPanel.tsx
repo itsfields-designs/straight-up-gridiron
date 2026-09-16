@@ -214,9 +214,10 @@ export function ChatPanel({
           <button
             onClick={() => post.mutate()}
             disabled={post.isPending}
-            className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+            aria-label="Send message"
+            className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
-            <Send size={14} /> Send
+            <Send size={16} /> <span className="hidden sm:inline">Send</span>
           </button>
         </div>
       ) : (

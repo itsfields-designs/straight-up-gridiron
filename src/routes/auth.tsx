@@ -130,7 +130,7 @@ function AuthPage() {
                   setMode(m);
                   resetFlow();
                 }}
-                className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
+                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
                   mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
@@ -148,7 +148,7 @@ function AuthPage() {
                   setMethod(m);
                   resetFlow();
                 }}
-                className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
+                className={`min-h-10 flex-1 rounded text-sm font-medium transition-colors ${
                   method === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
@@ -166,11 +166,14 @@ function AuthPage() {
                 <input
                   id="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="mb-4 min-h-12 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </>
             ) : (
@@ -181,11 +184,13 @@ function AuthPage() {
                 <input
                   id="phone"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+1 415 555 0134"
-                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="mb-1 min-h-12 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
                 <p className="mb-4 text-xs text-faint">Include your country code, like +1. No text message needed.</p>
               </>
@@ -201,7 +206,7 @@ function AuthPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="how your league sees you"
-                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="mb-4 min-h-12 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </>
             )}
@@ -217,7 +222,7 @@ function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+              className="mb-4 min-h-12 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
 
 
@@ -240,7 +245,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
+              className="min-h-12 w-full rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
             >
               {mode === "login" ? "Log in" : "Create account"}
             </button>
@@ -253,7 +258,7 @@ function AuthPage() {
           <button
             type="button"
             onClick={googleSignIn}
-            className="w-full rounded-md border border-border-strong bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-secondary"
+            className="min-h-12 w-full rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
           >
             Continue with Google
           </button>

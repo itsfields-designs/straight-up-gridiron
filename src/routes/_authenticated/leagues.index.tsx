@@ -61,7 +61,7 @@ function LeagueHub() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Your leagues</h1>
+      <h1 className="text-xl font-semibold sm:text-2xl">Your leagues</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Join a league to make weekly picks against friends, or start your own.
       </p>
@@ -81,27 +81,27 @@ function LeagueHub() {
             key={l.id}
             to="/leagues/$leagueId"
             params={{ leagueId: l.id }}
-            className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3.5 transition-colors hover:bg-secondary"
+            className="flex min-h-[3.5rem] items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3.5 transition-colors hover:bg-secondary"
           >
-            <div>
-              <div className="font-medium">{l.name}</div>
+            <div className="min-w-0">
+              <div className="truncate font-medium">{l.name}</div>
               <div className="text-xs text-faint">Invite code {l.code}</div>
             </div>
-            <ChevronRight size={16} className="text-faint" />
+            <ChevronRight size={16} className="shrink-0 text-faint" />
           </Link>
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
         <button
           onClick={() => setPanel(panel === "create" ? "none" : "create")}
-          className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+          className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
         >
           <Plus size={15} /> Create a league
         </button>
         <button
           onClick={() => setPanel(panel === "join" ? "none" : "join")}
-          className="rounded-md border border-border-strong bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-secondary"
+          className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
         >
           Join with a code
         </button>

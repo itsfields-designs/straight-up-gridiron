@@ -117,7 +117,7 @@ function CommissionerPage() {
   if (!owned.length)
     return (
       <div>
-        <h1 className="text-2xl font-semibold">Commissioner</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Commissioner</h1>
         <div className="mt-5 rounded-lg border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted-foreground">
             You don't run a league yet. Start one and this page becomes your control room.
@@ -153,17 +153,17 @@ function CommissionerPage() {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold">
-            <ShieldCheck size={20} className="text-accent" /> Commissioner
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-xl font-semibold sm:text-2xl">
+            <ShieldCheck size={20} className="shrink-0 text-accent" /> Commissioner
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Everything you need to run {league.name} in one place.
           </p>
         </div>
-        <div className="flex gap-2">
-          <div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="min-w-0">
             <label className="mb-1 block text-xs text-faint" htmlFor="league">
               League
             </label>
@@ -171,7 +171,7 @@ function CommissionerPage() {
               id="league"
               value={league.id}
               onChange={(e) => setLeagueId(e.target.value)}
-              className="rounded-md border border-input bg-card px-3 py-2.5 text-sm"
+              className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm"
             >
               {owned.map((l) => (
                 <option key={l.id} value={l.id}>
@@ -180,7 +180,7 @@ function CommissionerPage() {
               ))}
             </select>
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="mb-1 block text-xs text-faint" htmlFor="cweek">
               Week
             </label>
@@ -188,7 +188,7 @@ function CommissionerPage() {
               id="cweek"
               value={activeWeek}
               onChange={(e) => setWeek(Number(e.target.value))}
-              className="w-28 rounded-md border border-input bg-card px-3 py-2.5 text-sm"
+              className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm sm:w-28"
             >
               {Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1).map((w) => (
                 <option key={w} value={w}>
@@ -200,28 +200,30 @@ function CommissionerPage() {
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-lg border border-border bg-card p-3.5">
-            <p className="text-xs text-faint">{s.label}</p>
-            <p className="mt-1 text-lg font-semibold">{s.value}</p>
+          <div key={s.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
+            <p className="text-[0.7rem] text-faint sm:text-xs">{s.label}</p>
+            <p className="mt-1 text-base font-semibold sm:text-lg">{s.value}</p>
             {s.hint && <p className="text-xs text-muted-foreground">{s.hint}</p>}
           </div>
         ))}
       </div>
 
-      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
-        {SECTIONS.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => setSection(s.id)}
-            className={`-mb-px flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3.5 py-2.5 text-sm font-medium ${
-              section === s.id ? "border-accent text-foreground" : "border-transparent text-faint"
-            }`}
-          >
-            <s.icon size={15} /> {s.label}
-          </button>
-        ))}
+      <div className="sticky top-[3.4rem] z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
+        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSection(s.id)}
+              className={`-mb-px flex shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 sm:py-2.5 ${
+                section === s.id ? "border-accent text-foreground" : "border-transparent text-faint"
+              }`}
+            >
+              <s.icon size={15} /> {s.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {section === "members" && (
