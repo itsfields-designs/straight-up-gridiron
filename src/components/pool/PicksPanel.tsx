@@ -31,6 +31,8 @@ export function PicksPanel({
 
   const [picks, setPicks] = useState<Record<string, Side>>({});
   const [tiebreaker, setTiebreaker] = useState("");
+  const [savedPicks, setSavedPicks] = useState<Record<string, Side>>({});
+  const [savedTiebreaker, setSavedTiebreaker] = useState("");
   const [activeEntry, setActiveEntry] = useState(1);
   const [draftSets, setDraftSets] = useState<number[]>([]);
 
