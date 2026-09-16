@@ -37,6 +37,11 @@ export function CashPanel({
     queryKey: ["standings", league.id, 0],
     queryFn: () => fetchStandings(league.id, 0),
   });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
+  });
+
 
   const [kind, setKind] = useState<"deposit" | "withdrawal">("deposit");
   const [amount, setAmount] = useState("");
