@@ -149,6 +149,14 @@ export function EntryPaymentsPanel({
         potsAuto: on,
         seasonPotPct: pct,
       });
+      const weekPaidCount = rows.filter((p) => p.weekNum === week).length;
+      await syncSeasonPotDeposit({
+        leagueId: league.id,
+        weekNum: week,
+        amount: on ? (weekPaidCount * fee * pct) / 100 : 0,
+        createdBy: currentUserId,
+      });
+
     },
     onSuccess: refresh,
     onError: (e: Error) => toast.error(e.message),
