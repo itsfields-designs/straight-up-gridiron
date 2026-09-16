@@ -114,8 +114,8 @@ export function MembersPanel({
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {[
           { label: "Entry fee", value: league.entry_fee },
-          { label: "Weekly pot", value: league.weekly_pot },
-          { label: "Season pot", value: league.season_pot },
+          { label: `Week ${shownWeek} pot`, value: weeklyPotFor(league, fees, shownWeek) },
+          { label: "Season pot", value: seasonPotFor(league, fees) },
         ].map((item) => (
           <div key={item.label} className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs text-faint">{item.label}</div>
