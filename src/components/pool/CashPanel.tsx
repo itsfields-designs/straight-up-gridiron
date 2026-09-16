@@ -222,9 +222,32 @@ export function CashPanel({
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">History</h2>
         <div className="rounded-lg border border-border bg-card">
-          {allTxns.length === 0 && allPayouts.length === 0 && (
+          {allTxns.length === 0 && allPayouts.length === 0 && allEntryPayments.length === 0 && (
             <p className="px-4 py-6 text-center text-sm text-faint">Nothing recorded yet.</p>
           )}
+          {allEntryPayments
+            .slice()
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+            .map((p, i) => (
+              <div
+                key={p.id}
+                className={`flex items-center justify-between gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              >
+                <div className="min-w-0">
+                  <div className="text-sm font-medium">
+                    {nameOf.get(p.userId) ?? "Unknown player"}
+                    {p.entryNo > 1 ? ` #${p.entryNo}` : ""}
+                  </div>
+                  <div className="truncate text-xs text-faint">
+                    Entry fee · Week {p.weekNum} · {new Date(p.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <span className="tabular-nums text-sm font-medium">
+                  +{money(p.amount > 0 ? p.amount : fee)}
+                </span>
+              </div>
+            ))}
+
           {allTxns.map((t, i) => (
             <div
               key={t.id}
