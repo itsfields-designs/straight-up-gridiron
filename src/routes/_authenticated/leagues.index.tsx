@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/leagues/")({
       { name: "description", content: "Your NFL pick'em leagues and invites." },
       { property: "og:title", content: "Your leagues — Gridiron Gods" },
       { property: "og:description", content: "Your NFL pick'em leagues and invites." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LeagueHub,

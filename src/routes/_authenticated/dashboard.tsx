@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
         property: "og:description",
         content: "All your NFL pick'em leagues, the current week, and standings at a glance.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: DashboardPage,

@@ -50,6 +50,8 @@ export const Route = createFileRoute("/_authenticated/commissioner")({
         content:
           "Run your league from one place: members, weekly entry payments, pot payouts, cash pool, bank and chat.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CommissionerPage,
@@ -205,7 +207,7 @@ function CommissionerPage() {
       <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
-            <p className="text-[0.7rem] text-faint sm:text-xs">{s.label}</p>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="mt-1 text-base font-semibold sm:text-lg">{s.value}</p>
             {s.hint && <p className="text-xs text-muted-foreground">{s.hint}</p>}
           </div>

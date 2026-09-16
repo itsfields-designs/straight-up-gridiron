@@ -38,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
         property: "og:description",
         content: "Make your weekly picks and check the league standings.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LeaguePage,

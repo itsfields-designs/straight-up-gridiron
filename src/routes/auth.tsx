@@ -15,6 +15,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Log in or create your Gridiron Gods account." },
       { property: "og:title", content: "Log in — Gridiron Gods" },
       { property: "og:description", content: "Log in or create your Gridiron Gods account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,

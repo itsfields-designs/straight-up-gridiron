@@ -40,6 +40,8 @@ export const Route = createFileRoute("/_authenticated/leaderboard")({
         property: "og:description",
         content: "Top performers in your NFL pick'em leagues, with points won each week.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LeaderboardPage,
