@@ -134,7 +134,7 @@ export function BankPanel({
           <button
             onClick={() => create.mutate()}
             disabled={create.isPending}
-            className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+            className="mt-3 min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
             {create.isPending ? "Saving…" : "Add deposit"}
           </button>
@@ -168,7 +168,7 @@ export function BankPanel({
                 {isOwner && (
                   <button
                     onClick={() => remove.mutate(d.id)}
-                    className="text-destructive"
+                    className="grid min-h-11 min-w-11 place-items-center rounded-md text-destructive hover:bg-destructive-soft"
                     aria-label="Delete deposit"
                   >
                     <Trash2 size={14} />

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { LoadingState } from "@/components/ui/feedback";
 
 import { fetchWeek, gradeGame, type Game } from "@/lib/pool";
 import { refreshNfl } from "@/lib/nfl.functions";
@@ -35,7 +36,7 @@ export function SchedulePanel({ week }: { week: number }) {
     }
   };
 
-  if (weekQuery.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (weekQuery.isLoading) return <LoadingState label="Loading schedule" />;
 
   return (
     <div className="space-y-6">
@@ -55,7 +56,7 @@ export function SchedulePanel({ week }: { week: number }) {
         <button
           onClick={runSync}
           disabled={syncing}
-          className="flex items-center gap-1.5 rounded-md border border-border-strong px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary disabled:opacity-40"
+          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-secondary disabled:opacity-40"
         >
           <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
           {syncing ? "Updating…" : "Refresh now"}
