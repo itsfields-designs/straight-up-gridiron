@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Copy, Shield, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import type { League, Member } from "@/lib/pool";
+import {
+  fetchCurrentWeek,
+  fetchEntryPayments,
+  seasonPotFor,
+  weeklyPotFor,
+  type League,
+  type Member,
+} from "@/lib/pool";
 
 export function MembersPanel({
   league,
@@ -25,6 +32,14 @@ export function MembersPanel({
   const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
+
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
+  });
+  const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+  const shownWeek = currentWeek.data ?? 1;
+  const fees = entryPayments.data ?? [];
 
   const money = (v: number | string) =>
     `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
