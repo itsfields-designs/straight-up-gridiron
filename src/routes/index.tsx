@@ -74,7 +74,7 @@ function Index() {
        </div>
       </section>
 
-      <section className="mx-auto grid max-w-4xl gap-3 px-5 pb-16 sm:grid-cols-3 sm:gap-4 sm:pb-24">
+      <section className="mx-auto grid max-w-4xl gap-3 px-5 py-8 sm:grid-cols-3 sm:gap-4 sm:py-12">
         {[
           {
             icon: Users,

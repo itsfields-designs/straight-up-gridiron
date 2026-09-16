@@ -83,15 +83,35 @@ function LeagueHub() {
 
       {!locked && (
         <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-          <button onClick={() => setPanel(panel === "create" ? "none" : "create")} aria-expanded={panel === "create"} className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"><Plus size={15} /> Create league</button>
-          <button onClick={() => setPanel(panel === "join" ? "none" : "join")} aria-expanded={panel === "join"} className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary">Join with code</button>
+          <button
+            type="button"
+            onClick={() => setPanel(panel === "create" ? "none" : "create")}
+            aria-expanded={panel === "create"}
+            className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+          >
+            <Plus size={15} /> Create league
+          </button>
+          <button
+            type="button"
+            onClick={() => setPanel(panel === "join" ? "none" : "join")}
+            aria-expanded={panel === "join"}
+            className="min-h-12 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary"
+          >
+            Join with code
+          </button>
         </div>
       )}
 
       {leagues.isLoading && <div className="mt-6"><LoadingState label="Loading your leagues" /></div>}
 
       {leagues.data?.length === 0 && (
-        <div className="mt-6"><EmptyState icon={Users} title="No leagues yet" description="Use the buttons above to start a league or join your friends." /></div>
+        <div className="mt-6">
+          <EmptyState
+            icon={Users}
+            title="No leagues yet"
+            description="Use the buttons above to start a league or join your friends."
+          />
+        </div>
       )}
 
       <div className="mt-6 grid gap-2.5">
@@ -147,7 +167,9 @@ function LeagueHub() {
             create.mutate();
           }}
         >
-          <label className="field-label" htmlFor="league-name">League name</label>
+          <label className="field-label" htmlFor="league-name">
+            League name
+          </label>
           <input
             id="league-name"
             value={name}
@@ -156,7 +178,9 @@ function LeagueHub() {
             required
             className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
-          <label className="field-label" htmlFor="league-rules">House rules</label>
+          <label className="field-label" htmlFor="league-rules">
+            House rules
+          </label>
           <textarea
             id="league-rules"
             rows={3}
@@ -182,7 +206,9 @@ function LeagueHub() {
             join.mutate();
           }}
         >
-          <label className="field-label" htmlFor="invite-code">Invite code</label>
+          <label className="field-label" htmlFor="invite-code">
+            Invite code
+          </label>
           <input
             id="invite-code"
             autoComplete="off"
