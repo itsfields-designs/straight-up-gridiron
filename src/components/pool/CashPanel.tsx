@@ -51,8 +51,21 @@ export function CashPanel({
 
   const allTxns = txns.data ?? [];
   const allPayouts = payouts.data ?? [];
-  const balances = cashBalances(allTxns, allPayouts);
+  const allEntryPayments = entryPayments.data ?? [];
+  const fee = Number(league.entry_fee) || 0;
+  const feePaid = entryFeeDeposits(allEntryPayments, fee);
+  const rawBalances = cashBalances(allTxns, allPayouts);
+  const balances = new Map(
+    members.map((m) => {
+      const b = rawBalances.get(m.user_id) ?? { deposited: 0, withdrawn: 0, won: 0 };
+      return [m.user_id, { ...b, deposited: b.deposited + (feePaid.get(m.user_id) ?? 0) }];
+    }),
+  );
+  for (const [id, b] of rawBalances) {
+    if (!balances.has(id)) balances.set(id, { ...b, deposited: b.deposited + (feePaid.get(id) ?? 0) });
+  }
   const rankOf = new Map((standings.data ?? []).map((s) => [s.userId, s]));
+
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
