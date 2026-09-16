@@ -157,8 +157,7 @@ function AuthPage() {
                 type="button"
                 onClick={() => {
                   setMode(m);
-                  setError("");
-                  setNotice("");
+                  resetFlow();
                 }}
                 className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
                   mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
@@ -169,21 +168,60 @@ function AuthPage() {
             ))}
           </div>
 
-          <form onSubmit={submit}>
-            <label className="field-label" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
+          <div className="mb-5 flex gap-1 rounded-md bg-secondary p-1">
+            {(["email", "phone"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setMethod(m);
+                  resetFlow();
+                }}
+                className={`flex-1 rounded py-2 text-sm font-medium transition-colors ${
+                  method === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                {m === "email" ? "Email" : "Phone number"}
+              </button>
+            ))}
+          </div>
 
-            {mode === "signup" && (
+          <form onSubmit={submit}>
+            {method === "email" ? (
+              <>
+                <label className="field-label" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </>
+            ) : (
+              <>
+                <label className="field-label" htmlFor="phone">
+                  Phone number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  required
+                  disabled={awaitingCode}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 415 555 0134"
+                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+                />
+                <p className="mb-4 text-xs text-faint">Include your country code, like +1.</p>
+              </>
+            )}
+
+            {mode === "signup" && !awaitingCode && (
               <>
                 <label className="field-label" htmlFor="username">
                   Username
@@ -198,19 +236,41 @@ function AuthPage() {
               </>
             )}
 
-            <label className="field-label" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
+            {!awaitingCode && (
+              <>
+                <label className="field-label" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </>
+            )}
+
+            {awaitingCode && (
+              <>
+                <label className="field-label" htmlFor="code">
+                  Text message code
+                </label>
+                <input
+                  id="code"
+                  inputMode="numeric"
+                  required
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="123456"
+                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </>
+            )}
+
 
             {error && (
               <div className="mb-3 flex items-start gap-2 rounded-md bg-destructive-soft px-3 py-2 text-sm text-destructive">
