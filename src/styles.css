@@ -144,3 +144,11 @@
   color: var(--color-muted-foreground);
   margin-bottom: 0.375rem;
 }
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
