@@ -40,7 +40,12 @@ export type League = {
   weekly_pot: number;
   season_pot: number;
   chat_locked: boolean;
+  pots_auto: boolean;
+  season_pot_pct: number;
 };
+
+const LEAGUE_COLS =
+  "id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_pct";
 
 export type Member = { user_id: string; username: string };
 
