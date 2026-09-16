@@ -66,7 +66,7 @@ export async function fetchMyLeagues(): Promise<League[]> {
   if (!ids.length) return [];
   const { data, error } = await supabase
     .from("leagues")
-    .select("id, name, rules, code, owner_id, entry_fee, weekly_pot, season_pot, chat_locked")
+    .select(LEAGUE_COLS)
     .in("id", ids)
     .order("created_at", { ascending: true });
   if (error) throw error;
