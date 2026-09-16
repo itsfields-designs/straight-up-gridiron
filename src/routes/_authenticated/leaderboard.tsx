@@ -253,7 +253,7 @@ function LeaderboardPage() {
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 {players.map((p) => (
                   <Line
-                    key={p.userId}
+                    key={p.key}
                     type="monotone"
                     dataKey={p.username}
                     stroke={p.color}
