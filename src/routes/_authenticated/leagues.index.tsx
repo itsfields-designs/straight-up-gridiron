@@ -37,6 +37,17 @@ function LeagueHub() {
   const createLeagueFn = useServerFn(createLeague);
   const joinLeagueFn = useServerFn(joinLeague);
 
+  const checkMembershipFn = useServerFn(checkMembership);
+  const checkoutFn = useServerFn(createSznCheckout);
+  const membership = useQuery({ queryKey: ["membership"], queryFn: () => checkMembershipFn() });
+  const locked = membership.data ? !membership.data.entitled : false;
+
+  const startCheckout = useMutation({
+    mutationFn: async () => await checkoutFn(),
+    onSuccess: ({ url }) => window.open(url, "_blank", "noopener"),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const create = useMutation({
     mutationFn: async () =>
       await createLeagueFn({ data: { name: name.trim(), rules: rules.trim() } }),
