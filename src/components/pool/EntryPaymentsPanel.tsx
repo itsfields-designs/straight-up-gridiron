@@ -10,9 +10,11 @@ import {
   money,
   saveLeaguePots,
   setEntryPaid,
+  syncSeasonPotDeposit,
   type League,
   type Member,
 } from "@/lib/pool";
+
 
 export function EntryPaymentsPanel({
   league,
@@ -56,9 +58,17 @@ export function EntryPaymentsPanel({
   useEffect(() => setExtraSets({}), [week, league.id]);
 
   const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["entry-payments", league.id] });
-    queryClient.invalidateQueries({ queryKey: ["league", league.id] });
-    queryClient.invalidateQueries({ queryKey: ["leagues"] });
+    for (const key of [
+      ["entry-payments", league.id],
+      ["league", league.id],
+      ["leagues"],
+      ["bank", league.id],
+      ["cash", league.id],
+      ["payouts", league.id],
+      ["standings", league.id],
+    ]) {
+      queryClient.invalidateQueries({ queryKey: key });
+    }
   };
 
   const toggle = useMutation({
@@ -92,11 +102,20 @@ export function EntryPaymentsPanel({
           weeklyPot: pots.weekly,
           seasonPot: pots.season,
         });
+        const share = Math.min(Math.max(Number(league.season_pot_pct) || 0, 0), 100) / 100;
+        const weekPaidCount = next.filter((p) => p.weekNum === week).length;
+        await syncSeasonPotDeposit({
+          leagueId: league.id,
+          weekNum: week,
+          amount: weekPaidCount * fee * share,
+          createdBy: currentUserId,
+        });
       }
     },
     onSuccess: refresh,
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const saveManual = useMutation({
     mutationFn: async () => {
@@ -130,6 +149,14 @@ export function EntryPaymentsPanel({
         potsAuto: on,
         seasonPotPct: pct,
       });
+      const weekPaidCount = rows.filter((p) => p.weekNum === week).length;
+      await syncSeasonPotDeposit({
+        leagueId: league.id,
+        weekNum: week,
+        amount: on ? (weekPaidCount * fee * pct) / 100 : 0,
+        createdBy: currentUserId,
+      });
+
     },
     onSuccess: refresh,
     onError: (e: Error) => toast.error(e.message),

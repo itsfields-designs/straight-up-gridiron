@@ -6,14 +6,17 @@ import { toast } from "sonner";
 import {
   addCashTxn,
   cashBalances,
+  collected,
   deleteCashTxn,
   fetchCashTxns,
+  fetchEntryPayments,
   fetchPayouts,
   fetchStandings,
   money,
   type League,
   type Member,
 } from "@/lib/pool";
+
 
 export function CashPanel({
   league,
@@ -34,6 +37,11 @@ export function CashPanel({
     queryKey: ["standings", league.id, 0],
     queryFn: () => fetchStandings(league.id, 0),
   });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
+  });
+
 
   const [kind, setKind] = useState<"deposit" | "withdrawal">("deposit");
   const [amount, setAmount] = useState("");
@@ -82,10 +90,11 @@ export function CashPanel({
     (s, b) => s + b.deposited - b.withdrawn,
     0,
   );
+  const fees = collected(entryPayments.data ?? [], 0, Number(league.entry_fee) || 0);
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-xs text-faint">Your balance</div>
           <div className="font-display text-lg font-medium">{money(myBalance)}</div>
@@ -98,10 +107,15 @@ export function CashPanel({
           <div className="font-display text-lg font-medium">{money(poolTotal)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
+          <div className="text-xs text-faint">Entry fees collected</div>
+          <div className="font-display text-lg font-medium">{money(fees.season)}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-xs text-faint">Entry fee</div>
           <div className="font-display text-lg font-medium">{money(league.entry_fee)}</div>
         </div>
       </div>
+
 
       <div className="rounded-lg border border-border bg-card p-4">
         <h2 className="mb-3 text-sm font-medium text-muted-foreground">Add money movement</h2>
