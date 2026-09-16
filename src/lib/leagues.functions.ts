@@ -25,6 +25,7 @@ export const joinLeague = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ code: z.string().trim().min(1).max(16) }).parse(data))
   .handler(async ({ data, context }) => {
+    await assertEntitled(context.userId, context.claims as Record<string, unknown>);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: id, error } = await supabaseAdmin.rpc("admin_join_league_by_code", {
       _code: data.code,
