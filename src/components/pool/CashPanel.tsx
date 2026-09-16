@@ -65,6 +65,8 @@ export function CashPanel({
     if (!balances.has(id)) balances.set(id, { ...b, deposited: b.deposited + (feePaid.get(id) ?? 0) });
   }
   const rankOf = new Map((standings.data ?? []).map((s) => [s.userId, s]));
+  const nameOf = new Map(members.map((m) => [m.user_id, m.username]));
+
 
 
   const invalidate = () => {
