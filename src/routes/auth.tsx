@@ -103,8 +103,6 @@ function AuthPage() {
   const resetFlow = () => {
     setError("");
     setNotice("");
-    setAwaitingCode(false);
-    setCode("");
   };
 
   return (
@@ -184,17 +182,16 @@ function AuthPage() {
                   id="phone"
                   type="tel"
                   required
-                  disabled={awaitingCode}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+1 415 555 0134"
-                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+                  className="mb-1 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
-                <p className="mb-4 text-xs text-faint">Include your country code, like +1.</p>
+                <p className="mb-4 text-xs text-faint">Include your country code, like +1. No text message needed.</p>
               </>
             )}
 
-            {mode === "signup" && !awaitingCode && (
+            {mode === "signup" && (
               <>
                 <label className="field-label" htmlFor="username">
                   Username
@@ -209,9 +206,8 @@ function AuthPage() {
               </>
             )}
 
-            {!awaitingCode && (
-              <>
-                <label className="field-label" htmlFor="password">
+            <>
+              <label className="field-label" htmlFor="password">
                   Password
                 </label>
                 <input
@@ -227,22 +223,7 @@ function AuthPage() {
               </>
             )}
 
-            {awaitingCode && (
-              <>
-                <label className="field-label" htmlFor="code">
-                  Text message code
-                </label>
-                <input
-                  id="code"
-                  inputMode="numeric"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="123456"
-                  className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </>
-            )}
+
 
 
             {error && (
@@ -262,7 +243,7 @@ function AuthPage() {
               disabled={busy}
               className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
             >
-              {awaitingCode ? "Confirm code" : mode === "login" ? "Log in" : "Create account"}
+              {mode === "login" ? "Log in" : "Create account"}
             </button>
           </form>
 
