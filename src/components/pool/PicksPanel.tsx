@@ -113,13 +113,13 @@ export function PicksPanel({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-1 rounded-md bg-secondary p-1">
+      <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+        <div className="flex shrink-0 gap-1 rounded-md bg-secondary p-1">
           {entryNos.map((n) => (
             <button
               key={n}
               onClick={() => setActiveEntry(n)}
-              className={`rounded px-3 py-1.5 text-sm font-medium ${
+              className={`min-h-10 shrink-0 rounded px-3.5 text-sm font-medium ${
                 activeEntry === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
               }`}
             >
@@ -131,40 +131,30 @@ export function PicksPanel({
         <button
           onClick={addSet}
           disabled={weekData.locked}
-          className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground disabled:opacity-40"
+          className="flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-muted-foreground disabled:opacity-40"
         >
-          <Plus size={14} /> Add another set
+          <Plus size={14} /> Add set
         </button>
         {activeEntry > 1 && (
           <button
             onClick={() => remove.mutate(activeEntry)}
             disabled={weekData.locked || remove.isPending}
-            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-destructive disabled:opacity-40"
+            className="flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-destructive disabled:opacity-40"
           >
             <Trash2 size={14} /> Remove set {activeEntry}
           </button>
         )}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-muted-foreground">
-          Set {activeEntry} · {picked} of {games.length} games picked
-          {weekData.locked && (
-            <span className="ml-2 text-destructive">· picks are locked for this week</span>
-          )}
-        </div>
-        <button
-          onClick={() => save.mutate()}
-          disabled={!canSubmit || weekData.locked || save.isPending}
-          className="rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
-        >
-          Save set {activeEntry}
-        </button>
+      <div className="mb-4 text-sm text-muted-foreground">
+        Set {activeEntry} · {picked} of {games.length} games picked
+        {weekData.locked && (
+          <span className="ml-2 text-destructive">· picks are locked for this week</span>
+        )}
+        <p className="mt-1 text-xs text-faint">
+          Each set stands on its own in the standings and costs one entry fee.
+        </p>
       </div>
-
-      <p className="mb-4 text-xs text-faint">
-        Each set of picks stands on its own in the standings and costs one entry fee.
-      </p>
 
       <div className="space-y-2.5">
         {games.map((game) => {
