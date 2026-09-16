@@ -325,7 +325,7 @@ export type WeeklyStanding = StoredStanding & { weekNum: number };
 export async function fetchWeeklyStandings(leagueId: string): Promise<WeeklyStanding[]> {
   const { data, error } = await supabase
     .from("league_standings")
-    .select("user_id, week_num, rank, correct, missed, tb_diff, submitted, updated_at")
+    .select("user_id, entry_no, week_num, rank, correct, missed, tb_diff, submitted, updated_at")
     .eq("league_id", leagueId)
     .gt("week_num", 0)
     .order("week_num", { ascending: true });
@@ -340,7 +340,8 @@ export async function fetchWeeklyStandings(leagueId: string): Promise<WeeklyStan
   const byId = new Map((profiles ?? []).map((p) => [p.id, p.username]));
   return rows.map((r) => ({
     userId: r.user_id,
-    username: byId.get(r.user_id) ?? "Unknown player",
+    entryNo: r.entry_no ?? 1,
+    username: entryLabel(byId.get(r.user_id) ?? "Unknown player", r.entry_no ?? 1),
     weekNum: r.week_num,
     rank: r.rank,
     correct: r.correct,
