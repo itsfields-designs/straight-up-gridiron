@@ -624,19 +624,21 @@ export type EntryPayment = {
   id: string;
   weekNum: number;
   userId: string;
+  entryNo: number;
   amount: number;
 };
 
 export async function fetchEntryPayments(leagueId: string): Promise<EntryPayment[]> {
   const { data, error } = await supabase
     .from("entry_payments")
-    .select("id, week_num, user_id, amount")
+    .select("id, week_num, user_id, entry_no, amount")
     .eq("league_id", leagueId);
   if (error) throw error;
   return (data ?? []).map((r) => ({
     id: r.id,
     weekNum: r.week_num,
     userId: r.user_id,
+    entryNo: r.entry_no ?? 1,
     amount: Number(r.amount),
   }));
 }
@@ -645,20 +647,23 @@ export async function setEntryPaid(args: {
   leagueId: string;
   weekNum: number;
   userId: string;
+  entryNo?: number;
   markedBy: string;
   amount: number;
   paid: boolean;
 }) {
+  const entryNo = args.entryNo ?? 1;
   if (args.paid) {
     const { error } = await supabase.from("entry_payments").upsert(
       {
         league_id: args.leagueId,
         week_num: args.weekNum,
         user_id: args.userId,
+        entry_no: entryNo,
         marked_by: args.markedBy,
         amount: args.amount,
       },
-      { onConflict: "league_id,week_num,user_id" },
+      { onConflict: "league_id,week_num,user_id,entry_no" },
     );
     if (error) throw error;
   } else {
@@ -667,7 +672,8 @@ export async function setEntryPaid(args: {
       .delete()
       .eq("league_id", args.leagueId)
       .eq("week_num", args.weekNum)
-      .eq("user_id", args.userId);
+      .eq("user_id", args.userId)
+      .eq("entry_no", entryNo);
     if (error) throw error;
   }
 }
