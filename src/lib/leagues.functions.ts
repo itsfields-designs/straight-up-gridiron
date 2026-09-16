@@ -9,6 +9,7 @@ export const createLeague = createServerFn({ method: "POST" })
     z.object({ name: z.string().trim().min(1).max(80), rules: z.string().max(2000) }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    await assertEntitled(context.userId, context.claims as Record<string, unknown>);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: id, error } = await supabaseAdmin.rpc("admin_create_league", {
       _name: data.name,
