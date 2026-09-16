@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronRight, Plus, Users } from "lucide-react";
+import { ChevronRight, Lock, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { useServerFn } from "@tanstack/react-start";
