@@ -24,7 +24,11 @@ function AuthPage() {
   const { mode: initialMode } = Route.useSearch();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">(initialMode ?? "signup");
+  const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [awaitingCode, setAwaitingCode] = useState(false);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -37,13 +41,55 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  /** Turns "(415) 555 0134" into "+14155550134" so the SMS actually sends. */
+  function normalizePhone(value: string) {
+    const digits = value.replace(/[^\d+]/g, "");
+    const e164 = digits.startsWith("+") ? digits : `+${digits}`;
+    if (!/^\+[1-9]\d{7,14}$/.test(e164))
+      throw new Error("Enter your phone number with country code, like +14155550134.");
+    return e164;
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setNotice("");
     setBusy(true);
     try {
-      if (mode === "login") {
+      if (method === "phone") {
+        const tel = normalizePhone(phone);
+        if (awaitingCode) {
+          const { error: err } = await supabase.auth.verifyOtp({
+            phone: tel,
+            token: code.trim(),
+            type: "sms",
+          });
+          if (err) throw err;
+          navigate({ to: "/leagues", replace: true });
+        } else if (mode === "login") {
+          const { error: err } = await supabase.auth.signInWithPassword({
+            phone: tel,
+            password,
+          });
+          if (err) throw err;
+          navigate({ to: "/leagues", replace: true });
+        } else {
+          if (username.trim().length < 3)
+            throw new Error("Username must be at least 3 characters.");
+          const { data, error: err } = await supabase.auth.signUp({
+            phone: tel,
+            password,
+            options: { data: { username: username.trim() } },
+          });
+          if (err) throw err;
+          if (data.session) {
+            navigate({ to: "/leagues", replace: true });
+          } else {
+            setAwaitingCode(true);
+            setNotice("We texted you a 6-digit code. Enter it below to finish signing up.");
+          }
+        }
+      } else if (mode === "login") {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) throw err;
         navigate({ to: "/leagues", replace: true });
@@ -80,6 +126,13 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/leagues", replace: true });
   }
+
+  const resetFlow = () => {
+    setError("");
+    setNotice("");
+    setAwaitingCode(false);
+    setCode("");
+  };
 
   return (
     <main className="flex min-h-screen items-center justify-center px-5 py-12">
