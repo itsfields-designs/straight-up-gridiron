@@ -51,8 +51,12 @@ export function PicksPanel({
 
   const mine = myEntries.find((e) => e.entry_no === activeEntry);
   useEffect(() => {
-    setPicks(mine?.picks ?? {});
-    setTiebreaker(mine?.tiebreaker != null ? String(mine.tiebreaker) : "");
+    const p = mine?.picks ?? {};
+    const t = mine?.tiebreaker != null ? String(mine.tiebreaker) : "";
+    setPicks(p);
+    setTiebreaker(t);
+    setSavedPicks(p);
+    setSavedTiebreaker(t);
   }, [mine, week, activeEntry]);
 
   const save = useMutation({
