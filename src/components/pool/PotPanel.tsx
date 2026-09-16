@@ -12,6 +12,7 @@ import {
   type League,
   type Member,
 } from "@/lib/pool";
+import { EntryPaymentsPanel } from "@/components/pool/EntryPaymentsPanel";
 
 export function PotPanel({
   league,
@@ -91,6 +92,14 @@ export function PotPanel({
 
   return (
     <div className="space-y-6">
+      <EntryPaymentsPanel
+        league={league}
+        members={members}
+        isOwner={isOwner}
+        currentUserId={currentUserId}
+        week={week}
+      />
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {cards.map((c) => (
           <div key={c.label} className="rounded-lg border border-border bg-card p-4">

@@ -55,6 +55,47 @@ export type Database = {
           },
         ]
       }
+      entry_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          league_id: string
+          marked_by: string
+          updated_at: string
+          user_id: string
+          week_num: number
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          league_id: string
+          marked_by: string
+          updated_at?: string
+          user_id: string
+          week_num: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          league_id?: string
+          marked_by?: string
+          updated_at?: string
+          user_id?: string
+          week_num?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_payments_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           away: string
@@ -263,8 +304,10 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          pots_auto: boolean
           rules: string
           season_pot: number
+          season_pot_pct: number
           weekly_pot: number
         }
         Insert: {
@@ -275,8 +318,10 @@ export type Database = {
           id?: string
           name: string
           owner_id: string
+          pots_auto?: boolean
           rules?: string
           season_pot?: number
+          season_pot_pct?: number
           weekly_pot?: number
         }
         Update: {
@@ -287,8 +332,10 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string
+          pots_auto?: boolean
           rules?: string
           season_pot?: number
+          season_pot_pct?: number
           weekly_pot?: number
         }
         Relationships: []
