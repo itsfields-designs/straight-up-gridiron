@@ -8,6 +8,7 @@ import {
   cashBalances,
   collected,
   deleteCashTxn,
+  entryFeeDeposits,
   fetchCashTxns,
   fetchEntryPayments,
   fetchPayouts,
@@ -16,6 +17,7 @@ import {
   type League,
   type Member,
 } from "@/lib/pool";
+
 
 
 export function CashPanel({
