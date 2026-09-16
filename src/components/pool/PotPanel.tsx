@@ -199,9 +199,10 @@ export function PotPanel({
             </label>
           </div>
           <button
+            type="button"
             onClick={() => create.mutate()}
             disabled={create.isPending}
-            className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+            className="mt-3 min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
             {create.isPending ? "Saving…" : "Record payout"}
           </button>
@@ -253,7 +254,7 @@ export function PotPanel({
                 {isOwner && (
                   <button
                     onClick={() => remove.mutate(p.id)}
-                    className="text-destructive"
+                    className="grid min-h-11 min-w-11 place-items-center rounded-md text-destructive hover:bg-destructive-soft"
                     aria-label="Delete payout"
                   >
                     <Trash2 size={14} />

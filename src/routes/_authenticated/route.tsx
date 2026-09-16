@@ -36,7 +36,7 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+      <header className="sticky top-0 z-30 border-b border-primary bg-primary text-primary-foreground shadow-sm">
         <div className="mx-auto grid max-w-4xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 sm:px-5 sm:py-3.5">
           <Link to="/leagues" className="flex min-w-0 items-center gap-2">
             <img
@@ -54,20 +54,20 @@ function AuthedLayout() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                  activeProps={{ className: "text-foreground font-medium" }}
+                  className="text-primary-foreground/75 transition-colors hover:text-primary-foreground"
+                  activeProps={{ className: "text-primary-foreground font-semibold" }}
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
-            <span className="hidden max-w-[14rem] truncate text-muted-foreground lg:inline">
+            <span className="hidden max-w-[14rem] truncate text-primary-foreground/75 lg:inline">
               {user.email}
             </span>
             <button
               onClick={signOut}
               aria-label="Log out"
-              className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-3 text-sm transition-colors hover:bg-secondary"
+              className="flex min-h-11 items-center gap-1.5 rounded-md border border-primary-foreground/35 px-3 text-sm transition-colors hover:bg-primary-foreground/10"
             >
               <LogOut size={15} /> <span className="hidden sm:inline">Log out</span>
             </button>
@@ -85,8 +85,8 @@ function AuthedLayout() {
             <Link
               key={item.to}
               to={item.to}
-              className="flex min-h-[3.75rem] flex-col items-center justify-center gap-1 text-[0.68rem] font-medium text-muted-foreground"
-              activeProps={{ className: "text-accent" }}
+              className="relative flex min-h-[3.75rem] flex-col items-center justify-center gap-1 text-xs font-medium text-muted-foreground"
+              activeProps={{ className: "text-primary before:absolute before:inset-x-4 before:top-0 before:h-0.5 before:bg-accent" }}
             >
               <item.icon size={20} />
               {item.short}

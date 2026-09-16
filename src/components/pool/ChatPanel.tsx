@@ -112,7 +112,7 @@ export function ChatPanel({
           <button
             onClick={() => lock.mutate()}
             disabled={lock.isPending}
-            className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium disabled:opacity-60"
+            className="flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-sm font-medium disabled:opacity-60"
           >
             {league.chat_locked ? <Unlock size={14} /> : <Lock size={14} />}
             {league.chat_locked ? "Unlock chat" : "Lock chat"}
@@ -135,7 +135,7 @@ export function ChatPanel({
       )}
 
       <div className="max-h-[28rem] space-y-3 overflow-y-auto rounded-lg border border-border bg-card p-4">
-        {messages.isLoading && <p className="text-sm text-faint">Loading messages…</p>}
+        {messages.isLoading && <p role="status" className="text-sm text-muted-foreground">Loading messages…</p>}
         {!messages.isLoading && list.length === 0 && (
           <p className="py-6 text-center text-sm text-faint">No messages yet. Say something.</p>
         )}
@@ -171,7 +171,7 @@ export function ChatPanel({
                   {isOwner && (
                     <button
                       onClick={() => pin.mutate({ id: m.id, pinned: !m.pinned })}
-                      className="flex items-center gap-1 text-muted-foreground"
+                      className="flex min-h-11 items-center gap-1 px-2 text-muted-foreground"
                     >
                       {m.pinned ? <PinOff size={12} /> : <Pin size={12} />}
                       {m.pinned ? "Unpin" : "Pin"}
@@ -180,7 +180,7 @@ export function ChatPanel({
                   {(mine || isOwner) && (
                     <button
                       onClick={() => remove.mutate(m.id)}
-                      className="flex items-center gap-1 text-destructive"
+                      className="flex min-h-11 items-center gap-1 px-2 text-destructive"
                     >
                       <Trash2 size={12} /> Delete
                     </button>
@@ -196,6 +196,7 @@ export function ChatPanel({
       {canPost ? (
         <div className="flex items-end gap-2">
           <textarea
+            aria-label="Message"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onKeyDown={(e) => {

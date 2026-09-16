@@ -136,12 +136,15 @@ export function CashPanel({
 
       <div className="rounded-lg border border-border bg-card p-4">
         <h2 className="mb-3 text-sm font-medium text-muted-foreground">Add money movement</h2>
-        <div className="flex w-fit gap-1 rounded-md bg-secondary p-1">
+        <div className="flex w-fit gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Money movement type">
           {(["deposit", "withdrawal"] as const).map((k) => (
             <button
               key={k}
+              type="button"
+              role="tab"
+              aria-selected={kind === k}
               onClick={() => setKind(k)}
-              className={`flex items-center gap-1.5 rounded px-3.5 py-1.5 text-sm font-medium ${
+              className={`flex min-h-11 items-center gap-1.5 rounded px-3.5 text-sm font-medium ${
                 kind === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
               }`}
             >
@@ -271,7 +274,7 @@ export function CashPanel({
                 {t.userId === currentUserId && (
                   <button
                     onClick={() => remove.mutate(t.id)}
-                    className="text-destructive"
+                    className="grid min-h-11 min-w-11 place-items-center rounded-md text-destructive hover:bg-destructive-soft"
                     aria-label="Delete entry"
                   >
                     <Trash2 size={14} />

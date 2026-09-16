@@ -25,6 +25,7 @@ import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
 import { ChatPanel } from "@/components/pool/ChatPanel";
 import { BankPanel } from "@/components/pool/BankPanel";
+import { LoadingState } from "@/components/ui/feedback";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
@@ -37,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
         property: "og:description",
         content: "Make your weekly picks and check the league standings.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LeaguePage,
@@ -94,7 +97,7 @@ function LeaguePage() {
     queryFn: () => fetchMembers(leagueId),
   });
 
-  if (league.isLoading) return <p className="text-sm text-muted-foreground">Loading league…</p>;
+  if (league.isLoading) return <LoadingState label="Loading league" />;
   if (league.isError || !league.data)
     return <p className="text-sm text-destructive">This league isn't available.</p>;
 
@@ -102,7 +105,7 @@ function LeaguePage() {
 
   return (
     <div>
-      <Link to="/leagues" className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground">
+      <Link to="/leagues" className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground">
         <ArrowLeft size={15} /> All leagues
       </Link>
 
@@ -131,12 +134,15 @@ function LeaguePage() {
       </div>
 
       <div className="sticky top-[3.4rem] z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
-        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto">
+        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto" role="tablist" aria-label="League sections">
           {TABS.map((t) => (
             <button
               key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className={`-mb-px flex shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 sm:py-2.5 ${
+              className={`-mb-px flex min-h-12 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 ${
                 tab === t.id ? "border-accent text-foreground" : "border-transparent text-faint"
               }`}
             >

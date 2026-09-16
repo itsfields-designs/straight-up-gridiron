@@ -33,6 +33,7 @@ import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
 import { BankPanel } from "@/components/pool/BankPanel";
 import { ChatPanel } from "@/components/pool/ChatPanel";
+import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/commissioner")({
   head: () => ({
@@ -49,6 +50,8 @@ export const Route = createFileRoute("/_authenticated/commissioner")({
         content:
           "Run your league from one place: members, weekly entry payments, pot payouts, cash pool, bank and chat.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CommissionerPage,
@@ -114,27 +117,22 @@ function CommissionerPage() {
     enabled: !!league,
   });
 
-  if (leagues.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (leagues.isLoading) return <LoadingState label="Loading commissioner dashboard" />;
 
   if (!owned.length)
     return (
       <div>
         <h1 className="text-xl font-semibold sm:text-2xl">Commissioner</h1>
-        <div className="mt-5 rounded-lg border border-dashed border-border-strong p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            You don't run a league yet. Start one and this page becomes your control room.
-          </p>
-          <Link
+        <div className="mt-5"><EmptyState icon={ShieldCheck} title="No leagues to manage" description="Start a league and this page becomes your control room." action={<Link
             to="/leagues"
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground"
           >
             Start a league
-          </Link>
-        </div>
+          </Link>} /></div>
       </div>
     );
 
-  if (!league) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (!league) return <LoadingState label="Loading league controls" />;
 
   const memberList = members.data ?? [];
   const paidRows = (payments.data ?? []).filter((p) => p.weekNum === activeWeek);
@@ -209,7 +207,7 @@ function CommissionerPage() {
       <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
-            <p className="text-[0.7rem] text-faint sm:text-xs">{s.label}</p>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="mt-1 text-base font-semibold sm:text-lg">{s.value}</p>
             {s.hint && <p className="text-xs text-muted-foreground">{s.hint}</p>}
           </div>
@@ -217,12 +215,15 @@ function CommissionerPage() {
       </div>
 
       <div className="sticky top-[3.4rem] z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
-        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto">
+        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto" role="tablist" aria-label="Commissioner sections">
           {SECTIONS.map((s) => (
             <button
               key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={section === s.id}
               onClick={() => setSection(s.id)}
-              className={`-mb-px flex shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 sm:py-2.5 ${
+              className={`-mb-px flex min-h-12 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 ${
                 section === s.id ? "border-accent text-foreground" : "border-transparent text-faint"
               }`}
             >

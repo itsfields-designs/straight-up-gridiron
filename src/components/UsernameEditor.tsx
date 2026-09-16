@@ -64,7 +64,7 @@ export function UsernameEditor({ userId }: { userId: string }) {
           <button
             type="button"
             onClick={startEdit}
-            className="flex items-center gap-1.5 rounded-md border border-border-strong px-2.5 py-1.5 text-xs transition-colors hover:bg-secondary"
+            className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-3 text-xs transition-colors hover:bg-secondary"
           >
             <Pencil size={12} /> Change
           </button>
@@ -76,6 +76,7 @@ export function UsernameEditor({ userId }: { userId: string }) {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               autoFocus
+              aria-label="New username"
               maxLength={24}
               placeholder="new username"
               className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -83,14 +84,14 @@ export function UsernameEditor({ userId }: { userId: string }) {
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex items-center gap-1 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground disabled:opacity-40"
+              className="flex min-h-11 items-center gap-1 rounded-md bg-accent px-3 text-xs font-medium text-accent-foreground disabled:opacity-40"
             >
               <Check size={13} /> Save
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="rounded-md border border-border-strong px-2.5 py-2 text-xs transition-colors hover:bg-secondary"
+              className="grid min-h-11 min-w-11 place-items-center rounded-md border border-border-strong text-xs transition-colors hover:bg-secondary"
               aria-label="Cancel"
             >
               <X size={13} />
@@ -101,7 +102,7 @@ export function UsernameEditor({ userId }: { userId: string }) {
           </p>
         </form>
       )}
-      {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-xs text-destructive">{error}</p>}
     </div>
   );
 }

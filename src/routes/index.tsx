@@ -20,6 +20,8 @@ export const Route = createFileRoute("/")({
         content:
           "Create a league, invite friends with a code, pick every NFL game straight up and watch the standings settle it.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -37,7 +39,8 @@ function Index() {
 
   return (
     <main className="min-h-screen">
-      <section className="mx-auto max-w-3xl px-5 py-14 text-center sm:py-20">
+      <section className="border-b border-primary bg-primary px-5 py-12 text-center text-primary-foreground sm:py-16">
+       <div className="mx-auto max-w-3xl">
         <img
           src={logoAsset.url}
           alt="Gridiron Gods"
@@ -49,7 +52,7 @@ function Index() {
         <h1 className="mt-6 text-4xl font-semibold uppercase tracking-tight sm:text-6xl">
           Gridiron Gods
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
+        <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           Pick winners straight up every week. Beat your league. No spreads, no points — just who
           you think wins, with a Monday-night total to break the ties.
         </p>
@@ -63,14 +66,15 @@ function Index() {
           <Link
             to="/auth"
             search={{ mode: "login" }}
-            className="flex min-h-12 items-center justify-center rounded-md border border-border-strong bg-card px-5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+            className="flex min-h-12 items-center justify-center rounded-md border border-primary-foreground/40 px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
           >
             Log in
           </Link>
         </div>
+       </div>
       </section>
 
-      <section className="mx-auto grid max-w-4xl gap-3 px-5 pb-16 sm:grid-cols-3 sm:gap-4 sm:pb-24">
+      <section className="mx-auto grid max-w-4xl gap-3 px-5 py-8 sm:grid-cols-3 sm:gap-4 sm:py-12">
         {[
           {
             icon: Users,
@@ -85,7 +89,7 @@ function Index() {
           {
             icon: Trophy,
             title: "Weekly and season standings",
-            body: "Records update for everyone as final scores get entered.",
+            body: "Records update for everyone automatically as official final scores arrive.",
           },
         ].map((f) => (
           <div key={f.title} className="rounded-lg border border-border bg-card p-5">

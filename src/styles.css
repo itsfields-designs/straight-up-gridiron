@@ -114,6 +114,26 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  :focus-visible {
+    outline: 3px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+  }
+
   /* Keep iOS from zooming when a field is focused. */
   input,
   select,
@@ -151,4 +171,11 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+@utility app-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-card);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--color-foreground) 6%, transparent);
 }

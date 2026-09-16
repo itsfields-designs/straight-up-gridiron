@@ -6,6 +6,7 @@ import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { UsernameEditor } from "@/components/UsernameEditor";
 import { MembershipCard } from "@/components/MembershipCard";
+import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
         property: "og:description",
         content: "All your NFL pick'em leagues, the current week, and standings at a glance.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: DashboardPage,
@@ -48,23 +51,15 @@ function DashboardPage() {
           : "Here's where you stand in every league."}
       </p>
 
-      <div className="mt-5 grid gap-3">
-        <MembershipCard />
-        <UsernameEditor userId={user.id} />
-      </div>
-
-      {leagues.isLoading && <p className="mt-6 text-sm text-muted-foreground">Loading…</p>}
+      {leagues.isLoading && <div className="mt-6"><LoadingState label="Loading your leagues" /></div>}
 
       {leagues.data?.length === 0 && (
-        <div className="mt-6 rounded-lg border border-dashed border-border-strong p-8 text-center">
-          <p className="text-sm text-muted-foreground">You haven't joined a league yet.</p>
-          <Link
+        <div className="mt-6"><EmptyState title="Your first league starts here" description="Create a league for friends or join one with an invite code." action={<Link
             to="/leagues"
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground"
           >
             <Plus size={15} /> Start or join a league
-          </Link>
-        </div>
+          </Link>} /></div>
       )}
 
       <div className="mt-6 grid gap-3">
@@ -125,6 +120,14 @@ function DashboardPage() {
           );
         })}
       </div>
+
+      <section className="mt-8 border-t border-border pt-6" aria-labelledby="account-heading">
+        <h2 id="account-heading" className="text-lg font-semibold">Account</h2>
+        <div className="mt-3 grid gap-3">
+          <MembershipCard />
+          <UsernameEditor userId={user.id} />
+        </div>
+      </section>
     </div>
   );
 }
