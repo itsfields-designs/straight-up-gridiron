@@ -81,8 +81,8 @@ export function SeasonPotPanel({
       await saveLeaguePots({
         leagueId: league.id,
         weeklyPot: Number(league.weekly_pot) || 0,
-        seasonPot: total,
-        seasonPotAuto: true,
+        seasonPot: league.season_pot_auto ? total : Number(league.season_pot) || 0,
+        seasonPotAuto: league.season_pot_auto,
       });
       await syncSeasonPotDeposit({ leagueId: league.id, amount: total, createdBy: currentUserId });
     },
@@ -158,16 +158,41 @@ export function SeasonPotPanel({
       </div>
 
       {isOwner && (
-        <label className="flex min-h-11 items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="h-5 w-5 accent-[hsl(var(--accent))]"
-            checked={league.season_pot_auto}
-            disabled={setAuto.isPending}
-            onChange={(event) => setAuto.mutate(event.target.checked)}
-          />
-          Calculate the Season Pot automatically from paid Season Pot fees
-        </label>
+        <div className="space-y-3">
+          <label className="block">
+            <span className="mb-1 block text-xs text-faint">Season Pot entry fee per set ($)</span>
+            <div className="flex items-end gap-2">
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={seasonFee}
+                onChange={(event) => setSeasonFee(event.target.value)}
+                className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="button"
+                onClick={() => saveSettings.mutate()}
+                disabled={saveSettings.isPending}
+                className="min-h-11 shrink-0 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+              >
+                {saveSettings.isPending ? "Saving…" : "Save fee"}
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-faint">This is charged in addition to the weekly entry fee.</p>
+          </label>
+          <label className="flex min-h-11 items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="h-5 w-5 accent-[hsl(var(--accent))]"
+              checked={league.season_pot_auto}
+              disabled={setAuto.isPending}
+              onChange={(event) => setAuto.mutate(event.target.checked)}
+            />
+            Calculate the Season Pot automatically from paid Season Pot fees
+          </label>
+        </div>
       )}
 
       {league.season_pot_auto ? (
@@ -188,32 +213,6 @@ export function SeasonPotPanel({
             </div>
           </div>
 
-          {isOwner && (
-            <label className="block">
-               <span className="mb-1 block text-xs text-faint">Season Pot entry fee per set ($)</span>
-              <div className="flex items-end gap-2">
-                <input
-                  type="number"
-                  min="0"
-                   step="0.01"
-                   value={seasonFee}
-                   onChange={(e) => setSeasonFee(e.target.value)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="button"
-                   onClick={() => saveSettings.mutate()}
-                   disabled={saveSettings.isPending}
-                  className="min-h-11 shrink-0 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
-                >
-                   {saveSettings.isPending ? "Saving…" : "Save fee"}
-                </button>
-              </div>
-              <p className="mt-1 text-xs text-faint">
-                 This is charged in addition to the weekly entry fee.
-              </p>
-            </label>
-          )}
         </div>
       ) : (
         <div className="space-y-4">
