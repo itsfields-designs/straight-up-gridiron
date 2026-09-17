@@ -312,6 +312,7 @@ export type Database = {
           owner_id: string
           pots_auto: boolean
           rules: string
+          season_entry_fee: number
           season_pot: number
           season_pot_pct: number
           weekly_pot: number
@@ -326,6 +327,7 @@ export type Database = {
           owner_id: string
           pots_auto?: boolean
           rules?: string
+          season_entry_fee?: number
           season_pot?: number
           season_pot_pct?: number
           weekly_pot?: number
@@ -340,6 +342,7 @@ export type Database = {
           owner_id?: string
           pots_auto?: boolean
           rules?: string
+          season_entry_fee?: number
           season_pot?: number
           season_pot_pct?: number
           weekly_pot?: number
@@ -454,6 +457,47 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      season_entry_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          entry_no: number
+          id: string
+          league_id: string
+          marked_by: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          entry_no?: number
+          id?: string
+          league_id: string
+          marked_by: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          entry_no?: number
+          id?: string
+          league_id?: string
+          marked_by?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_entry_payments_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       weeks: {
         Row: {
