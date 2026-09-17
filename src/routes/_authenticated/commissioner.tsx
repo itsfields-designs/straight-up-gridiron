@@ -22,6 +22,7 @@ import {
   fetchMembers,
   fetchMyLeagues,
   fetchPayouts,
+  fetchSeasonEntryPayments,
   money,
   seasonPotFor,
   weeklyPotFor,
@@ -109,6 +110,11 @@ function CommissionerPage() {
     queryFn: () => fetchBankDeposits(league!.id),
     enabled: !!league,
   });
+  const seasonPayments = useQuery({
+    queryKey: ["season-entry-payments", league?.id],
+    queryFn: () => fetchSeasonEntryPayments(league!.id),
+    enabled: !!league,
+  });
   const cash = useQuery({
     queryKey: ["cash", league?.id],
     queryFn: () => fetchCashTxns(league!.id),
@@ -154,7 +160,7 @@ function CommissionerPage() {
       label: `Week ${activeWeek} pot`,
       value: money(weeklyPotFor(league, payments.data ?? [], activeWeek)),
     },
-    { label: "Season pot", value: money(seasonPotFor(league, payments.data ?? [])) },
+    { label: "Season pot", value: money(seasonPotFor(league, seasonPayments.data ?? [])) },
     { label: "Bank balance", value: money(bank.balance) },
   ];
 
@@ -254,7 +260,7 @@ function CommissionerPage() {
         />
       )}
       {section === "season" && (
-        <SeasonPotPanel league={league} isOwner currentUserId={user.id} />
+        <SeasonPotPanel league={league} members={memberList} isOwner currentUserId={user.id} />
       )}
       {section === "pot" && (
         <PotPanel

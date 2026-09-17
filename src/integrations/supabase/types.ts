@@ -314,6 +314,7 @@ export type Database = {
           rules: string
           season_entry_fee: number
           season_pot: number
+          season_pot_auto: boolean
           season_pot_pct: number
           weekly_pot: number
         }
@@ -329,6 +330,7 @@ export type Database = {
           rules?: string
           season_entry_fee?: number
           season_pot?: number
+          season_pot_auto?: boolean
           season_pot_pct?: number
           weekly_pot?: number
         }
@@ -344,6 +346,7 @@ export type Database = {
           rules?: string
           season_entry_fee?: number
           season_pot?: number
+          season_pot_auto?: boolean
           season_pot_pct?: number
           weekly_pot?: number
         }

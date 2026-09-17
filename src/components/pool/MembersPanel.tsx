@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   fetchCurrentWeek,
   fetchEntryPayments,
+  fetchSeasonEntryPayments,
   seasonPotFor,
   weeklyPotFor,
   type League,
@@ -30,6 +31,7 @@ export function MembersPanel({
   const [copied, setCopied] = useState(false);
   const [rules, setRules] = useState(league.rules);
   const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
+  const [seasonEntryFee, setSeasonEntryFee] = useState(String(league.season_entry_fee ?? 0));
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
 
@@ -38,6 +40,10 @@ export function MembersPanel({
     queryFn: () => fetchEntryPayments(league.id),
   });
   const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+  const seasonEntryPayments = useQuery({
+    queryKey: ["season-entry-payments", league.id],
+    queryFn: () => fetchSeasonEntryPayments(league.id),
+  });
   const shownWeek = currentWeek.data ?? 1;
   const fees = entryPayments.data ?? [];
 
@@ -84,6 +90,7 @@ export function MembersPanel({
         .update({
           rules,
           entry_fee: num(entryFee),
+          season_entry_fee: num(seasonEntryFee),
           weekly_pot: num(weeklyPot),
           season_pot: num(seasonPot),
         })
@@ -120,11 +127,12 @@ export function MembersPanel({
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {[
-          { label: "Entry fee", value: league.entry_fee },
+          { label: "Weekly fee", value: league.entry_fee },
+          { label: "Season fee", value: league.season_entry_fee },
           { label: `Week ${shownWeek} pot`, value: weeklyPotFor(league, fees, shownWeek) },
-          { label: "Season pot", value: seasonPotFor(league, fees) },
+          { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
         ].map((item) => (
           <div key={item.label} className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs text-faint">{item.label}</div>
@@ -178,9 +186,10 @@ export function MembersPanel({
             onChange={(e) => setRules(e.target.value)}
             className="min-h-11 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {[
               { label: "Entry fee", value: entryFee, set: setEntryFee },
+               { label: "Season entry fee", value: seasonEntryFee, set: setSeasonEntryFee },
               { label: "Weekly pot", value: weeklyPot, set: setWeeklyPot },
               { label: "Season pot", value: seasonPot, set: setSeasonPot },
             ].map((f) => (

@@ -8,6 +8,7 @@ import {
   deletePayout,
   fetchEntryPayments,
   fetchPayouts,
+  fetchSeasonEntryPayments,
   money,
   seasonPotFor,
   weeklyPotFor,
@@ -38,6 +39,10 @@ export function PotPanel({
   const entryPayments = useQuery({
     queryKey: ["entry-payments", league.id],
     queryFn: () => fetchEntryPayments(league.id),
+  });
+  const seasonEntryPayments = useQuery({
+    queryKey: ["season-entry-payments", league.id],
+    queryFn: () => fetchSeasonEntryPayments(league.id),
   });
 
   const [userId, setUserId] = useState("");
@@ -95,7 +100,8 @@ export function PotPanel({
   });
 
   const cards = [
-    { label: "Entry fee", value: league.entry_fee },
+    { label: "Weekly fee", value: league.entry_fee },
+    { label: "Season fee", value: league.season_entry_fee },
     {
       label: `Week ${week} pot`,
       value: weeklyPotFor(league, fees, week),
@@ -103,7 +109,7 @@ export function PotPanel({
     },
     {
       label: "Season pot",
-      value: seasonPotFor(league, fees),
+      value: seasonPotFor(league, seasonEntryPayments.data ?? []),
       sub: `${money(paidSeason)} paid out`,
     },
   ];
@@ -118,7 +124,7 @@ export function PotPanel({
         week={week}
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {cards.map((c) => (
           <div key={c.label} className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs text-faint">{c.label}</div>

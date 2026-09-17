@@ -18,6 +18,7 @@ import {
   fetchEntryPayments,
   fetchMyLeagues,
   fetchPayouts,
+  fetchSeasonEntryPayments,
   fetchStandings,
   fetchWeeklyStandings,
   money,
@@ -95,6 +96,11 @@ function LeaderboardPage() {
   });
 
   const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+  const seasonEntryPayments = useQuery({
+    queryKey: ["season-entry-payments", activeId],
+    queryFn: () => fetchSeasonEntryPayments(activeId!),
+    enabled: !!activeId,
+  });
 
   const wonBy = useMemo(() => {
     const map = new Map<string, number>();
@@ -177,9 +183,10 @@ function LeaderboardPage() {
       </div>
 
       {activeLeague && (
-        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-2.5">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
           {[
-            { label: "Entry fee", value: activeLeague.entry_fee },
+             { label: "Weekly fee", value: activeLeague.entry_fee },
+             { label: "Season fee", value: activeLeague.season_entry_fee },
             {
               label: `Week ${currentWeek.data ?? 1} pot`,
               value: weeklyPotFor(
@@ -188,7 +195,7 @@ function LeaderboardPage() {
                 currentWeek.data ?? 1,
               ),
             },
-            { label: "Season pot", value: seasonPotFor(activeLeague, entryPayments.data ?? []) },
+             { label: "Season pot", value: seasonPotFor(activeLeague, seasonEntryPayments.data ?? []) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
               <div className="text-xs text-muted-foreground">{c.label}</div>
