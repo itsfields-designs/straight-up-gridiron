@@ -10,7 +10,6 @@ import {
   money,
   saveLeaguePots,
   setEntryPaid,
-  syncSeasonPotDeposit,
   type League,
   type Member,
 } from "@/lib/pool";
@@ -107,15 +106,7 @@ export function EntryPaymentsPanel({
         await saveLeaguePots({
           leagueId: league.id,
           weeklyPot: pots.weekly,
-          seasonPot: pots.season,
-        });
-        const share = Math.min(Math.max(Number(league.season_pot_pct) || 0, 0), 100) / 100;
-        const weekPaidCount = next.filter((p) => p.weekNum === week).length;
-        await syncSeasonPotDeposit({
-          leagueId: league.id,
-          weekNum: week,
-          amount: weekPaidCount * fee * share,
-          createdBy: currentUserId,
+          seasonPot: Number(league.season_pot) || 0,
         });
       }
     },
@@ -147,21 +138,12 @@ export function EntryPaymentsPanel({
 
   const setAuto = useMutation({
     mutationFn: async (on: boolean) => {
-      const pct = Math.min(Math.max(Number(league.season_pot_pct) || 0, 0), 100);
-      const pots = autoPots(rows, { ...league, season_pot_pct: pct }, week);
+      const pots = autoPots(rows, league, week);
       await saveLeaguePots({
         leagueId: league.id,
         weeklyPot: on ? pots.weekly : Number(league.weekly_pot) || 0,
-        seasonPot: on ? pots.season : Number(league.season_pot) || 0,
+        seasonPot: Number(league.season_pot) || 0,
         potsAuto: on,
-        seasonPotPct: pct,
-      });
-      const weekPaidCount = rows.filter((p) => p.weekNum === week).length;
-      await syncSeasonPotDeposit({
-        leagueId: league.id,
-        weekNum: week,
-        amount: on ? (weekPaidCount * fee * pct) / 100 : 0,
-        createdBy: currentUserId,
       });
     },
     onSuccess: refresh,
@@ -268,15 +250,10 @@ export function EntryPaymentsPanel({
           </label>
 
           {league.pots_auto ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3">
               <div className="rounded-md border border-border p-3">
                 <div className="text-xs text-faint">Weekly pot (auto)</div>
                 <div className="font-display text-lg font-medium">{money(auto.weekly)}</div>
-              </div>
-              <div className="rounded-md border border-border p-3">
-                <div className="text-xs text-faint">Season pot</div>
-                <div className="font-display text-lg font-medium">{money(auto.season)}</div>
-                <div className="mt-0.5 text-xs text-faint">Set the share in the Season pot tab</div>
               </div>
             </div>
           ) : (
