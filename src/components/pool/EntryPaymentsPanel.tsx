@@ -44,16 +44,12 @@ export function EntryPaymentsPanel({
   const fee = Number(league.entry_fee) || 0;
 
   const [manualWeekly, setManualWeekly] = useState(String(league.weekly_pot ?? 0));
-  const [manualSeason, setManualSeason] = useState(String(league.season_pot ?? 0));
-  const [share, setShare] = useState(String(league.season_pot_pct ?? 0));
   // Extra payable sets the commissioner has opened up by hand, per member.
   const [extraSets, setExtraSets] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setManualWeekly(String(league.weekly_pot ?? 0));
-    setManualSeason(String(league.season_pot ?? 0));
-    setShare(String(league.season_pot_pct ?? 0));
-  }, [league.weekly_pot, league.season_pot, league.season_pot_pct]);
+  }, [league.weekly_pot]);
 
   useEffect(() => setExtraSets({}), [week, league.id]);
 
@@ -132,18 +128,18 @@ export function EntryPaymentsPanel({
     mutationFn: async () => {
       const num = (v: string) => {
         const n = Number(v);
-        if (!Number.isFinite(n) || n < 0) throw new Error("Amounts must be zero or more");
+        if (!Number.isFinite(n) || n < 0) throw new Error("Amount must be zero or more");
         return Math.round(n * 100) / 100;
       };
       await saveLeaguePots({
         leagueId: league.id,
         weeklyPot: num(manualWeekly),
-        seasonPot: num(manualSeason),
+        seasonPot: Number(league.season_pot) || 0,
         potsAuto: false,
       });
     },
     onSuccess: () => {
-      toast.success("Pot amounts saved");
+      toast.success("Weekly pot saved");
       refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -151,7 +147,7 @@ export function EntryPaymentsPanel({
 
   const setAuto = useMutation({
     mutationFn: async (on: boolean) => {
-      const pct = Math.min(Math.max(Number(share) || 0, 0), 100);
+      const pct = Math.min(Math.max(Number(league.season_pot_pct) || 0, 0), 100);
       const pots = autoPots(rows, { ...league, season_pot_pct: pct }, week);
       await saveLeaguePots({
         leagueId: league.id,
@@ -167,7 +163,6 @@ export function EntryPaymentsPanel({
         amount: on ? (weekPaidCount * fee * pct) / 100 : 0,
         createdBy: currentUserId,
       });
-
     },
     onSuccess: refresh,
     onError: (e: Error) => toast.error(e.message),
@@ -273,31 +268,19 @@ export function EntryPaymentsPanel({
           </label>
 
           {league.pots_auto ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-md border border-border p-3">
                 <div className="text-xs text-faint">Weekly pot (auto)</div>
                 <div className="font-display text-lg font-medium">{money(auto.weekly)}</div>
               </div>
               <div className="rounded-md border border-border p-3">
-                <div className="text-xs text-faint">Season pot (auto)</div>
+                <div className="text-xs text-faint">Season pot</div>
                 <div className="font-display text-lg font-medium">{money(auto.season)}</div>
+                <div className="mt-0.5 text-xs text-faint">Set the share in the Season pot tab</div>
               </div>
-              <label className="block">
-                <span className="mb-1 block text-xs text-faint">Season pot share (%)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={share}
-                  onChange={(e) => setShare(e.target.value)}
-                  onBlur={() => setAuto.mutate(true)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </label>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-1 block text-xs text-faint">Weekly pot ($)</span>
                 <input
@@ -310,25 +293,14 @@ export function EntryPaymentsPanel({
                   className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
-              <label className="block">
-                <span className="mb-1 block text-xs text-faint">Season pot ($)</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  inputMode="decimal"
-                  value={manualSeason}
-                  onChange={(e) => setManualSeason(e.target.value)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </label>
               <div className="flex items-end">
                 <button
+                  type="button"
                   onClick={() => saveManual.mutate()}
                   disabled={saveManual.isPending}
-                  className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+                  className="w-full min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
                 >
-                  {saveManual.isPending ? "Saving…" : "Save pot amounts"}
+                  {saveManual.isPending ? "Saving…" : "Save weekly pot"}
                 </button>
               </div>
             </div>

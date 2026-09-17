@@ -7,6 +7,7 @@ import {
   Landmark,
   MessageSquare,
   ShieldCheck,
+  Trophy,
   Users,
   Wallet,
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { MembersPanel } from "@/components/pool/MembersPanel";
 import { EntryPaymentsPanel } from "@/components/pool/EntryPaymentsPanel";
+import { SeasonPotPanel } from "@/components/pool/SeasonPotPanel";
 import { PotPanel } from "@/components/pool/PotPanel";
 import { CashPanel } from "@/components/pool/CashPanel";
 import { BankPanel } from "@/components/pool/BankPanel";
@@ -57,11 +59,12 @@ export const Route = createFileRoute("/_authenticated/commissioner")({
   component: CommissionerPage,
 });
 
-type Section = "members" | "payments" | "pot" | "cash" | "bank" | "chat";
+type Section = "members" | "payments" | "season" | "pot" | "cash" | "bank" | "chat";
 
 const SECTIONS: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "members", label: "Members", icon: Users },
   { id: "payments", label: "Entry payments", icon: CheckCircle2 },
+  { id: "season", label: "Season pot", icon: Trophy },
   { id: "pot", label: "Pot & payouts", icon: Banknote },
   { id: "cash", label: "Cash pool", icon: Wallet },
   { id: "bank", label: "League bank", icon: Landmark },
@@ -249,6 +252,9 @@ function CommissionerPage() {
           currentUserId={user.id}
           week={activeWeek}
         />
+      )}
+      {section === "season" && (
+        <SeasonPotPanel league={league} isOwner currentUserId={user.id} />
       )}
       {section === "pot" && (
         <PotPanel
