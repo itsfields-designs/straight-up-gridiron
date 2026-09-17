@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchEntryPayments,
   fetchPayouts,
+  fetchSeasonEntryPayments,
   fetchStandings,
   money,
   seasonPotFor,
@@ -24,6 +25,10 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
     queryKey: ["entry-payments", leagueId],
     queryFn: () => fetchEntryPayments(leagueId),
   });
+  const seasonEntryPayments = useQuery({
+    queryKey: ["season-entry-payments", leagueId],
+    queryFn: () => fetchSeasonEntryPayments(leagueId),
+  });
 
   const rows = standings.data ?? [];
   const updatedAt = rows[0]?.updatedAt;
@@ -39,9 +44,9 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
       {league && (
         <div className="mb-5 grid grid-cols-3 gap-2 sm:gap-3">
           {[
-            { label: "Entry fee", value: league.entry_fee },
+            { label: "Weekly fee", value: league.entry_fee },
             { label: `Week ${week} pot`, value: weeklyPotFor(league, fees, week) },
-            { label: "Season pot", value: seasonPotFor(league, fees) },
+            { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
               <div className="text-xs text-muted-foreground">{c.label}</div>

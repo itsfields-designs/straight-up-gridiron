@@ -74,7 +74,7 @@ export function BankPanel({
 
   const cards = [
     { label: "In the league bank", value: summary.balance, strong: true },
-    { label: "Season pot held", value: Number(league.season_pot) || 0 },
+    { label: "Season pot held", value: bankDeposits.filter((d) => d.note === "Season pot entry fees").reduce((sum, d) => sum + d.amount, 0) },
     { label: "Deposits in", value: summary.commissioner + summary.memberDeposits },
     { label: "Paid out", value: summary.paid + summary.withdrawals },
   ];
@@ -97,8 +97,7 @@ export function BankPanel({
       </div>
 
       <p className="rounded-md border border-border bg-secondary px-3 py-2.5 text-sm text-muted-foreground">
-        The league bank holds the season pot: every entry fee the commissioner ticks off adds its
-        season share here automatically. Every payout and member withdrawal comes out of this
+        The league bank holds the season pot: every separate Season Pot fee the commissioner marks paid is added here automatically. Every payout and member withdrawal comes out of this
         balance, and payments are blocked if the bank doesn't hold enough.
       </p>
 
