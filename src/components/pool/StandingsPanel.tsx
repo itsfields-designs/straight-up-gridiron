@@ -42,9 +42,10 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
   return (
     <div>
       {league && (
-        <div className="mb-5 grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {[
             { label: "Weekly fee", value: league.entry_fee },
+            { label: "Season fee", value: league.season_entry_fee },
             { label: `Week ${week} pot`, value: weeklyPotFor(league, fees, week) },
             { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
           ].map((c) => (

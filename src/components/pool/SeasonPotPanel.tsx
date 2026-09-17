@@ -111,6 +111,19 @@ export function SeasonPotPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const setAuto = useMutation({
+    mutationFn: async (on: boolean) => {
+      await saveLeaguePots({
+        leagueId: league.id,
+        weeklyPot: Number(league.weekly_pot) || 0,
+        seasonPot: on ? rows.reduce((sum, p) => sum + (p.amount > 0 ? p.amount : fee), 0) : Number(league.season_pot) || 0,
+        seasonPotAuto: on,
+      });
+    },
+    onSuccess: refresh,
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const toggle = useMutation({
     mutationFn: async ({ userId, entryNo, paid }: { userId: string; entryNo: number; paid: boolean }) => {
       await setSeasonEntryPaid({ leagueId: league.id, userId, entryNo, markedBy: currentUserId, amount: fee, paid });
@@ -143,6 +156,19 @@ export function SeasonPotPanel({
           {league.season_pot_auto ? "Auto-calculated from season fees" : "Manual amount"}
         </div>
       </div>
+
+      {isOwner && (
+        <label className="flex min-h-11 items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="h-5 w-5 accent-[hsl(var(--accent))]"
+            checked={league.season_pot_auto}
+            disabled={setAuto.isPending}
+            onChange={(event) => setAuto.mutate(event.target.checked)}
+          />
+          Calculate the Season Pot automatically from paid Season Pot fees
+        </label>
+      )}
 
       {league.season_pot_auto ? (
         <div className="space-y-4">

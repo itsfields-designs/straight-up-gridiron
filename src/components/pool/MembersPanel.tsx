@@ -127,9 +127,10 @@ export function MembersPanel({
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {[
-          { label: "Entry fee", value: league.entry_fee },
+          { label: "Weekly fee", value: league.entry_fee },
+          { label: "Season fee", value: league.season_entry_fee },
           { label: `Week ${shownWeek} pot`, value: weeklyPotFor(league, fees, shownWeek) },
           { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
         ].map((item) => (

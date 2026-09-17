@@ -130,10 +130,16 @@ export function CashPanel({
     0,
   );
   const fees = collected(entryPayments.data ?? [], 0, Number(league.entry_fee) || 0);
+  const seasonFees = allSeasonPayments.reduce(
+    (sum, payment) =>
+      sum +
+      (payment.amount > 0 ? payment.amount : Number(league.season_entry_fee) || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-xs text-faint">Your balance</div>
           <div className="font-display text-lg font-medium">{money(myBalance)}</div>
@@ -146,12 +152,16 @@ export function CashPanel({
           <div className="font-display text-lg font-medium">{money(poolTotal)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <div className="text-xs text-faint">Entry fees collected</div>
+          <div className="text-xs text-faint">Weekly fees collected</div>
           <div className="font-display text-lg font-medium">{money(fees.season)}</div>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <div className="text-xs text-faint">Entry fee</div>
+          <div className="text-xs text-faint">Weekly fee</div>
           <div className="font-display text-lg font-medium">{money(league.entry_fee)}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="text-xs text-faint">Season fees collected</div>
+          <div className="font-display text-lg font-medium">{money(seasonFees)}</div>
         </div>
       </div>
 

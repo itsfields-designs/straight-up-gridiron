@@ -183,9 +183,10 @@ function LeaderboardPage() {
       </div>
 
       {activeLeague && (
-        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-2.5">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
           {[
              { label: "Weekly fee", value: activeLeague.entry_fee },
+             { label: "Season fee", value: activeLeague.season_entry_fee },
             {
               label: `Week ${currentWeek.data ?? 1} pot`,
               value: weeklyPotFor(
