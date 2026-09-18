@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as OfficeFootballPoolRouteImport } from './routes/office-football-pool'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
@@ -31,6 +33,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficeFootballPoolRoute = OfficeFootballPoolRouteImport.update({
+  id: '/office-football-pool',
+  path: '/office-football-pool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCommissionerRoute =
@@ -71,6 +83,8 @@ const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/office-football-pool': typeof OfficeFootballPoolRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -81,6 +95,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/office-football-pool': typeof OfficeFootballPoolRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -93,6 +109,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/office-football-pool': typeof OfficeFootballPoolRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -105,6 +123,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/office-football-pool'
+    | '/sitemap.xml'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
@@ -115,6 +135,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/office-football-pool'
+    | '/sitemap.xml'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
@@ -126,6 +148,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/office-football-pool'
+    | '/sitemap.xml'
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
     | '/_authenticated/leaderboard'
@@ -138,6 +162,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  OfficeFootballPoolRoute: typeof OfficeFootballPoolRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
 }
 
@@ -162,6 +188,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/office-football-pool': {
+      id: '/office-football-pool'
+      path: '/office-football-pool'
+      fullPath: '/office-football-pool'
+      preLoaderRoute: typeof OfficeFootballPoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/commissioner': {
@@ -232,6 +272,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  OfficeFootballPoolRoute: OfficeFootballPoolRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
 }
 export const routeTree = rootRouteImport

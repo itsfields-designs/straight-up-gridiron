@@ -7,18 +7,30 @@ import { lovable } from "@/integrations/lovable/index";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: true },
   validateSearch: (search: Record<string, unknown>): { mode?: "login" | "signup" } =>
     search['mode'] === "login" ? { mode: "login" } : {},
-  head: () => ({
-    meta: [
-      { title: "Log in — Gridiron Gods" },
-      { name: "description", content: "Log in or create your Gridiron Gods account." },
-      { property: "og:title", content: "Log in — Gridiron Gods" },
-      { property: "og:description", content: "Log in or create your Gridiron Gods account." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  loaderDeps: ({ search }) => ({ mode: search.mode ?? "signup" }),
+  loader: ({ deps }) => ({ mode: deps.mode }),
+  head: ({ loaderData }) => {
+    const login = loaderData?.mode === "login";
+    const title = login ? "Log in to Gridiron Gods" : "Sign up for Gridiron Gods";
+    const description = login
+      ? "Log in to make your weekly NFL picks and check your league standings."
+      : "Create your free Gridiron Gods account and start an NFL pick'em league with friends.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: "https://gridirongods.app/auth" },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: "https://gridirongods.app/auth" }],
+    };
+  },
   component: AuthPage,
 });
 
@@ -116,7 +128,9 @@ function AuthPage() {
             alt="Gridiron Gods"
             className="mx-auto h-16 w-16 rounded-lg object-cover"
           />
-          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Gods</h1>
+          <h1 className="mt-4 text-3xl font-semibold uppercase">
+            {mode === "login" ? "Log in to Gridiron Gods" : "Sign up for Gridiron Gods"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick winners straight up. Beat your league.
           </p>

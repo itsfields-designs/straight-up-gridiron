@@ -29,19 +29,35 @@ import { LoadingState } from "@/components/ui/feedback";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
-  head: () => ({
-    meta: [
-      { title: "League — Gridiron Gods" },
-      { name: "description", content: "Make your weekly picks and check the league standings." },
-      { property: "og:title", content: "League — Gridiron Gods" },
-      {
-        property: "og:description",
-        content: "Make your weekly picks and check the league standings.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  staticData: { sitemap: false },
+  loader: async ({ params }) => {
+    // Private page: only look up the name in the browser, where the member is signed in.
+    if (typeof window === "undefined") return { leagueName: null as string | null };
+    try {
+      const league = await fetchLeague(params.leagueId);
+      return { leagueName: league?.name ?? null };
+    } catch {
+      return { leagueName: null as string | null };
+    }
+  },
+  head: ({ loaderData }) => {
+    const name = loaderData?.leagueName;
+    const title = name ? `${name} — Gridiron Gods` : "Your league — Gridiron Gods";
+    const description = name
+      ? `Weekly picks, standings and payouts for ${name} on Gridiron Gods.`
+      : "Make your weekly picks and check the league standings.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "noindex" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+    };
+  },
   component: LeaguePage,
 });
 

@@ -13,6 +13,7 @@ async function runSync(full: boolean) {
 }
 
 export const Route = createFileRoute("/api/public/nfl-sync")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

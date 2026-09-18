@@ -12,6 +12,7 @@ import { fetchMyLeagues } from "@/lib/pool";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/leagues/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Your leagues — Gridiron Gods" },

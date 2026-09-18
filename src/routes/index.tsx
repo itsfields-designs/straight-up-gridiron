@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Gridiron Gods — weekly NFL pick'em for your league" },
@@ -20,9 +21,11 @@ export const Route = createFileRoute("/")({
         content:
           "Create a league, invite friends with a code, pick every NFL game straight up and watch the standings settle it.",
       },
+      { property: "og:url", content: "https://gridirongods.app/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://gridirongods.app/" }],
   }),
   component: Index,
 });
@@ -50,7 +53,7 @@ function Index() {
           <Trophy size={14} /> 2026 season
         </span>
         <h1 className="mt-6 text-4xl font-semibold uppercase tracking-tight sm:text-6xl">
-          Gridiron Gods
+          Gridiron Gods — NFL pick'em for your league
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           Pick winners straight up every week. Beat your league. No spreads, no points — just who

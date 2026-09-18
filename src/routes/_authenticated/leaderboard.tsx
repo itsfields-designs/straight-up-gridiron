@@ -29,6 +29,7 @@ import { useLiveScores } from "@/hooks/useLiveScores";
 import { LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Leaderboard — Gridiron Gods" },
