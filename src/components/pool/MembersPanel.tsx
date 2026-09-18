@@ -105,6 +105,9 @@ export function MembersPanel({
     onSuccess: () => {
       toast.success("League settings updated");
       queryClient.invalidateQueries({ queryKey: ["league", league.id] });
+      queryClient.invalidateQueries({ queryKey: ["leagues"] });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
