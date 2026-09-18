@@ -9,19 +9,24 @@ import {
   fetchPickEntries,
   fetchWeek,
   gradeGame,
+  leagueGames,
+  leagueWeekLocked,
   savePicks,
+  skipsEarlyGames,
+  type League,
   type Side,
 } from "@/lib/pool";
 
 export function PicksPanel({
-  leagueId,
+  league,
   week,
   userId,
 }: {
-  leagueId: string;
+  league: League;
   week: number;
   userId: string;
 }) {
+  const leagueId = league.id;
   const queryClient = useQueryClient();
   const weekQuery = useQuery({ queryKey: ["week", week], queryFn: () => fetchWeek(week) });
   const entriesQuery = useQuery({
@@ -96,7 +101,10 @@ export function PicksPanel({
   if (weekQuery.isLoading) return <LoadingState label="Loading matchups" />;
 
   const weekData = weekQuery.data?.week;
-  const games = weekQuery.data?.games ?? [];
+  const allGames = weekQuery.data?.games ?? [];
+  const games = leagueGames(allGames, league, week);
+  const skipped = allGames.length - games.length;
+  const locked = leagueWeekLocked(games, weekData, league, week);
 
   if (!weekData || games.length === 0) {
     return (
@@ -114,7 +122,7 @@ export function PicksPanel({
   const remaining = Math.max(games.length - picked, 0);
   const isDirty =
     JSON.stringify(picks) !== JSON.stringify(savedPicks) || tiebreaker !== savedTiebreaker;
-  const saveHint = weekData.locked
+  const saveHint = locked
     ? "Picks are locked for this week."
     : remaining > 0
       ? `${remaining} ${remaining === 1 ? "pick" : "picks"} remaining.`
@@ -156,7 +164,7 @@ export function PicksPanel({
         </div>
         <button
           onClick={addSet}
-          disabled={weekData.locked}
+          disabled={locked}
           className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-muted-foreground disabled:opacity-40"
         >
           <Plus size={14} /> Add set
@@ -164,7 +172,7 @@ export function PicksPanel({
         {activeEntry > 1 && (
           <button
             onClick={() => remove.mutate(activeEntry)}
-            disabled={weekData.locked || remove.isPending}
+            disabled={locked || remove.isPending}
             className="flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium text-destructive disabled:opacity-40"
           >
             <Trash2 size={14} /> Remove set {activeEntry}
@@ -174,7 +182,7 @@ export function PicksPanel({
 
       <div className="mb-4 text-sm text-muted-foreground" aria-live="polite">
         Set {activeEntry} · {picked} of {games.length} games picked
-        {weekData.locked && (
+        {locked && (
           <span className="ml-2 text-destructive">· picks are locked for this week</span>
         )}
         <p className="mt-1 text-xs text-faint">
@@ -215,7 +223,7 @@ export function PicksPanel({
                       type="button"
                       aria-pressed={chosen}
                       aria-label={`Pick ${game[side]}${side === "home" ? ", home team" : ", away team"}`}
-                      disabled={weekData.locked}
+                      disabled={locked}
                       onClick={() => setPicks((p) => ({ ...p, [game.id]: side }))}
                       className={`flex min-h-12 items-center justify-between gap-1 rounded-md border px-3 py-2.5 text-left text-sm font-medium ${
                         chosen
@@ -241,7 +249,7 @@ export function PicksPanel({
                   <input
                     id="tb"
                     type="number"
-                    disabled={weekData.locked}
+                    disabled={locked}
                     value={tiebreaker}
                     onChange={(e) => setTiebreaker(e.target.value)}
                     placeholder="33"
@@ -257,12 +265,12 @@ export function PicksPanel({
       <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-lg bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
         <button
           onClick={() => save.mutate()}
-          disabled={!canSubmit || weekData.locked || save.isPending || !isDirty}
+          disabled={!canSubmit || locked || save.isPending || !isDirty}
           className={`min-h-12 w-full rounded-md px-4 text-sm font-semibold shadow-lg transition-opacity md:w-auto ${
-            isDirty && canSubmit && !weekData.locked
+            isDirty && canSubmit && !locked
               ? "bg-accent text-accent-foreground hover:opacity-85 md:shadow-none"
               : "bg-secondary text-muted-foreground md:shadow-none"
-          } ${save.isPending || !canSubmit || !isDirty || weekData.locked ? "opacity-60" : ""}`}
+          } ${save.isPending || !canSubmit || !isDirty || locked ? "opacity-60" : ""}`}
         >
           {save.isPending
             ? "Saving…"
