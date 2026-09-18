@@ -6,6 +6,7 @@ import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { UsernameEditor } from "@/components/UsernameEditor";
 import { MembershipCard } from "@/components/MembershipCard";
+import { InviteFriends } from "@/components/InviteFriends";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
