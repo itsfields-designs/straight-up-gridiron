@@ -303,6 +303,7 @@ export type Database = {
       }
       leagues: {
         Row: {
+          cashapp_handle: string
           chat_locked: boolean
           code: string
           commissioner_cut_enabled: boolean
@@ -323,6 +324,7 @@ export type Database = {
           weekly_pot: number
         }
         Insert: {
+          cashapp_handle?: string
           chat_locked?: boolean
           code: string
           commissioner_cut_enabled?: boolean
@@ -343,6 +345,7 @@ export type Database = {
           weekly_pot?: number
         }
         Update: {
+          cashapp_handle?: string
           chat_locked?: boolean
           code?: string
           commissioner_cut_enabled?: boolean

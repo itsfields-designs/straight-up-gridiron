@@ -1,0 +1,1 @@
+ALTER TABLE public.leagues ADD COLUMN IF NOT EXISTS cashapp_handle text NOT NULL DEFAULT '';
