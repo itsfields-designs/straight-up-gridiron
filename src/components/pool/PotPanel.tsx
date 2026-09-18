@@ -297,3 +297,89 @@ export function PotPanel({
     </div>
   );
 }
+
+/** Player-facing card: shows the entry fees due and a button that opens Cash App
+ *  pre-filled with the commissioner's handle and the chosen fee amount. */
+function PlayerPayCard({
+  handle,
+  weeklyFee,
+  seasonFee,
+  week,
+}: {
+  handle: string;
+  weeklyFee: number;
+  seasonFee: number;
+  week: number;
+}) {
+  const [kind, setKind] = useState<"weekly" | "season">("weekly");
+  const amount = kind === "weekly" ? weeklyFee : seasonFee;
+  const cleanHandle = handle.replace(/^\$/, "");
+  const cashAppUrl = amount > 0 ? `https://cash.app/$${cleanHandle}/${amount}` : `https://cash.app/$${cleanHandle}`;
+
+  const copyHandle = async () => {
+    try {
+      await navigator.clipboard.writeText(`$${cleanHandle}`);
+      toast.success("Cash App handle copied");
+    } catch {
+      toast.error("Couldn't copy");
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <h2 className="mb-1 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+        <Banknote size={15} /> Pay your entry fee
+      </h2>
+      <p className="mb-3 text-xs text-faint">
+        Send your entry fee to the commissioner on Cash App. They'll mark you paid once it clears.
+      </p>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setKind("weekly")}
+          className={`min-h-11 rounded-md border px-3 text-sm font-medium transition-colors ${
+            kind === "weekly"
+              ? "border-accent bg-accent-soft text-accent-foreground"
+              : "border-border bg-card text-muted-foreground"
+          }`}
+        >
+          <div className="text-xs text-faint">Week {week}</div>
+          <div>{money(weeklyFee)}</div>
+        </button>
+        <button
+          type="button"
+          onClick={() => setKind("season")}
+          disabled={seasonFee <= 0}
+          className={`min-h-11 rounded-md border px-3 text-sm font-medium transition-colors disabled:opacity-50 ${
+            kind === "season"
+              ? "border-accent bg-accent-soft text-accent-foreground"
+              : "border-border bg-card text-muted-foreground"
+          }`}
+        >
+          <div className="text-xs text-faint">Season</div>
+          <div>{money(seasonFee)}</div>
+        </button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <a
+          href={cashAppUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+        >
+          <Banknote size={15} /> Pay {money(amount)} on Cash App
+        </a>
+        <button
+          type="button"
+          onClick={copyHandle}
+          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-sm font-medium text-muted-foreground"
+          aria-label="Copy Cash App handle"
+        >
+          <Copy size={14} /> ${cleanHandle}
+        </button>
+      </div>
+    </div>
+  );
+}
