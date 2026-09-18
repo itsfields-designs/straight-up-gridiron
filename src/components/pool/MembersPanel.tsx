@@ -35,6 +35,8 @@ export function MembersPanel({
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
   const [sundayOnly, setSundayOnly] = useState(Boolean(league.sunday_only));
+  const [cutOn, setCutOn] = useState(Boolean(league.commissioner_cut_enabled));
+  const [cutPct, setCutPct] = useState(String(league.commissioner_cut_pct ?? 0));
 
   const entryPayments = useQuery({
     queryKey: ["entry-payments", league.id],
