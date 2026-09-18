@@ -34,6 +34,7 @@ export function MembersPanel({
   const [seasonEntryFee, setSeasonEntryFee] = useState(String(league.season_entry_fee ?? 0));
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
+  const [sundayOnly, setSundayOnly] = useState(Boolean(league.sunday_only));
 
   const entryPayments = useQuery({
     queryKey: ["entry-payments", league.id],
@@ -85,6 +86,7 @@ export function MembersPanel({
         if (!Number.isFinite(n) || n < 0) throw new Error("Amounts must be zero or more");
         return Math.round(n * 100) / 100;
       };
+      const changedSunday = sundayOnly !== Boolean(league.sunday_only);
       const { error } = await supabase
         .from("leagues")
         .update({
@@ -93,6 +95,9 @@ export function MembersPanel({
           season_entry_fee: num(seasonEntryFee),
           weekly_pot: num(weeklyPot),
           season_pot: num(seasonPot),
+          sunday_only: sundayOnly,
+          // Applies from the week it is changed, so finished weeks keep their records.
+          ...(changedSunday ? { sunday_only_from_week: shownWeek } : {}),
         })
         .eq("id", league.id);
       if (error) throw error;
@@ -100,6 +105,9 @@ export function MembersPanel({
     onSuccess: () => {
       toast.success("League settings updated");
       queryClient.invalidateQueries({ queryKey: ["league", league.id] });
+      queryClient.invalidateQueries({ queryKey: ["leagues"] });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -207,6 +215,27 @@ export function MembersPanel({
               </label>
             ))}
           </div>
+
+          <label className="mt-4 flex items-start gap-3 rounded-lg border border-border bg-card p-3.5">
+            <input
+              type="checkbox"
+              checked={sundayOnly}
+              onChange={(e) => setSundayOnly(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 rounded border-input accent-[var(--accent)]"
+            />
+            <span className="text-sm">
+              <span className="font-medium">Sunday and Monday games only</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                Thursday, Friday and Saturday games are left off the pick sheet and never count
+                toward records. Picks stay open until the first Sunday kickoff. Changing this takes
+                effect from Week {shownWeek} onward — finished weeks keep their results.
+                {league.sunday_only && (
+                  <> Currently active from Week {league.sunday_only_from_week}.</>
+                )}
+              </span>
+            </span>
+          </label>
+
           <button
             type="button"
             onClick={() => saveRules.mutate()}

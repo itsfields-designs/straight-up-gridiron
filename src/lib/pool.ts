@@ -50,10 +50,12 @@ export type League = {
   pots_auto: boolean;
   season_pot_auto: boolean;
   season_pot_pct: number;
+  sunday_only: boolean;
+  sunday_only_from_week: number;
 };
 
 const LEAGUE_COLS =
-  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct";
+  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week";
 
 export type Member = { user_id: string; username: string };
 
@@ -847,4 +849,49 @@ export async function saveLeaguePots(args: {
     })
     .eq("id", args.leagueId);
   if (error) throw error;
+}
+
+// ---- pre-Sunday (Thu/Fri/Sat) games ---------------------------------------
+
+/** True when a game kicks off Thursday, Friday or Saturday (US Eastern). */
+export function isEarlyWeekGame(game: Game): boolean {
+  if (!game.kickoff) return false;
+  const day = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    weekday: "short",
+  }).format(new Date(game.kickoff));
+  return day === "Thu" || day === "Fri" || day === "Sat";
+}
+
+/** Whether this league skips pre-Sunday games for the given week. */
+export function skipsEarlyGames(league: Pick<League, "sunday_only" | "sunday_only_from_week">, weekNum: number) {
+  return Boolean(league.sunday_only) && weekNum >= (league.sunday_only_from_week ?? 1);
+}
+
+/** The games that count in this league for the given week. */
+export function leagueGames(
+  games: Game[],
+  league: Pick<League, "sunday_only" | "sunday_only_from_week">,
+  weekNum: number,
+): Game[] {
+  if (!skipsEarlyGames(league, weekNum)) return games;
+  return games.filter((g) => !isEarlyWeekGame(g));
+}
+
+/**
+ * Picks lock when the first counting game kicks off. Leagues that skip
+ * pre-Sunday games therefore stay open through Thursday night.
+ */
+export function leagueWeekLocked(
+  countingGames: Game[],
+  week: Week | null | undefined,
+  league: Pick<League, "sunday_only" | "sunday_only_from_week">,
+  weekNum: number,
+): boolean {
+  if (!skipsEarlyGames(league, weekNum)) return Boolean(week?.locked);
+  const kickoffs = countingGames
+    .map((g) => (g.kickoff ? new Date(g.kickoff).getTime() : null))
+    .filter((t): t is number => t != null);
+  if (!kickoffs.length) return Boolean(week?.locked);
+  return Math.min(...kickoffs) <= Date.now();
 }

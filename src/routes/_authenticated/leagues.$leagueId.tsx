@@ -152,7 +152,7 @@ function LeaguePage() {
         </div>
       </div>
 
-      {tab === "picks" && <PicksPanel leagueId={leagueId} week={activeWeek} userId={user.id} />}
+      {tab === "picks" && <PicksPanel league={league.data} week={activeWeek} userId={user.id} />}
       {tab === "standings" && (
         <StandingsPanel leagueId={leagueId} week={activeWeek} league={league.data} />
       )}
@@ -182,7 +182,7 @@ function LeaguePage() {
           currentUserId={user.id}
         />
       )}
-      {tab === "schedule" && <SchedulePanel week={activeWeek} />}
+      {tab === "schedule" && <SchedulePanel week={activeWeek} league={league.data} />}
     </div>
   );
 }
