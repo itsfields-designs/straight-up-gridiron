@@ -9,6 +9,7 @@ import {
   deleteBankDeposit,
   fetchBankDeposits,
   fetchCashTxns,
+  fetchEntryPayments,
   fetchPayouts,
   money,
   type League,
@@ -33,17 +34,26 @@ export function BankPanel({
     queryKey: ["payouts", league.id],
     queryFn: () => fetchPayouts(league.id),
   });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
+  });
 
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
 
   const bankDeposits = deposits.data ?? [];
   const summary = bankSummary(bankDeposits, txns.data ?? [], payouts.data ?? []);
+  const weeklyFees = (entryPayments.data ?? []).reduce((s, p) => s + p.amount, 0);
+  const depositsIn = summary.commissioner + summary.memberDeposits + weeklyFees;
+  const paidOut = summary.paid + summary.withdrawals;
+  const balance = depositsIn - paidOut;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["bank", league.id] });
     queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
     queryClient.invalidateQueries({ queryKey: ["payouts", league.id] });
+    queryClient.invalidateQueries({ queryKey: ["entry-payments", league.id] });
   };
 
   const create = useMutation({
@@ -73,10 +83,10 @@ export function BankPanel({
   });
 
   const cards = [
-    { label: "In the league bank", value: summary.balance, strong: true },
-    { label: "Season pot held", value: bankDeposits.filter((d) => d.note === "Season pot entry fees").reduce((sum, d) => sum + d.amount, 0) },
-    { label: "Deposits in", value: summary.commissioner + summary.memberDeposits },
-    { label: "Paid out", value: summary.paid + summary.withdrawals },
+    { label: "In the league bank", value: balance, strong: true },
+    { label: "Weekly fees held", value: weeklyFees },
+    { label: "Deposits in", value: depositsIn },
+    { label: "Paid out", value: paidOut },
   ];
 
   return (
@@ -87,7 +97,7 @@ export function BankPanel({
             <div className="text-xs text-faint">{c.label}</div>
             <div
               className={`font-display font-medium ${c.strong ? "text-2xl" : "text-lg"} ${
-                c.strong && summary.balance <= 0 ? "text-destructive" : ""
+                c.strong && balance <= 0 ? "text-destructive" : ""
               }`}
             >
               {money(c.value)}
@@ -97,8 +107,8 @@ export function BankPanel({
       </div>
 
       <p className="rounded-md border border-border bg-secondary px-3 py-2.5 text-sm text-muted-foreground">
-        The league bank holds the season pot: every separate Season Pot fee the commissioner marks paid is added here automatically. Every payout and member withdrawal comes out of this
-        balance, and payments are blocked if the bank doesn't hold enough.
+        The league bank holds every entry fee the commissioner marks paid — weekly fees and season pot fees — plus any extra deposits. Every payout and member withdrawal comes out of
+        this balance, and payments are blocked if the bank doesn't hold enough.
       </p>
 
 
