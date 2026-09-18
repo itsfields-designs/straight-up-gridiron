@@ -49,7 +49,7 @@ async function isExempt(userId: string): Promise<boolean> {
   return data?.membership_exempt === true;
 }
 
-async function membershipStatus(
+export async function membershipStatus(
   userId: string,
   claims: Record<string, unknown>,
 ): Promise<MembershipStatus> {
