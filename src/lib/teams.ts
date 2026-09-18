@@ -38,7 +38,8 @@ const TEAMS: Record<string, Team> = {
 
 export function teamInfo(name: string): Team {
   const key = Object.keys(TEAMS).find((t) => name.toLowerCase().includes(t.toLowerCase()));
-  if (key) return TEAMS[key];
+  const hit = key ? TEAMS[key] : undefined;
+  if (hit) return hit;
   const letters = name.replace(/[^A-Za-z0-9]/g, "");
   return { abbr: letters.slice(0, 3).toUpperCase(), color: "#3f4a45" };
 }
