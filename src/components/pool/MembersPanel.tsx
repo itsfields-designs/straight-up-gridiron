@@ -35,6 +35,8 @@ export function MembersPanel({
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
   const [sundayOnly, setSundayOnly] = useState(Boolean(league.sunday_only));
+  const [cutOn, setCutOn] = useState(Boolean(league.commissioner_cut_enabled));
+  const [cutPct, setCutPct] = useState(String(league.commissioner_cut_pct ?? 0));
 
   const entryPayments = useQuery({
     queryKey: ["entry-payments", league.id],
@@ -87,6 +89,9 @@ export function MembersPanel({
         return Math.round(n * 100) / 100;
       };
       const changedSunday = sundayOnly !== Boolean(league.sunday_only);
+      const pct = Number(cutPct);
+      if (!Number.isFinite(pct) || pct < 0 || pct > 100)
+        throw new Error("Commissioner's Cut must be between 0 and 100");
       const { error } = await supabase
         .from("leagues")
         .update({
@@ -96,6 +101,8 @@ export function MembersPanel({
           weekly_pot: num(weeklyPot),
           season_pot: num(seasonPot),
           sunday_only: sundayOnly,
+          commissioner_cut_enabled: cutOn,
+          commissioner_cut_pct: Math.round(pct * 100) / 100,
           // Applies from the week it is changed, so finished weeks keep their records.
           ...(changedSunday ? { sunday_only_from_week: shownWeek } : {}),
         })
@@ -235,6 +242,39 @@ export function MembersPanel({
               </span>
             </span>
           </label>
+
+          <div className="mt-4 rounded-lg border border-border bg-card p-3.5">
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={cutOn}
+                onChange={(e) => setCutOn(e.target.checked)}
+                className="mt-0.5 h-5 w-5 shrink-0 rounded border-input accent-[var(--accent)]"
+              />
+              <span className="text-sm">
+                <span className="font-medium">Commissioner's Cut</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">
+                  Takes a set percentage off the weekly and season pots before payouts. Everyone in
+                  the league sees the reduced pot amounts.
+                </span>
+              </span>
+            </label>
+            {cutOn && (
+              <label className="mt-3 block">
+                <span className="mb-1 block text-xs text-faint">Commissioner's Cut (%)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={cutPct}
+                  onChange={(e) => setCutPct(e.target.value)}
+                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring sm:w-40"
+                />
+              </label>
+            )}
+          </div>
 
           <button
             type="button"

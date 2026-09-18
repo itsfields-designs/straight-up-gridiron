@@ -52,10 +52,12 @@ export type League = {
   season_pot_pct: number;
   sunday_only: boolean;
   sunday_only_from_week: number;
+  commissioner_cut_enabled: boolean;
+  commissioner_cut_pct: number;
 };
 
 const LEAGUE_COLS =
-  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week";
+  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week, commissioner_cut_enabled, commissioner_cut_pct";
 
 export type Member = { user_id: string; username: string };
 
@@ -817,17 +819,49 @@ export function autoPots(payments: EntryPayment[], league: League, weekNum: numb
   };
 }
 
-/** Weekly pot for one specific week: auto leagues only count that week's payments. */
-export function weeklyPotFor(league: League, payments: EntryPayment[], weekNum: number) {
+/** Percentage the commissioner keeps, or 0 when the feature is off. */
+export function commissionerCutPct(league: Pick<League, "commissioner_cut_enabled" | "commissioner_cut_pct">) {
+  if (!league.commissioner_cut_enabled) return 0;
+  const pct = Number(league.commissioner_cut_pct) || 0;
+  return Math.min(Math.max(pct, 0), 100);
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** Dollar amount of the Commissioner's Cut on a gross pot. */
+export function commissionerCut(
+  league: Pick<League, "commissioner_cut_enabled" | "commissioner_cut_pct">,
+  gross: number,
+) {
+  return round2((Number(gross) || 0) * (commissionerCutPct(league) / 100));
+}
+
+/** Pot after the Commissioner's Cut is taken out. */
+function afterCut(league: League, gross: number) {
+  return round2(gross - commissionerCut(league, gross));
+}
+
+/** Gross weekly pot, before the Commissioner's Cut. */
+export function weeklyPotGross(league: League, payments: EntryPayment[], weekNum: number) {
   if (!league.pots_auto) return Number(league.weekly_pot) || 0;
   return autoPots(payments, league, weekNum).weekly;
 }
 
-/** Season pot across all weeks (auto) or the manual amount. */
-export function seasonPotFor(league: League, payments: SeasonEntryPayment[]) {
+/** Weekly pot for one specific week: auto leagues only count that week's payments. */
+export function weeklyPotFor(league: League, payments: EntryPayment[], weekNum: number) {
+  return afterCut(league, weeklyPotGross(league, payments, weekNum));
+}
+
+/** Gross season pot, before the Commissioner's Cut. */
+export function seasonPotGross(league: League, payments: SeasonEntryPayment[]) {
   if (!league.season_pot_auto) return Number(league.season_pot) || 0;
   const fee = Number(league.season_entry_fee) || 0;
-  return Math.round(payments.reduce((sum, p) => sum + (p.amount > 0 ? p.amount : fee), 0) * 100) / 100;
+  return round2(payments.reduce((sum, p) => sum + (p.amount > 0 ? p.amount : fee), 0));
+}
+
+/** Season pot across all weeks (auto) or the manual amount, after the cut. */
+export function seasonPotFor(league: League, payments: SeasonEntryPayment[]) {
+  return afterCut(league, seasonPotGross(league, payments));
 }
 
 export async function saveLeaguePots(args: {

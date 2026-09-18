@@ -305,6 +305,8 @@ export type Database = {
         Row: {
           chat_locked: boolean
           code: string
+          commissioner_cut_enabled: boolean
+          commissioner_cut_pct: number
           created_at: string
           entry_fee: number
           id: string
@@ -323,6 +325,8 @@ export type Database = {
         Insert: {
           chat_locked?: boolean
           code: string
+          commissioner_cut_enabled?: boolean
+          commissioner_cut_pct?: number
           created_at?: string
           entry_fee?: number
           id?: string
@@ -341,6 +345,8 @@ export type Database = {
         Update: {
           chat_locked?: boolean
           code?: string
+          commissioner_cut_enabled?: boolean
+          commissioner_cut_pct?: number
           created_at?: string
           entry_fee?: number
           id?: string
