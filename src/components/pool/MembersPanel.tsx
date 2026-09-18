@@ -34,6 +34,7 @@ export function MembersPanel({
   const [seasonEntryFee, setSeasonEntryFee] = useState(String(league.season_entry_fee ?? 0));
   const [weeklyPot, setWeeklyPot] = useState(String(league.weekly_pot ?? 0));
   const [seasonPot, setSeasonPot] = useState(String(league.season_pot ?? 0));
+  const [sundayOnly, setSundayOnly] = useState(Boolean(league.sunday_only));
 
   const entryPayments = useQuery({
     queryKey: ["entry-payments", league.id],
