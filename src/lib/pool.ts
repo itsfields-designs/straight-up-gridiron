@@ -50,10 +50,12 @@ export type League = {
   pots_auto: boolean;
   season_pot_auto: boolean;
   season_pot_pct: number;
+  sunday_only: boolean;
+  sunday_only_from_week: number;
 };
 
 const LEAGUE_COLS =
-  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct";
+  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week";
 
 export type Member = { user_id: string; username: string };
 
