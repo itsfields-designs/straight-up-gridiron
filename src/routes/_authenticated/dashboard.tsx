@@ -134,10 +134,17 @@ function DashboardPage() {
       <section className="mt-8 border-t border-border pt-6" aria-labelledby="account-heading">
         <h2 id="account-heading" className="text-lg font-semibold">Account</h2>
         <div className="mt-3 grid gap-3">
+          {leagues.data?.[0] ? (
+            <InviteFriends
+              leagueCode={leagues.data[0].code}
+              leagueName={leagues.data[0].name}
+            />
+          ) : null}
           <MembershipCard />
           <UsernameEditor userId={user.id} />
         </div>
       </section>
+
     </div>
   );
 }
