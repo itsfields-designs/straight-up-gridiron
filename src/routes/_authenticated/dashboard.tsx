@@ -9,6 +9,7 @@ import { MembershipCard } from "@/components/MembershipCard";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Dashboard — Gridiron Gods" },

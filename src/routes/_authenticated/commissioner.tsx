@@ -39,6 +39,7 @@ import { ChatPanel } from "@/components/pool/ChatPanel";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/commissioner")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Commissioner — Gridiron Gods" },

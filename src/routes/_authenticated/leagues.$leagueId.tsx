@@ -29,6 +29,7 @@ import { LoadingState } from "@/components/ui/feedback";
 
 
 export const Route = createFileRoute("/_authenticated/leagues/$leagueId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "League — Gridiron Gods" },
