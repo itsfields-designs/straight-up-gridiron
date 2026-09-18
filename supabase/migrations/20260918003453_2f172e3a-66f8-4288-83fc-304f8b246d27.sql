@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.tg_league_rules_recompute() FROM PUBLIC, anon, authenticated;
