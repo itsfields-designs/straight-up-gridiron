@@ -148,6 +148,15 @@ export function PotPanel({
         ))}
       </div>
 
+      {!isOwner && league.cashapp_handle && (
+        <PlayerPayCard
+          handle={league.cashapp_handle}
+          weeklyFee={Number(league.entry_fee) || 0}
+          seasonFee={Number(league.season_entry_fee) || 0}
+          week={week}
+        />
+      )}
+
       {isOwner && (
         <div className="rounded-lg border border-border bg-card p-4">
           <h2 className="mb-3 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
