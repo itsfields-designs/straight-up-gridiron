@@ -355,7 +355,7 @@ function PlayerPayCard({
             <p className="text-sm text-muted-foreground">Week {week} · {money(weeklyFee)}</p>
           </div>
         </div>
-        <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${paid ? "bg-success-soft text-success" : "bg-accent-soft text-accent-foreground"}`}>
+        <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${paid ? "bg-secondary text-success" : "bg-accent-soft text-accent-foreground"}`}>
           {paid ? "Paid" : "Due"}
         </span>
       </div>
