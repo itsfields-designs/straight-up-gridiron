@@ -316,6 +316,8 @@ export type Database = {
           season_pot: number
           season_pot_auto: boolean
           season_pot_pct: number
+          sunday_only: boolean
+          sunday_only_from_week: number
           weekly_pot: number
         }
         Insert: {
@@ -332,6 +334,8 @@ export type Database = {
           season_pot?: number
           season_pot_auto?: boolean
           season_pot_pct?: number
+          sunday_only?: boolean
+          sunday_only_from_week?: number
           weekly_pot?: number
         }
         Update: {
@@ -348,6 +352,8 @@ export type Database = {
           season_pot?: number
           season_pot_auto?: boolean
           season_pot_pct?: number
+          sunday_only?: boolean
+          sunday_only_from_week?: number
           weekly_pot?: number
         }
         Relationships: []
