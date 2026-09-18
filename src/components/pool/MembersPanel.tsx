@@ -215,6 +215,27 @@ export function MembersPanel({
               </label>
             ))}
           </div>
+
+          <label className="mt-4 flex items-start gap-3 rounded-lg border border-border bg-card p-3.5">
+            <input
+              type="checkbox"
+              checked={sundayOnly}
+              onChange={(e) => setSundayOnly(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 rounded border-input accent-[var(--accent)]"
+            />
+            <span className="text-sm">
+              <span className="font-medium">Sunday and Monday games only</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                Thursday, Friday and Saturday games are left off the pick sheet and never count
+                toward records. Picks stay open until the first Sunday kickoff. Changing this takes
+                effect from Week {shownWeek} onward — finished weeks keep their results.
+                {league.sunday_only && (
+                  <> Currently active from Week {league.sunday_only_from_week}.</>
+                )}
+              </span>
+            </span>
+          </label>
+
           <button
             type="button"
             onClick={() => saveRules.mutate()}
