@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { LoadingState } from "@/components/ui/feedback";
 
-import { fetchWeek, gradeGame, type Game } from "@/lib/pool";
+import { fetchWeek, gradeGame, isEarlyWeekGame, skipsEarlyGames, type Game, type League } from "@/lib/pool";
 import { refreshNfl } from "@/lib/nfl.functions";
 
 function statusLabel(game: Game) {
@@ -14,7 +14,8 @@ function statusLabel(game: Game) {
   return game.slot || "Scheduled";
 }
 
-export function SchedulePanel({ week }: { week: number }) {
+export function SchedulePanel({ week, league }: { week: number; league?: League }) {
+  const skipsEarly = league ? skipsEarlyGames(league, week) : false;
   const queryClient = useQueryClient();
   const refresh = useServerFn(refreshNfl);
   const [syncing, setSyncing] = useState(false);
@@ -66,6 +67,7 @@ export function SchedulePanel({ week }: { week: number }) {
       <div className="rounded-lg border border-border bg-card">
         {games.map((g, i) => {
           const winner = gradeGame(g);
+          const excluded = skipsEarly && isEarlyWeekGame(g);
           const hasScore = g.away_score != null && g.home_score != null;
           return (
             <div
@@ -76,6 +78,11 @@ export function SchedulePanel({ week }: { week: number }) {
                 <span className={winner === "away" ? "font-semibold" : "font-medium"}>{g.away}</span>
                 <span className="text-faint"> @ </span>
                 <span className={winner === "home" ? "font-semibold" : "font-medium"}>{g.home}</span>
+                {excluded && (
+                  <span className="ml-2 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+                    doesn't count
+                  </span>
+                )}
                 {g.id === weekData?.tiebreaker_game_id && (
                   <span className="ml-2 rounded bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent-soft-foreground">
                     tiebreaker
