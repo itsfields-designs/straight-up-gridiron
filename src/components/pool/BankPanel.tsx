@@ -9,6 +9,7 @@ import {
   deleteBankDeposit,
   fetchBankDeposits,
   fetchCashTxns,
+  fetchEntryPayments,
   fetchPayouts,
   money,
   type League,
@@ -32,6 +33,10 @@ export function BankPanel({
   const payouts = useQuery({
     queryKey: ["payouts", league.id],
     queryFn: () => fetchPayouts(league.id),
+  });
+  const entryPayments = useQuery({
+    queryKey: ["entry-payments", league.id],
+    queryFn: () => fetchEntryPayments(league.id),
   });
 
   const [amount, setAmount] = useState("");
