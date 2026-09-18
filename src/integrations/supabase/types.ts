@@ -473,6 +473,62 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          league_id: string | null
+          league_invite_code: string
+          referred_credit_amount: number
+          referred_user_id: string
+          referrer_credit_amount: number
+          referrer_user_id: string
+          rewarded_at: string | null
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_event_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          league_id?: string | null
+          league_invite_code?: string
+          referred_credit_amount?: number
+          referred_user_id: string
+          referrer_credit_amount?: number
+          referrer_user_id: string
+          rewarded_at?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_event_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          league_id?: string | null
+          league_invite_code?: string
+          referred_credit_amount?: number
+          referred_user_id?: string
+          referrer_credit_amount?: number
+          referrer_user_id?: string
+          rewarded_at?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_event_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_entry_payments: {
         Row: {
           amount: number
@@ -513,6 +569,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stripe_events: {
+        Row: {
+          id: string
+          processed_at: string
+          type: string
+        }
+        Insert: {
+          id: string
+          processed_at?: string
+          type: string
+        }
+        Update: {
+          id?: string
+          processed_at?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      szn_credit_ledger: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string
+          id?: string
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       weeks: {
         Row: {
