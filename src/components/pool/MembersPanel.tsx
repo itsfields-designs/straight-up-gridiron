@@ -101,6 +101,8 @@ export function MembersPanel({
           weekly_pot: num(weeklyPot),
           season_pot: num(seasonPot),
           sunday_only: sundayOnly,
+          commissioner_cut_enabled: cutOn,
+          commissioner_cut_pct: Math.round(pct * 100) / 100,
           // Applies from the week it is changed, so finished weeks keep their records.
           ...(changedSunday ? { sunday_only_from_week: shownWeek } : {}),
         })
