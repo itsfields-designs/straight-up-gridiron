@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
+import { TeamBadge } from "@/components/pool/TeamBadge";
 
 import {
   deletePickEntry,
