@@ -97,7 +97,7 @@ export function BankPanel({
             <div className="text-xs text-faint">{c.label}</div>
             <div
               className={`font-display font-medium ${c.strong ? "text-2xl" : "text-lg"} ${
-                c.strong && summary.balance <= 0 ? "text-destructive" : ""
+                c.strong && balance <= 0 ? "text-destructive" : ""
               }`}
             >
               {money(c.value)}
@@ -107,8 +107,8 @@ export function BankPanel({
       </div>
 
       <p className="rounded-md border border-border bg-secondary px-3 py-2.5 text-sm text-muted-foreground">
-        The league bank holds the season pot: every separate Season Pot fee the commissioner marks paid is added here automatically. Every payout and member withdrawal comes out of this
-        balance, and payments are blocked if the bank doesn't hold enough.
+        The league bank holds every entry fee the commissioner marks paid — weekly fees and season pot fees — plus any extra deposits. Every payout and member withdrawal comes out of
+        this balance, and payments are blocked if the bank doesn't hold enough.
       </p>
 
 
