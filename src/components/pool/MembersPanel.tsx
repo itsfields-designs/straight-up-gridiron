@@ -104,6 +104,7 @@ export function MembersPanel({
           sunday_only: sundayOnly,
           commissioner_cut_enabled: cutOn,
           commissioner_cut_pct: Math.round(pct * 100) / 100,
+          cashapp_handle: cashapp.trim().replace(/^\$/, ""),
           // Applies from the week it is changed, so finished weeks keep their records.
           ...(changedSunday ? { sunday_only_from_week: shownWeek } : {}),
         })
