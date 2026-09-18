@@ -64,8 +64,8 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
             </div>
           </div>
           <p className="mt-2 text-xs text-primary-foreground/75">
-            Entry {money(league.entry_fee)} a week or {money(league.season_entry_fee)} for the
-            season. Monday night's combined score breaks ties.
+            Entry {money(league.entry_fee)} for weekly pot or {money(league.season_entry_fee)} for
+            season pot. Monday night's combined score breaks ties.
           </p>
         </div>
       )}
