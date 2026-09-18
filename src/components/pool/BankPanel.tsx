@@ -44,11 +44,16 @@ export function BankPanel({
 
   const bankDeposits = deposits.data ?? [];
   const summary = bankSummary(bankDeposits, txns.data ?? [], payouts.data ?? []);
+  const weeklyFees = (entryPayments.data ?? []).reduce((s, p) => s + p.amount, 0);
+  const depositsIn = summary.commissioner + summary.memberDeposits + weeklyFees;
+  const paidOut = summary.paid + summary.withdrawals;
+  const balance = depositsIn - paidOut;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["bank", league.id] });
     queryClient.invalidateQueries({ queryKey: ["cash", league.id] });
     queryClient.invalidateQueries({ queryKey: ["payouts", league.id] });
+    queryClient.invalidateQueries({ queryKey: ["entry-payments", league.id] });
   };
 
   const create = useMutation({
@@ -78,10 +83,10 @@ export function BankPanel({
   });
 
   const cards = [
-    { label: "In the league bank", value: summary.balance, strong: true },
-    { label: "Season pot held", value: bankDeposits.filter((d) => d.note === "Season pot entry fees").reduce((sum, d) => sum + d.amount, 0) },
-    { label: "Deposits in", value: summary.commissioner + summary.memberDeposits },
-    { label: "Paid out", value: summary.paid + summary.withdrawals },
+    { label: "In the league bank", value: balance, strong: true },
+    { label: "Weekly fees held", value: weeklyFees },
+    { label: "Deposits in", value: depositsIn },
+    { label: "Paid out", value: paidOut },
   ];
 
   return (
