@@ -121,52 +121,58 @@ function LeaguePage() {
 
   return (
     <div>
-      <Link to="/leagues" className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground">
-        <ArrowLeft size={15} /> All leagues
-      </Link>
+      <section className="-mx-4 -mt-4 mb-4 bg-primary px-4 pb-4 pt-3 text-primary-foreground sm:mx-0 sm:mt-0 sm:rounded-2xl sm:pt-4">
+        <Link
+          to="/leagues"
+          className="inline-flex min-h-9 items-center gap-1.5 text-xs font-medium text-primary-foreground/75"
+        >
+          <ArrowLeft size={14} /> All leagues
+        </Link>
+        <h1 className="mt-1 font-display text-2xl font-semibold">{league.data.name}</h1>
+        <p className="mt-1 max-w-xl text-sm text-primary-foreground/75">{league.data.rules}</p>
 
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-xl font-semibold sm:text-2xl">{league.data.name}</h1>
-          <p className="mt-1 max-w-xl text-sm text-muted-foreground">{league.data.rules}</p>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-faint" htmlFor="week">
-            Week
-          </label>
-          <select
-            id="week"
-            value={activeWeek}
-            onChange={(e) => setWeek(Number(e.target.value))}
-            className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm sm:w-28"
-          >
-            {Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1).map((w) => (
-              <option key={w} value={w}>
-                Week {w}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="sticky top-[3.4rem] z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
-        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto" role="tablist" aria-label="League sections">
-          {TABS.map((t) => (
+        <div
+          className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4"
+          role="group"
+          aria-label="Week"
+        >
+          {Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1).map((w) => (
             <button
-              key={t.id}
+              key={w}
               type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              onClick={() => setTab(t.id)}
-              className={`-mb-px flex min-h-12 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 ${
-                tab === t.id ? "border-accent text-foreground" : "border-transparent text-faint"
+              aria-pressed={activeWeek === w}
+              onClick={() => setWeek(w)}
+              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold ${
+                activeWeek === w
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-primary-foreground/10 text-primary-foreground/80"
               }`}
             >
-              <t.icon size={15} /> {t.label}
+              W{w}
             </button>
           ))}
         </div>
+      </section>
+
+      <div className="no-scrollbar sticky top-[3.5rem] z-20 -mx-4 mb-4 flex gap-2 overflow-x-auto bg-background/95 px-4 py-2 backdrop-blur">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            onClick={() => setTab(t.id)}
+            className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-sm font-medium ${
+              tab === t.id
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-card text-muted-foreground"
+            }`}
+          >
+            <t.icon size={15} /> {t.label}
+          </button>
+        ))}
       </div>
+
 
       {tab === "picks" && <PicksPanel league={league.data} week={activeWeek} userId={user.id} />}
       {tab === "standings" && (
