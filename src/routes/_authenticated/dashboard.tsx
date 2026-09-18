@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { ChevronRight, ClipboardList, Plus } from "lucide-react";
 
@@ -6,6 +7,8 @@ import { fetchCurrentWeek, fetchMyLeagues, fetchStandings } from "@/lib/pool";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { UsernameEditor } from "@/components/UsernameEditor";
 import { MembershipCard } from "@/components/MembershipCard";
+import { InviteFriends } from "@/components/InviteFriends";
+import { readInvite } from "@/lib/invite";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -32,6 +35,20 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function DashboardPage() {
   useLiveScores();
   const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
+
+  // Someone who paid after opening an invite link continues straight into that league.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("membership") !== "success") return;
+    const invite = readInvite();
+    if (!invite) return;
+    navigate({
+      to: "/join/$code",
+      params: { code: invite.code },
+      search: invite.ref ? { ref: invite.ref } : {},
+      replace: true,
+    });
+  }, [navigate]);
 
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
   const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
@@ -134,10 +151,17 @@ function DashboardPage() {
       <section className="mt-8 border-t border-border pt-6" aria-labelledby="account-heading">
         <h2 id="account-heading" className="text-lg font-semibold">Account</h2>
         <div className="mt-3 grid gap-3">
+          {leagues.data?.[0] ? (
+            <InviteFriends
+              leagueCode={leagues.data[0].code}
+              leagueName={leagues.data[0].name}
+            />
+          ) : null}
           <MembershipCard />
           <UsernameEditor userId={user.id} />
         </div>
       </section>
+
     </div>
   );
 }

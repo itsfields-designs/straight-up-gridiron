@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Copy, Shield, X } from "lucide-react";
+import { Shield, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { InviteFriends } from "@/components/InviteFriends";
 import {
   fetchCurrentWeek,
   fetchEntryPayments,
@@ -28,7 +29,6 @@ export function MembersPanel({
 }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
   const [rules, setRules] = useState(league.rules);
   const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
   const [seasonEntryFee, setSeasonEntryFee] = useState(String(league.season_entry_fee ?? 0));
@@ -119,28 +119,10 @@ export function MembersPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  function copyCode() {
-    navigator.clipboard?.writeText(league.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
-        <div>
-          <div className="text-xs text-faint">Invite code</div>
-          <div className="font-display text-lg font-medium tracking-widest">{league.code}</div>
-        </div>
-        <button
-          type="button"
-          onClick={copyCode}
-          aria-live="polite"
-          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-secondary"
-        >
-          <Copy size={14} /> {copied ? "Copied" : "Copy code"}
-        </button>
-      </div>
+      <InviteFriends leagueCode={league.code} leagueName={league.name} />
+
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {[

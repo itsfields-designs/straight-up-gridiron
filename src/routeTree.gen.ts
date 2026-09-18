@@ -17,9 +17,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as JoinCodeRouteImport } from './routes/join.$code'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -62,6 +64,11 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const JoinCodeRoute = JoinCodeRouteImport.update({
+  id: '/join/$code',
+  path: '/join/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLeaguesIndexRoute =
   AuthenticatedLeaguesIndexRouteImport.update({
     id: '/leagues/',
@@ -79,6 +86,11 @@ const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
   path: '/api/public/nfl-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,8 +100,10 @@ export interface FileRoutesByFullPath {
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,8 +114,10 @@ export interface FileRoutesByTo {
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRoutesById {
@@ -114,8 +130,10 @@ export interface FileRoutesById {
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/join/$code': typeof JoinCodeRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
 }
 export interface FileRouteTypes {
@@ -128,8 +146,10 @@ export interface FileRouteTypes {
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
+    | '/join/$code'
     | '/leagues/$leagueId'
     | '/api/public/nfl-sync'
+    | '/api/public/stripe-webhook'
     | '/leagues/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,8 +160,10 @@ export interface FileRouteTypes {
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
+    | '/join/$code'
     | '/leagues/$leagueId'
     | '/api/public/nfl-sync'
+    | '/api/public/stripe-webhook'
     | '/leagues'
   id:
     | '__root__'
@@ -153,8 +175,10 @@ export interface FileRouteTypes {
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
     | '/_authenticated/leaderboard'
+    | '/join/$code'
     | '/_authenticated/leagues/$leagueId'
     | '/api/public/nfl-sync'
+    | '/api/public/stripe-webhook'
     | '/_authenticated/leagues/'
   fileRoutesById: FileRoutesById
 }
@@ -164,7 +188,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   OfficeFootballPoolRoute: typeof OfficeFootballPoolRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  JoinCodeRoute: typeof JoinCodeRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -225,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/join/$code': {
+      id: '/join/$code'
+      path: '/join/$code'
+      fullPath: '/join/$code'
+      preLoaderRoute: typeof JoinCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/leagues/': {
       id: '/_authenticated/leagues/'
       path: '/leagues'
@@ -244,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/nfl-sync'
       fullPath: '/api/public/nfl-sync'
       preLoaderRoute: typeof ApiPublicNflSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -274,7 +314,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   OfficeFootballPoolRoute: OfficeFootballPoolRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  JoinCodeRoute: JoinCodeRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
