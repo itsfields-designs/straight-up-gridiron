@@ -86,6 +86,7 @@ export function MembersPanel({
         if (!Number.isFinite(n) || n < 0) throw new Error("Amounts must be zero or more");
         return Math.round(n * 100) / 100;
       };
+      const changedSunday = sundayOnly !== Boolean(league.sunday_only);
       const { error } = await supabase
         .from("leagues")
         .update({
@@ -94,6 +95,9 @@ export function MembersPanel({
           season_entry_fee: num(seasonEntryFee),
           weekly_pot: num(weeklyPot),
           season_pot: num(seasonPot),
+          sunday_only: sundayOnly,
+          // Applies from the week it is changed, so finished weeks keep their records.
+          ...(changedSunday ? { sunday_only_from_week: shownWeek } : {}),
         })
         .eq("id", league.id);
       if (error) throw error;
