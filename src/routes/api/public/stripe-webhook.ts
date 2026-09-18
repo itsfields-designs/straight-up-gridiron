@@ -42,9 +42,12 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           return Response.json({ received: true, rewarded: false });
         }
 
-        const { claimStripeEvent, rewardReferral } = await import("@/lib/referrals.server");
-        const fresh = await claimStripeEvent(event.id, event.type);
-        if (!fresh) return Response.json({ received: true, duplicate: true });
+        const { alreadyProcessed, claimStripeEvent, rewardReferral } = await import(
+          "@/lib/referrals.server"
+        );
+        if (await alreadyProcessed(event.id)) {
+          return Response.json({ received: true, duplicate: true });
+        }
 
         try {
           const result = await rewardReferral({
@@ -52,11 +55,13 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             sessionId: session.id,
             eventId: event.id,
           });
+          await claimStripeEvent(event.id, event.type);
           return Response.json({ received: true, rewarded: result.rewarded });
         } catch (err) {
           console.error("[stripe-webhook] reward failed", err);
           return new Response("Reward failed", { status: 500 });
         }
+
       },
     },
   },
