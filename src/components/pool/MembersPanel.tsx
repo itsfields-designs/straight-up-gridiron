@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Copy, Shield, X } from "lucide-react";
+import { Shield, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { InviteFriends } from "@/components/InviteFriends";
 import {
   fetchCurrentWeek,
   fetchEntryPayments,
@@ -28,7 +29,6 @@ export function MembersPanel({
 }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
   const [rules, setRules] = useState(league.rules);
   const [entryFee, setEntryFee] = useState(String(league.entry_fee ?? 0));
   const [seasonEntryFee, setSeasonEntryFee] = useState(String(league.season_entry_fee ?? 0));
@@ -118,12 +118,6 @@ export function MembersPanel({
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  function copyCode() {
-    navigator.clipboard?.writeText(league.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
 
   return (
     <div className="space-y-6">
