@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Banknote, Copy, Trash2 } from "lucide-react";
+import { Banknote, Clock3, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -21,6 +21,7 @@ import {
   type Member,
 } from "@/lib/pool";
 import { EntryPaymentsPanel } from "@/components/pool/EntryPaymentsPanel";
+import { Button } from "@/components/ui/button";
 
 export function PotPanel({
   league,
@@ -108,6 +109,13 @@ export function PotPanel({
   const cutPct = commissionerCutPct(league);
   const weeklyCut = commissionerCut(league, weeklyGross);
   const seasonCut = commissionerCut(league, seasonGross);
+  const currentMember = members.find((member) => member.user_id === currentUserId);
+  const weeklyPaid = fees.some(
+    (payment) => payment.userId === currentUserId && payment.weekNum === week,
+  );
+  const seasonPaid = (seasonEntryPayments.data ?? []).some(
+    (payment) => payment.userId === currentUserId,
+  );
 
   const cards = [
     { label: "Weekly fee", value: league.entry_fee },
@@ -130,13 +138,27 @@ export function PotPanel({
 
   return (
     <div className="space-y-6">
-      <EntryPaymentsPanel
-        league={league}
-        members={members}
-        isOwner={isOwner}
-        currentUserId={currentUserId}
-        week={week}
-      />
+      {isOwner ? (
+        <EntryPaymentsPanel
+          league={league}
+          members={members}
+          isOwner={isOwner}
+          currentUserId={currentUserId}
+          week={week}
+        />
+      ) : (
+        league.cashapp_handle && (
+          <PlayerPayCard
+            handle={league.cashapp_handle}
+            weeklyFee={Number(league.entry_fee) || 0}
+            seasonFee={Number(league.season_entry_fee) || 0}
+            week={week}
+            username={currentMember?.username ?? "your username"}
+            weeklyPaid={weeklyPaid}
+            seasonPaid={seasonPaid}
+          />
+        )
+      )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {cards.map((c) => (
@@ -147,15 +169,6 @@ export function PotPanel({
           </div>
         ))}
       </div>
-
-      {!isOwner && league.cashapp_handle && (
-        <PlayerPayCard
-          handle={league.cashapp_handle}
-          weeklyFee={Number(league.entry_fee) || 0}
-          seasonFee={Number(league.season_entry_fee) || 0}
-          week={week}
-        />
-      )}
 
       {isOwner && (
         <div className="rounded-lg border border-border bg-card p-4">
@@ -305,14 +318,21 @@ function PlayerPayCard({
   weeklyFee,
   seasonFee,
   week,
+  username,
+  weeklyPaid,
+  seasonPaid,
 }: {
   handle: string;
   weeklyFee: number;
   seasonFee: number;
   week: number;
+  username: string;
+  weeklyPaid: boolean;
+  seasonPaid: boolean;
 }) {
   const [kind, setKind] = useState<"weekly" | "season">("weekly");
   const amount = kind === "weekly" ? weeklyFee : seasonFee;
+  const paid = kind === "weekly" ? weeklyPaid : seasonPaid;
   const cleanHandle = handle.replace(/^\$/, "");
   const cashAppUrl = amount > 0 ? `https://cash.app/$${cleanHandle}/${amount}` : `https://cash.app/$${cleanHandle}`;
 
@@ -326,60 +346,71 @@ function PlayerPayCard({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <h2 className="mb-1 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-        <Banknote size={15} /> Pay your entry fee
-      </h2>
-      <p className="mb-3 text-xs text-faint">
-        Send your entry fee to the commissioner on Cash App. They'll mark you paid once it clears.
-      </p>
+    <section className="rounded-lg border border-border bg-card p-4 sm:p-5" aria-labelledby="your-entry-title">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <Clock3 className="shrink-0 text-accent" size={24} aria-hidden="true" />
+          <div>
+            <h2 id="your-entry-title" className="font-display text-lg font-semibold">Your entry</h2>
+            <p className="text-sm text-muted-foreground">Week {week} · {money(weeklyFee)}</p>
+          </div>
+        </div>
+        <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${paid ? "bg-secondary text-success" : "bg-accent-soft text-accent-foreground"}`}>
+          {paid ? "Paid" : "Due"}
+        </span>
+      </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <button
+      <div className="grid grid-cols-2 gap-3">
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setKind("weekly")}
-          className={`min-h-11 rounded-md border px-3 text-sm font-medium transition-colors ${
+          className={`h-auto min-h-28 flex-col items-start whitespace-normal px-4 py-4 text-left shadow-none ${
             kind === "weekly"
-              ? "border-accent bg-accent-soft text-accent-foreground"
-              : "border-border bg-card text-muted-foreground"
+              ? "border-accent bg-accent-soft hover:bg-accent-soft"
+              : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <div className="text-xs text-faint">Week {week}</div>
-          <div>{money(weeklyFee)}</div>
-        </button>
-        <button
+          <span className="font-display text-3xl font-semibold text-foreground">{money(weeklyFee)}</span>
+          <span className="text-sm font-normal text-muted-foreground">Just this week</span>
+        </Button>
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setKind("season")}
           disabled={seasonFee <= 0}
-          className={`min-h-11 rounded-md border px-3 text-sm font-medium transition-colors disabled:opacity-50 ${
+          className={`h-auto min-h-28 flex-col items-start whitespace-normal px-4 py-4 text-left shadow-none ${
             kind === "season"
-              ? "border-accent bg-accent-soft text-accent-foreground"
-              : "border-border bg-card text-muted-foreground"
+              ? "border-accent bg-accent-soft hover:bg-accent-soft"
+              : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <div className="text-xs text-faint">Season</div>
-          <div>{money(seasonFee)}</div>
-        </button>
+          <span className="font-display text-3xl font-semibold text-foreground">{money(seasonFee)}</span>
+          <span className="text-sm font-normal text-muted-foreground">Whole season</span>
+        </Button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <a
-          href={cashAppUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-        >
-          <Banknote size={15} /> Pay {money(amount)} on Cash App
+      <Button asChild size="lg" className="mt-4 w-full text-base font-semibold">
+        <a href={cashAppUrl} target="_blank" rel="noopener noreferrer">
+          Pay {money(amount)} on Cash App
         </a>
-        <button
+      </Button>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <span className="text-sm text-muted-foreground">Cash App · ${cleanHandle}</span>
+        <Button
           type="button"
+          variant="outline"
           onClick={copyHandle}
-          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-sm font-medium text-muted-foreground"
+          className="text-muted-foreground shadow-none"
           aria-label="Copy Cash App handle"
         >
-          <Copy size={14} /> ${cleanHandle}
-        </button>
+          <Copy aria-hidden="true" /> Copy handle
+        </Button>
       </div>
-    </div>
+      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        Add your username, <span className="font-medium text-foreground">{username}</span>, in the note so the commish can match your payment.
+      </p>
+    </section>
   );
 }
