@@ -140,12 +140,23 @@ async function addCredit(args: {
   if (error && !`${error.message}`.toLowerCase().includes("duplicate")) throw new Error(error.message);
 }
 
-/** Returns true when this Stripe event had not been handled before. */
+/** True when this Stripe event was handled already. */
+export async function alreadyProcessed(eventId: string) {
+  const { data } = await supabaseAdmin
+    .from("stripe_events")
+    .select("id")
+    .eq("id", eventId)
+    .maybeSingle();
+  return !!data;
+}
+
+/** Records the Stripe event so retries are ignored. */
 export async function claimStripeEvent(eventId: string, type: string) {
   const { error } = await supabaseAdmin.from("stripe_events").insert({ id: eventId, type });
   if (error) return false;
   return true;
 }
+
 
 /**
  * Issues both $5 credits once the referred member's SZN Pass payment lands.
