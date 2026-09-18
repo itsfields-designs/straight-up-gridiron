@@ -57,9 +57,17 @@ Note: `integration_identifier: hosted_web_0002` is not accepted by the installed
 
 In test mode use card `4242 4242 4242 4242`, any future expiry, any CVC, any ZIP.
 
+## Referral rewards
+
+- Webhook endpoint: `POST /api/public/stripe-webhook` (registered in Stripe, live mode, events `checkout.session.completed` + `checkout.session.async_payment_succeeded`).
+- `STRIPE_WEBHOOK_SECRET` holds the endpoint signing secret; signatures are verified before anything is processed.
+- Coupon `szn_referral_5` ($5 off, once) is applied at checkout for a referred member.
+- Checkout metadata: `product`, `user_id`, `league_id`, `league_invite_code`, `referrer_user_id`, `referral_id`.
+- On a paid event both sides get a $5 `szn_credit_ledger` entry (`referral_bonus` / `referral_reward`) and the referral is marked rewarded. Event ids are recorded in `stripe_events`, and unique indexes make retries safe.
+
 ## Next steps
 
-- Add a webhook handler (e.g. `checkout.session.completed`, `customer.subscription.deleted`) if you want membership state stored in your own database instead of read live from Stripe.
+- Add `customer.subscription.deleted` handling if you want membership state stored locally instead of read live from Stripe.
 - Update pricing by creating a new Stripe Price and changing `SZN_PASS.priceId`.
 
 ## Resources
