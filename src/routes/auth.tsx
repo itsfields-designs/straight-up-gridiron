@@ -128,7 +128,9 @@ function AuthPage() {
             alt="Gridiron Gods"
             className="mx-auto h-16 w-16 rounded-lg object-cover"
           />
-          <h1 className="mt-4 text-3xl font-semibold uppercase">Gridiron Gods</h1>
+          <h1 className="mt-4 text-3xl font-semibold uppercase">
+            {initialMode === "login" ? "Log in to Gridiron Gods" : "Sign up for Gridiron Gods"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick winners straight up. Beat your league.
           </p>
