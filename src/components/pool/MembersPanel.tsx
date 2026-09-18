@@ -127,20 +127,8 @@ export function MembersPanel({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
-        <div>
-          <div className="text-xs text-faint">Invite code</div>
-          <div className="font-display text-lg font-medium tracking-widest">{league.code}</div>
-        </div>
-        <button
-          type="button"
-          onClick={copyCode}
-          aria-live="polite"
-          className="flex min-h-11 items-center gap-1.5 rounded-md border border-border-strong px-4 text-sm font-medium transition-colors hover:bg-secondary"
-        >
-          <Copy size={14} /> {copied ? "Copied" : "Copy code"}
-        </button>
-      </div>
+      <InviteFriends leagueCode={league.code} leagueName={league.name} />
+
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {[
