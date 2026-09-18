@@ -89,6 +89,9 @@ export function MembersPanel({
         return Math.round(n * 100) / 100;
       };
       const changedSunday = sundayOnly !== Boolean(league.sunday_only);
+      const pct = Number(cutPct);
+      if (!Number.isFinite(pct) || pct < 0 || pct > 100)
+        throw new Error("Commissioner's Cut must be between 0 and 100");
       const { error } = await supabase
         .from("leagues")
         .update({
