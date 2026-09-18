@@ -213,7 +213,7 @@ export function MembersPanel({
               <span className="text-sm text-faint">$</span>
               <input
                 type="text"
-                inputMode="latin-name"
+                inputMode="text"
                 value={cashapp}
                 onChange={(e) => setCashapp(e.target.value)}
                 placeholder="thehoodinvestor"
