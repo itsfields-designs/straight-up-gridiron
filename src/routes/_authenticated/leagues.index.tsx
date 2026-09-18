@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { createLeague, joinLeague } from "@/lib/leagues.functions";
 import { checkMembership, createSznCheckout, SZN_PASS } from "@/lib/membership.functions";
 import { fetchMyLeagues } from "@/lib/pool";
+import { readInvite } from "@/lib/invite";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 
 export const Route = createFileRoute("/_authenticated/leagues/")({
@@ -47,7 +48,12 @@ function LeagueHub() {
   const locked = membership.data ? !membership.data.entitled : false;
 
   const startCheckout = useMutation({
-    mutationFn: async () => await checkoutFn(),
+    mutationFn: async () => {
+      const invite = readInvite();
+      return await checkoutFn({
+        data: invite ? { leagueCode: invite.code, ref: invite.ref } : {},
+      });
+    },
     onSuccess: ({ url }) => window.open(url, "_blank", "noopener"),
     onError: (e: Error) => toast.error(e.message),
   });

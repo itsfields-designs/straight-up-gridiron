@@ -9,6 +9,7 @@ import {
   openCustomerPortal,
   SZN_PASS,
 } from "@/lib/membership.functions";
+import { readInvite } from "@/lib/invite";
 
 export function MembershipCard() {
   const check = useServerFn(checkMembership);
@@ -33,7 +34,13 @@ export function MembershipCard() {
     setError("");
     setBusy(kind);
     try {
-      const { url } = kind === "checkout" ? await checkout() : await portal();
+      const invite = readInvite();
+      const { url } =
+        kind === "checkout"
+          ? await checkout({
+              data: invite ? { leagueCode: invite.code, ref: invite.ref } : {},
+            })
+          : await portal();
       window.open(url, "_blank", "noopener");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");

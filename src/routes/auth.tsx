@@ -4,6 +4,7 @@ import { AlertCircle, Trophy } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { readInvite } from "@/lib/invite";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
@@ -47,11 +48,27 @@ function AuthPage() {
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
 
+  /** An invite link opened before signing in continues where it left off. */
+  function afterAuth() {
+    const invite = readInvite();
+    if (invite) {
+      navigate({
+        to: "/join/$code",
+        params: { code: invite.code },
+        search: invite.ref ? { ref: invite.ref } : {},
+        replace: true,
+      });
+      return;
+    }
+    navigate({ to: "/leagues", replace: true });
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/leagues", replace: true });
+      if (data.session) afterAuth();
     });
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Phone numbers become a stable internal address so no text message is needed. */
   function phoneAccountEmail(value: string) {
@@ -74,7 +91,7 @@ function AuthPage() {
           password,
         });
         if (err) throw err;
-        navigate({ to: "/leagues", replace: true });
+        afterAuth();
       } else {
         if (username.trim().length < 3) throw new Error("Username must be at least 3 characters.");
         const { data, error: err } = await supabase.auth.signUp({
@@ -89,7 +106,7 @@ function AuthPage() {
           },
         });
         if (err) throw err;
-        if (data.session) navigate({ to: "/leagues", replace: true });
+        if (data.session) afterAuth();
         else if (method === "phone")
           setNotice("Account created. Log in with your phone number and password.");
         else setNotice("Check your email to confirm your account, then log in.");
@@ -111,7 +128,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/leagues", replace: true });
+    afterAuth();
   }
 
   const resetFlow = () => {
