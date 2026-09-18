@@ -54,10 +54,11 @@ export type League = {
   sunday_only_from_week: number;
   commissioner_cut_enabled: boolean;
   commissioner_cut_pct: number;
+  cashapp_handle: string;
 };
 
 const LEAGUE_COLS =
-  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week, commissioner_cut_enabled, commissioner_cut_pct";
+  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week, commissioner_cut_enabled, commissioner_cut_pct, cashapp_handle";
 
 export type Member = { user_id: string; username: string };
 
