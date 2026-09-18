@@ -53,7 +53,7 @@ function Index() {
           <Trophy size={14} /> 2026 season
         </span>
         <h1 className="mt-6 text-4xl font-semibold uppercase tracking-tight sm:text-6xl">
-          Gridiron Gods
+          Gridiron Gods — NFL pick'em for your league
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
           Pick winners straight up every week. Beat your league. No spreads, no points — just who
