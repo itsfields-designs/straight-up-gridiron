@@ -99,18 +99,28 @@ export function PotPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const weeklyGross = weeklyPotGross(league, fees, week);
+  const seasonGross = seasonPotGross(league, seasonEntryPayments.data ?? []);
+  const cutPct = commissionerCutPct(league);
+  const weeklyCut = commissionerCut(league, weeklyGross);
+  const seasonCut = commissionerCut(league, seasonGross);
+
   const cards = [
     { label: "Weekly fee", value: league.entry_fee },
     { label: "Season fee", value: league.season_entry_fee },
     {
       label: `Week ${week} pot`,
       value: weeklyPotFor(league, fees, week),
-      sub: `${money(paidWeekly)} paid out`,
+      sub: cutPct
+        ? `${money(paidWeekly)} paid out · ${money(weeklyCut)} commissioner's cut`
+        : `${money(paidWeekly)} paid out`,
     },
     {
       label: "Season pot",
       value: seasonPotFor(league, seasonEntryPayments.data ?? []),
-      sub: `${money(paidSeason)} paid out`,
+      sub: cutPct
+        ? `${money(paidSeason)} paid out · ${money(seasonCut)} commissioner's cut`
+        : `${money(paidSeason)} paid out`,
     },
   ];
 
