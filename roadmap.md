@@ -6,3 +6,11 @@
 - [x] Improve league tabs, picks, standings, and leaderboard
 - [x] Improve commissioner, payments, members, money, schedule, and chat screens
 - [x] Verify mobile and desktop journeys, metadata, and build health
+
+# Invite links and referral rewards
+
+- [x] Single invite link (`/join/CODE?ref=USER`) replaces the bare invite code as the primary action
+- [x] Referral records, SZN Credit ledger and processed-payment log with anti-abuse guards
+- [x] $5 off at checkout for referred members, $5 credit to both sides after payment
+- [x] Signed Stripe webhook issues rewards once per payment
+- [x] Referral stats on the dashboard and every league page
