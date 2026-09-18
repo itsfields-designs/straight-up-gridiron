@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Gridiron Gods — weekly NFL pick'em for your league" },
@@ -20,9 +21,11 @@ export const Route = createFileRoute("/")({
         content:
           "Create a league, invite friends with a code, pick every NFL game straight up and watch the standings settle it.",
       },
+      { property: "og:url", content: "https://gridirongods.app/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://gridirongods.app/" }],
   }),
   component: Index,
 });
