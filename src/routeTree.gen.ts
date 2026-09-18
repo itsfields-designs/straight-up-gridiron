@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as JoinCodeRouteImport } from './routes/join.$code'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
@@ -64,6 +65,11 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const JoinCodeRoute = JoinCodeRouteImport.update({
   id: '/join/$code',
   path: '/join/$code',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
+    | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
     | '/api/public/nfl-sync'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
+    | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
     | '/api/public/nfl-sync'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
     | '/_authenticated/leaderboard'
+    | '/_authenticated/profile'
     | '/join/$code'
     | '/_authenticated/leagues/$leagueId'
     | '/api/public/nfl-sync'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/join/$code': {
       id: '/join/$code'
       path: '/join/$code'
@@ -293,6 +312,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommissionerRoute: typeof AuthenticatedCommissionerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedLeaguesLeagueIdRoute: typeof AuthenticatedLeaguesLeagueIdRoute
   AuthenticatedLeaguesIndexRoute: typeof AuthenticatedLeaguesIndexRoute
 }
@@ -301,6 +321,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommissionerRoute: AuthenticatedCommissionerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedLeaguesLeagueIdRoute: AuthenticatedLeaguesLeagueIdRoute,
   AuthenticatedLeaguesIndexRoute: AuthenticatedLeaguesIndexRoute,
 }

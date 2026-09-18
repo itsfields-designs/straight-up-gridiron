@@ -39,33 +39,46 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
   }
   const fees = entryPayments.data ?? [];
 
+  const best = Math.max(1, ...rows.map((r) => r.correct));
+
   return (
     <div>
       {league && (
-        <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-          {[
-            { label: "Weekly fee", value: league.entry_fee },
-            { label: "Season fee", value: league.season_entry_fee },
-            { label: `Week ${week} pot`, value: weeklyPotFor(league, fees, week) },
-            { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
-          ].map((c) => (
-            <div key={c.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
-              <div className="text-xs text-muted-foreground">{c.label}</div>
-              <div className="font-display text-base font-medium sm:text-lg">{money(c.value)}</div>
+        <div className="mb-4 rounded-2xl bg-primary p-4 text-primary-foreground">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
+                Week {week} pot
+              </p>
+              <p className="font-display text-2xl font-semibold">
+                {money(weeklyPotFor(league, fees, week))}
+              </p>
             </div>
-          ))}
+            <div>
+              <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
+                Season pot
+              </p>
+              <p className="font-display text-2xl font-semibold">
+                {money(seasonPotFor(league, seasonEntryPayments.data ?? []))}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-primary-foreground/75">
+            Entry {money(league.entry_fee)} a week or {money(league.season_entry_fee)} for the
+            season. Monday night's combined score breaks ties.
+          </p>
         </div>
       )}
 
-      <div className="mb-5 flex w-fit gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Standings period">
-        {(["season", "week"] as const).map((m) => (
+      <div className="mb-4 grid grid-cols-2 gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Standings period">
+        {(["week", "season"] as const).map((m) => (
           <button
             key={m}
             type="button"
             role="tab"
             aria-selected={mode === m}
             onClick={() => setMode(m)}
-            className={`min-h-11 rounded px-3.5 text-sm font-medium ${
+            className={`min-h-10 rounded-full px-3.5 text-sm font-semibold ${
               mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
@@ -82,31 +95,40 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
             {rows.map((r) => (
               <li
                 key={`${r.userId}-${r.entryNo}`}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
+                className="rounded-2xl border border-border bg-card p-3"
               >
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-secondary text-sm font-semibold tabular-nums">
-                  {r.rank}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{r.username}</p>
-                  <p className="text-xs text-faint">
-                    Set {r.entryNo} · tiebreaker {r.tbDiff ?? "—"}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-sm font-semibold tabular-nums">
+                    {r.rank}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{r.username}</p>
+                    <p className="text-xs text-faint">
+                      Set {r.entryNo} · tiebreaker {r.tbDiff ?? "—"}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-sm font-semibold tabular-nums">
+                      {r.correct}-{r.missed}
+                    </p>
+                    <p className="text-xs text-faint tabular-nums">{money(wonBy.get(r.userId) ?? 0)}</p>
+                  </div>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-sm tabular-nums">
-                    {r.correct}-{r.missed}
-                  </p>
-                  <p className="text-xs text-faint tabular-nums">{money(wonBy.get(r.userId) ?? 0)}</p>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
+                  <div
+                    className="h-full rounded-full bg-accent"
+                    style={{ width: `${Math.round((r.correct / best) * 100)}%` }}
+                  />
                 </div>
               </li>
             ))}
             {rows.length === 0 && (
-              <li className="rounded-lg border border-dashed border-border-strong p-6 text-center text-sm text-faint">
+              <li className="rounded-2xl border border-dashed border-border-strong p-6 text-center text-sm text-faint">
                 Picks haven’t been graded for this period yet.
               </li>
             )}
           </ul>
+
 
           <div className="hidden overflow-hidden rounded-lg border border-border bg-card sm:block">
             <table className="w-full text-sm">
