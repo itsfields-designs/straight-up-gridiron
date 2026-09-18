@@ -187,6 +187,14 @@ export function PicksPanel({
         )}
         <p className="mt-1 text-xs text-faint">
           Each set stands on its own in the standings and costs one entry fee.
+          {skipsEarlyGames(league, week) && skipped > 0 && (
+            <>
+              {" "}
+              This league skips games before Sunday, so {skipped}{" "}
+              {skipped === 1 ? "game is" : "games are"} left off and picks stay open until the first
+              Sunday kickoff.
+            </>
+          )}
         </p>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
           <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${games.length ? (picked / games.length) * 100 : 0}%` }} />
