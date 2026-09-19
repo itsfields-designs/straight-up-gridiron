@@ -27,7 +27,7 @@ import { StandingsPanel } from "@/components/pool/StandingsPanel";
 export const Route = createFileRoute("/_authenticated/college")({
   staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>) => ({
-    league: typeof search.league === "string" ? search.league : undefined,
+    league: typeof search['league'] === "string" ? (search['league'] as string) : undefined,
   }),
   head: () => ({
     meta: [

@@ -83,9 +83,6 @@ function LeaguePage() {
   const refreshNflFn = useServerFn(refreshNfl);
   const refreshCfbFn = useServerFn(refreshCfb);
   const [tab, setTab] = useState<Tab>("picks");
-  useEffect(() => {
-    if (college && (tab === "picks" || tab === "standings")) setTab("schedule");
-  }, [college, tab]);
   const [week, setWeek] = useState<number | null>(null);
 
   const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
