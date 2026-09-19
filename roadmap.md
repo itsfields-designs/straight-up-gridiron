@@ -20,4 +20,5 @@
 
 - [x] AP Top 25 rankings and ranked-team schedule pulled from the public college feed
 - [x] College tab with rankings, weekly Top 25 picks and a shared leaderboard
+- [x] Match every NCAA league pick board to the Top 25 pick'em screen
 - [x] Automatic refresh every five minutes during the season
