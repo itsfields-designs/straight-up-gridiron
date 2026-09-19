@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as OfficeFootballPoolRouteImport } from './routes/office-football-pool'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthenticatedCollegeRouteImport } from './routes/_authenticated/college'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
@@ -21,6 +22,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as JoinCodeRouteImport } from './routes/join.$code'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
+import { Route as ApiPublicCfbSyncRouteImport } from './routes/api/public/cfb-sync'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
@@ -47,6 +49,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCollegeRoute = AuthenticatedCollegeRouteImport.update({
+  id: '/college',
+  path: '/college',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommissionerRoute =
   AuthenticatedCommissionerRouteImport.update({
@@ -87,6 +94,11 @@ const AuthenticatedLeaguesLeagueIdRoute =
     path: '/leagues/$leagueId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCfbSyncRoute = ApiPublicCfbSyncRouteImport.update({
+  id: '/api/public/cfb-sync',
+  path: '/api/public/cfb-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
   id: '/api/public/nfl-sync',
   path: '/api/public/nfl-sync',
@@ -103,12 +115,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -118,12 +132,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
@@ -135,12 +151,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/college': typeof AuthenticatedCollegeRoute
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -152,12 +170,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/college'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
     | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/leagues/'
@@ -167,12 +187,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/college'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
     | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/leagues'
@@ -183,12 +205,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/_authenticated/college'
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
     | '/join/$code'
     | '/_authenticated/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/_authenticated/leagues/'
@@ -201,6 +225,7 @@ export interface RootRouteChildren {
   OfficeFootballPoolRoute: typeof OfficeFootballPoolRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   JoinCodeRoute: typeof JoinCodeRoute
+  ApiPublicCfbSyncRoute: typeof ApiPublicCfbSyncRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
@@ -241,6 +266,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/college': {
+      id: '/_authenticated/college'
+      path: '/college'
+      fullPath: '/college'
+      preLoaderRoute: typeof AuthenticatedCollegeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/commissioner': {
       id: '/_authenticated/commissioner'
@@ -291,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaguesLeagueIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cfb-sync': {
+      id: '/api/public/cfb-sync'
+      path: '/api/public/cfb-sync'
+      fullPath: '/api/public/cfb-sync'
+      preLoaderRoute: typeof ApiPublicCfbSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/nfl-sync': {
       id: '/api/public/nfl-sync'
       path: '/api/public/nfl-sync'
@@ -309,6 +348,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCollegeRoute: typeof AuthenticatedCollegeRoute
   AuthenticatedCommissionerRoute: typeof AuthenticatedCommissionerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
@@ -318,6 +358,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCollegeRoute: AuthenticatedCollegeRoute,
   AuthenticatedCommissionerRoute: AuthenticatedCommissionerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
@@ -336,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfficeFootballPoolRoute: OfficeFootballPoolRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   JoinCodeRoute: JoinCodeRoute,
+  ApiPublicCfbSyncRoute: ApiPublicCfbSyncRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }

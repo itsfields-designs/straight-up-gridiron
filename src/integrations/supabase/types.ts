@@ -55,6 +55,171 @@ export type Database = {
           },
         ]
       }
+      cfb_games: {
+        Row: {
+          away: string
+          away_logo: string | null
+          away_rank: number | null
+          away_score: number | null
+          home: string
+          home_logo: string | null
+          home_rank: number | null
+          home_score: number | null
+          id: string
+          kickoff: string | null
+          slot: string
+          sort_order: number
+          state: string
+          week_num: number
+        }
+        Insert: {
+          away: string
+          away_logo?: string | null
+          away_rank?: number | null
+          away_score?: number | null
+          home: string
+          home_logo?: string | null
+          home_rank?: number | null
+          home_score?: number | null
+          id: string
+          kickoff?: string | null
+          slot?: string
+          sort_order?: number
+          state?: string
+          week_num: number
+        }
+        Update: {
+          away?: string
+          away_logo?: string | null
+          away_rank?: number | null
+          away_score?: number | null
+          home?: string
+          home_logo?: string | null
+          home_rank?: number | null
+          home_score?: number | null
+          id?: string
+          kickoff?: string | null
+          slot?: string
+          sort_order?: number
+          state?: string
+          week_num?: number
+        }
+        Relationships: []
+      }
+      cfb_pick_entries: {
+        Row: {
+          id: string
+          picks: Json
+          updated_at: string
+          user_id: string
+          week_num: number
+        }
+        Insert: {
+          id?: string
+          picks?: Json
+          updated_at?: string
+          user_id: string
+          week_num: number
+        }
+        Update: {
+          id?: string
+          picks?: Json
+          updated_at?: string
+          user_id?: string
+          week_num?: number
+        }
+        Relationships: []
+      }
+      cfb_rankings: {
+        Row: {
+          first_place_votes: number
+          logo: string | null
+          points: number
+          previous: number | null
+          rank: number
+          record: string
+          short_name: string
+          team: string
+          trend: string
+          updated_at: string
+        }
+        Insert: {
+          first_place_votes?: number
+          logo?: string | null
+          points?: number
+          previous?: number | null
+          rank: number
+          record?: string
+          short_name?: string
+          team: string
+          trend?: string
+          updated_at?: string
+        }
+        Update: {
+          first_place_votes?: number
+          logo?: string | null
+          points?: number
+          previous?: number | null
+          rank?: number
+          record?: string
+          short_name?: string
+          team?: string
+          trend?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cfb_standings: {
+        Row: {
+          correct: number
+          id: string
+          missed: number
+          rank: number
+          updated_at: string
+          user_id: string
+          username: string
+          week_num: number
+        }
+        Insert: {
+          correct?: number
+          id?: string
+          missed?: number
+          rank?: number
+          updated_at?: string
+          user_id: string
+          username?: string
+          week_num: number
+        }
+        Update: {
+          correct?: number
+          id?: string
+          missed?: number
+          rank?: number
+          updated_at?: string
+          user_id?: string
+          username?: string
+          week_num?: number
+        }
+        Relationships: []
+      }
+      cfb_weeks: {
+        Row: {
+          label: string
+          locked: boolean
+          week_num: number
+        }
+        Insert: {
+          label: string
+          locked?: boolean
+          week_num: number
+        }
+        Update: {
+          label?: string
+          locked?: boolean
+          week_num?: number
+        }
+        Relationships: []
+      }
       entry_payments: {
         Row: {
           amount: number
@@ -657,6 +822,7 @@ export type Database = {
       }
       generate_league_code: { Args: never; Returns: string }
       recompute_all_league_standings: { Args: never; Returns: number }
+      recompute_cfb_standings: { Args: never; Returns: undefined }
       recompute_league_standings: {
         Args: { _league_id: string }
         Returns: undefined
