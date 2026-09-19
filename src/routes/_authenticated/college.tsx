@@ -74,6 +74,14 @@ function CollegePage() {
   }, [currentWeek.data, week]);
   const activeWeek = week ?? currentWeek.data ?? 1;
 
+  const leagues = useQuery({ queryKey: ["my-leagues"], queryFn: fetchMyLeagues });
+  const collegeLeagues = (leagues.data ?? []).filter(isCollegeLeague);
+  const selectedLeague: League | null =
+    collegeLeagues.find((l) => l.id === leagueParam) ?? null;
+  const setScope = (id: string | undefined) => {
+    navigate({ to: "/college", search: { league: id } });
+  };
+
   const sync = async () => {
     setSyncing(true);
     try {
