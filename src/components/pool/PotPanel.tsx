@@ -170,8 +170,10 @@ export function PotPanel({
             seasonFee={Number(league.season_entry_fee) || 0}
             week={week}
             username={currentMember?.username ?? "your username"}
-            weeklyPaid={weeklyPaid}
-            seasonPaid={seasonPaid}
+            weeklySets={weeklySets}
+            seasonSets={seasonSets}
+            weeklySetsPaid={weeklySetsPaid}
+            seasonSetsPaid={seasonSetsPaid}
           />
         )
       )}
