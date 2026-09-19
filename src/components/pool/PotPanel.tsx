@@ -8,6 +8,7 @@ import {
   deletePayout,
   fetchEntryPayments,
   fetchPayouts,
+  fetchPickEntries,
   fetchSeasonEntryPayments,
   money,
   commissionerCut,
@@ -48,6 +49,10 @@ export function PotPanel({
   const seasonEntryPayments = useQuery({
     queryKey: ["season-entry-payments", league.id],
     queryFn: () => fetchSeasonEntryPayments(league.id),
+  });
+  const pickEntries = useQuery({
+    queryKey: ["pick-entries", league.id],
+    queryFn: () => fetchPickEntries(league.id),
   });
 
   const [userId, setUserId] = useState("");
