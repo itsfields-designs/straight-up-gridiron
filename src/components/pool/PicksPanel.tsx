@@ -266,7 +266,14 @@ export function PicksPanel({
                   return (
                     <article key={game.id} className="rounded-2xl border border-border bg-card p-3">
                       <div className="flex items-center justify-between text-xs text-faint">
-                        <span>{game.slot}</span>
+                        <span className="flex items-center gap-2">
+                          {game.slot}
+                          {isTb && (
+                            <span className="rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-soft-foreground">
+                              Tiebreaker
+                            </span>
+                          )}
+                        </span>
                         <span className="flex items-center gap-1">
                           {locked && <Lock size={11} />}
                           {game.state === "post" ? "Final" : game.state === "in" ? "Live" : "Scheduled"}
