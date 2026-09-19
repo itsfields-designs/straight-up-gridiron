@@ -387,9 +387,11 @@ function PicksTab({
 function LeaderboardTab({
   week,
   onWeekChange,
+  userId,
 }: {
   week: number;
   onWeekChange: (w: number) => void;
+  userId: string;
 }) {
   const [scope, setScope] = useState<"week" | "season">("week");
   const target = scope === "season" ? 0 : week;
@@ -397,10 +399,25 @@ function LeaderboardTab({
     queryKey: ["cfb-standings", target],
     queryFn: () => fetchCfbStandings(target),
   });
+  const rows = standings.data ?? [];
+  const me = rows.find((r) => r.userId === userId);
 
   return (
     <div className="grid gap-3">
+      <div className="rounded-2xl bg-accent-soft px-4 py-3">
+        <p className="text-sm font-semibold text-accent-soft-foreground">
+          Everyone on Gridiron Gods plays this board
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {rows.length > 0
+            ? `${rows.length} ${rows.length === 1 ? "player" : "players"} competing${
+                me ? ` · you're #${me.rank}` : ""
+              }`
+            : "No league needed — first picks put you on the board."}
+        </p>
+      </div>
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-secondary p-1">
+
         {(["week", "season"] as const).map((s) => (
           <button
             key={s}
