@@ -187,7 +187,7 @@ function RankingsTab() {
 }
 
 function rankTag(rank: number | null) {
-  return rank ? <span className="mr-1 text-xs font-semibold text-accent-foreground">#{rank}</span> : null;
+  return rank ? <span className="mr-1 rounded bg-accent-soft px-1 py-0.5 text-[11px] font-bold text-accent-soft-foreground">#{rank}</span> : null;
 }
 
 function PicksTab({

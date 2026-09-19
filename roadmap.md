@@ -15,3 +15,9 @@
 - [x] $5 off at checkout for referred members, $5 credit to both sides after payment
 - [x] Signed Stripe webhook issues rewards once per payment
 - [x] Referral stats on the dashboard and every league page
+
+# College Top 25
+
+- [x] AP Top 25 rankings and ranked-team schedule pulled from the public college feed
+- [x] College tab with rankings, weekly Top 25 picks and a shared leaderboard
+- [x] Automatic refresh every five minutes during the season
