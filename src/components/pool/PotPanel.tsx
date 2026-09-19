@@ -381,13 +381,16 @@ function PlayerPayCard({
           <Clock3 className="shrink-0 text-accent" size={24} aria-hidden="true" />
           <div>
             <h2 id="your-entry-title" className="font-display text-lg font-semibold">Your entry</h2>
-            <p className="text-sm text-muted-foreground">Week {week} · {money(weeklyFee)}</p>
+            <p className="text-sm text-muted-foreground">
+              Week {week} · {weeklySets} {weeklySets === 1 ? "set" : "sets"} × {money(weeklyFee)}
+            </p>
           </div>
         </div>
         <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${paid ? "bg-secondary text-success" : "bg-accent-soft text-accent-foreground"}`}>
-          {paid ? "Paid" : "Due"}
+          {paid ? "Paid" : setsPaid > 0 ? `${setsPaid} of ${sets} paid` : "Due"}
         </span>
       </div>
+
 
       <div className="grid grid-cols-2 gap-3">
         <Button
