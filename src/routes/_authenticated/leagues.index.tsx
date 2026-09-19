@@ -35,6 +35,7 @@ function LeagueHub() {
   const navigate = useNavigate();
   const [panel, setPanel] = useState<"none" | "create" | "join">("none");
   const [name, setName] = useState("");
+  const [sport, setSport] = useState<"nfl" | "ncaa" | null>(null);
   const [rules, setRules] = useState(DEFAULT_RULES);
   const [code, setCode] = useState("");
 
@@ -59,8 +60,10 @@ function LeagueHub() {
   });
 
   const create = useMutation({
-    mutationFn: async () =>
-      await createLeagueFn({ data: { name: name.trim(), rules: rules.trim() } }),
+    mutationFn: async () => {
+      if (!sport) throw new Error("Choose NFL or NCAA for your league.");
+      return await createLeagueFn({ data: { name: name.trim(), rules: rules.trim(), sport } });
+    },
     onSuccess: (id) => {
       setPanel("none");
       setName("");
@@ -130,7 +133,12 @@ function LeagueHub() {
             className="flex min-h-[3.5rem] items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3.5 transition-colors hover:bg-secondary"
           >
             <div className="min-w-0">
-              <div className="truncate font-medium">{l.name}</div>
+              <div className="truncate font-medium">
+                {l.name}{" "}
+                <span className="ml-1 rounded-sm bg-secondary px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {l.sport === "ncaa" ? "NCAA" : "NFL"}
+                </span>
+              </div>
               <div className="text-xs text-faint">Invite code {l.code}</div>
             </div>
             <ChevronRight size={16} className="shrink-0 text-faint" />
@@ -185,6 +193,31 @@ function LeagueHub() {
             required
             className="mb-4 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
+          <span className="field-label">Sport</span>
+          <div className="mb-4 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Sport">
+            {(
+              [
+                { value: "nfl", label: "NFL", hint: "Pro football, weeks 1–18" },
+                { value: "ncaa", label: "NCAA", hint: "College Top 25 games" },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={sport === opt.value}
+                onClick={() => setSport(opt.value)}
+                className={`min-h-12 rounded-md border px-3 py-2 text-left transition-colors ${
+                  sport === opt.value
+                    ? "border-accent bg-accent-soft ring-2 ring-accent/40"
+                    : "border-input bg-card hover:bg-secondary"
+                }`}
+              >
+                <div className="text-sm font-semibold">{opt.label}</div>
+                <div className="text-xs text-muted-foreground">{opt.hint}</div>
+              </button>
+            ))}
+          </div>
           <label className="field-label" htmlFor="league-rules">
             House rules
           </label>
@@ -197,7 +230,7 @@ function LeagueHub() {
           />
           <button
             type="submit"
-            disabled={create.isPending}
+            disabled={create.isPending || !sport}
             className="rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-40"
           >
             Create league
