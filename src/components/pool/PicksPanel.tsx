@@ -323,6 +323,22 @@ export function PicksPanel({
                           );
                         })}
                       </div>
+                      {isTb && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <label className="text-sm text-muted-foreground" htmlFor="tb">
+                            Combined final score, both teams:
+                          </label>
+                          <input
+                            id="tb"
+                            type="number"
+                            disabled={locked}
+                            value={tiebreaker}
+                            onChange={(e) => setTiebreaker(e.target.value)}
+                            placeholder="52"
+                            className="min-h-11 w-24 rounded-xl border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+                      )}
                     </article>
                   );
                 }
