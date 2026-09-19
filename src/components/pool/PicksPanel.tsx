@@ -4,6 +4,7 @@ import { Check, Lock, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
+import { NcaaPickDeadline, ncaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
 
 import { fetchLeagueWeek } from "@/lib/league-sport";
 import {
@@ -109,7 +110,9 @@ export function PicksPanel({
   const allGames = weekQuery.data?.games ?? [];
   const games = leagueGames(allGames, league, week);
   const skipped = allGames.length - games.length;
-  const locked = leagueWeekLocked(games, weekData, league, week);
+  const locked = isCollege
+    ? ncaaWeekLocked(games, weekData?.locked)
+    : leagueWeekLocked(games, weekData, league, week);
 
   if (!weekData || games.length === 0) {
     return (
@@ -218,9 +221,12 @@ export function PicksPanel({
       </div>
 
       {isCollege ? (
-        <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
-          {picked} of {games.length} picked · Set {activeEntry}
-        </p>
+        <>
+          <NcaaPickDeadline games={games} storedLocked={weekData.locked} />
+          <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
+            {picked} of {games.length} picked · Set {activeEntry}
+          </p>
+        </>
       ) : (
         <div className="mb-4 rounded-2xl border border-border bg-card p-4" aria-live="polite">
           <div className="flex items-center justify-between gap-3">

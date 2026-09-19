@@ -7,6 +7,7 @@ import { Globe, Lock, RefreshCw, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
+import { NcaaPickDeadline, ncaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
 import { refreshCfb } from "@/lib/cfb.functions";
 import {
   TOTAL_CFB_WEEKS,
@@ -15,7 +16,6 @@ import {
   fetchCfbStandings,
   fetchCfbWeek,
   fetchMyCfbPicks,
-  gameLocked,
   gradeCfbGame,
   saveCfbPicks,
   type CfbGame,
@@ -266,6 +266,7 @@ function PicksTab({
   }, [picksQuery.data, week]);
 
   const games = weekQuery.data?.games ?? [];
+  const locked = ncaaWeekLocked(games, weekQuery.data?.week?.locked);
   const tbGameId = weekQuery.data?.week?.tiebreaker_game_id ?? null;
   const savedTiebreaker =
     picksQuery.data?.tiebreaker != null ? String(picksQuery.data.tiebreaker) : "";
@@ -277,7 +278,7 @@ function PicksTab({
   );
 
   const choose = (game: CfbGame, side: Side) => {
-    if (gameLocked(game)) return;
+    if (locked) return;
     setDraft((d) => ({ ...d, [game.id]: side }));
   };
 
@@ -311,13 +312,13 @@ function PicksTab({
         />
       ) : (
         <>
+          <NcaaPickDeadline games={games} storedLocked={weekQuery.data?.week?.locked} />
           <p className="text-sm text-muted-foreground">
             {Object.keys(draft).length} of {games.length} picked
           </p>
           <div className="grid gap-2.5">
             {games.map((g) => {
               const winner = gradeCfbGame(g);
-              const locked = gameLocked(g);
               const pick = draft[g.id];
               return (
                 <article key={g.id} className="rounded-2xl border border-border bg-card p-3">
@@ -399,14 +400,20 @@ function PicksTab({
           </div>
           <button
             onClick={save}
-            disabled={!dirty || saving}
+            disabled={!dirty || saving || locked}
             className={`sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] min-h-12 rounded-xl px-4 text-sm font-semibold ${
-              dirty
+              dirty && !locked
                 ? "bg-accent text-accent-foreground"
                 : "bg-secondary text-muted-foreground"
             }`}
           >
-            {saving ? "Saving…" : dirty ? `Save Week ${week} picks` : "Picks saved"}
+            {saving
+              ? "Saving…"
+              : locked
+                ? "Picks locked for this week"
+                : dirty
+                  ? `Save Week ${week} picks`
+                  : "Picks saved"}
           </button>
         </>
       )}
