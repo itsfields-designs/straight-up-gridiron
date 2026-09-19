@@ -115,12 +115,23 @@ export function PotPanel({
   const weeklyCut = commissionerCut(league, weeklyGross);
   const seasonCut = commissionerCut(league, seasonGross);
   const currentMember = members.find((member) => member.user_id === currentUserId);
-  const weeklyPaid = fees.some(
-    (payment) => payment.userId === currentUserId && payment.weekNum === week,
+  const myEntries = (pickEntries.data ?? []).filter((e) => e.user_id === currentUserId);
+  // Sets the player actually saved for this week, and across the season.
+  const weeklySets = Math.max(
+    1,
+    new Set(myEntries.filter((e) => e.week_num === week).map((e) => e.entry_no)).size,
   );
-  const seasonPaid = (seasonEntryPayments.data ?? []).some(
-    (payment) => payment.userId === currentUserId,
-  );
+  const seasonSets = Math.max(1, new Set(myEntries.map((e) => e.entry_no)).size);
+  const weeklySetsPaid = new Set(
+    fees
+      .filter((payment) => payment.userId === currentUserId && payment.weekNum === week)
+      .map((payment) => payment.entryNo),
+  ).size;
+  const seasonSetsPaid = new Set(
+    (seasonEntryPayments.data ?? [])
+      .filter((payment) => payment.userId === currentUserId)
+      .map((payment) => payment.entryNo),
+  ).size;
 
   const cards = [
     { label: "Weekly fee", value: league.entry_fee },
