@@ -88,9 +88,6 @@ function LeaguePage() {
   const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
   const sport = league.data?.sport ?? "nfl";
   const college = league.data ? isCollegeLeague(league.data) : false;
-  useEffect(() => {
-    if (college && (tab === "picks" || tab === "standings")) setTab("schedule");
-  }, [college, tab]);
 
   // Scores stream in live; this is just a backstop pull when someone opens the page.
   useLiveScores();
