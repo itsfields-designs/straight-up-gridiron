@@ -14,8 +14,10 @@ import {
   Wallet,
 } from "lucide-react";
 
-import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { fetchLeague, fetchMembers } from "@/lib/pool";
+import { fetchLeagueCurrentWeek, isCollegeLeague, totalWeeksFor } from "@/lib/league-sport";
 import { refreshNfl } from "@/lib/nfl.functions";
+import { refreshCfb } from "@/lib/cfb.functions";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";

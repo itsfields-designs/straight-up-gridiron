@@ -5,10 +5,10 @@ import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
 
+import { fetchLeagueWeek } from "@/lib/league-sport";
 import {
   deletePickEntry,
   fetchPickEntries,
-  fetchWeek,
   gradeGame,
   leagueGames,
   leagueWeekLocked,
@@ -29,7 +29,10 @@ export function PicksPanel({
 }) {
   const leagueId = league.id;
   const queryClient = useQueryClient();
-  const weekQuery = useQuery({ queryKey: ["week", week], queryFn: () => fetchWeek(week) });
+  const weekQuery = useQuery({
+    queryKey: ["week", league.sport, week],
+    queryFn: () => fetchLeagueWeek(league.sport, week),
+  });
   const entriesQuery = useQuery({
     queryKey: ["picks", leagueId, week],
     queryFn: () => fetchPickEntries(leagueId, week),
@@ -111,7 +114,7 @@ export function PicksPanel({
     return (
       <div className="rounded-lg border border-dashed border-border-strong p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          No schedule has been entered for Week {week} yet. Any member can add it under "Schedule &
+          No matchups have loaded for Week {week} yet. Tap "Refresh now" under "Schedule &
           results".
         </p>
       </div>
@@ -119,7 +122,9 @@ export function PicksPanel({
   }
 
   const picked = Object.keys(picks).length;
-  const canSubmit = picked === games.length && tiebreaker !== "" && !isNaN(Number(tiebreaker));
+  const needsTiebreaker = Boolean(weekData.tiebreaker_game_id);
+  const canSubmit =
+    picked === games.length && (!needsTiebreaker || (tiebreaker !== "" && !isNaN(Number(tiebreaker))));
   const remaining = Math.max(games.length - picked, 0);
   const isDirty =
     JSON.stringify(picks) !== JSON.stringify(savedPicks) || tiebreaker !== savedTiebreaker;
@@ -127,7 +132,7 @@ export function PicksPanel({
     ? "Picks are locked for this week."
     : remaining > 0
       ? `${remaining} ${remaining === 1 ? "pick" : "picks"} remaining.`
-      : tiebreaker === ""
+      : needsTiebreaker && tiebreaker === ""
         ? "Enter the tiebreaker score to save."
         : isDirty
           ? "Your set is ready to save."
