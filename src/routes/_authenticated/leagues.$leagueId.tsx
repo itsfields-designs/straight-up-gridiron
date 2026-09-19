@@ -88,6 +88,9 @@ function LeaguePage() {
   const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
   const sport = league.data?.sport ?? "nfl";
   const college = league.data ? isCollegeLeague(league.data) : false;
+  useEffect(() => {
+    if (college && (tab === "picks" || tab === "standings")) setTab("schedule");
+  }, [college, tab]);
 
   // Scores stream in live; this is just a backstop pull when someone opens the page.
   useLiveScores();
@@ -165,7 +168,7 @@ function LeaguePage() {
       </section>
 
       <div className="no-scrollbar sticky top-[3.5rem] z-20 -mx-4 mb-4 flex gap-2 overflow-x-auto bg-background/95 px-4 py-2 backdrop-blur">
-        {TABS.map((t) => (
+        {(college ? TABS.filter((t) => t.id !== "picks" && t.id !== "standings") : TABS).map((t) => (
           <button
             key={t.id}
             type="button"
@@ -184,8 +187,27 @@ function LeaguePage() {
       </div>
 
 
-      {tab === "picks" && <PicksPanel league={league.data} week={activeWeek} userId={user.id} />}
-      {tab === "standings" && (
+      {college && (
+        <Link
+          to="/college"
+          search={{ league: leagueId }}
+          className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold">Picks & leaderboard</span>
+            <span className="block text-xs text-muted-foreground">
+              All college football lives on the College page.
+            </span>
+          </span>
+          <span className="shrink-0 rounded-xl bg-accent px-3.5 py-2 text-sm font-semibold text-accent-foreground">
+            Open College
+          </span>
+        </Link>
+      )}
+      {!college && tab === "picks" && (
+        <PicksPanel league={league.data} week={activeWeek} userId={user.id} />
+      )}
+      {!college && tab === "standings" && (
         <StandingsPanel leagueId={leagueId} week={activeWeek} league={league.data} />
       )}
       {tab === "pot" && (
