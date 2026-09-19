@@ -24,9 +24,6 @@ import { type Side } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/college")({
   staticData: { sitemap: false },
-  validateSearch: (search: Record<string, unknown>) => ({
-    league: typeof search['league'] === "string" ? (search['league'] as string) : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "College Top 25 — Gridiron Gods" },
