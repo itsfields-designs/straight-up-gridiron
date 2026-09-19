@@ -1,5 +1,6 @@
 # UI/UX refresh
 
+- [x] Match the public home and authentication screens to the supplied mobile redesign
 - [x] Add shared usability patterns and stronger global accessibility styles
 - [x] Refine public home and account flows
 - [x] Refine signed-in navigation, dashboard, and league list

@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Trophy, ClipboardList, Users } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const navigate = useNavigate();
+  const [samplePick, setSamplePick] = useState<"Panthers" | "Falcons" | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -40,68 +42,129 @@ function Index() {
   }, [navigate]);
 
 
-  return (
-    <main className="min-h-screen">
-      <section className="border-b border-primary bg-primary px-5 py-12 text-center text-primary-foreground sm:py-16">
-       <div className="mx-auto max-w-3xl">
-        <img
-          src={logoAsset.url}
-          alt="Gridiron Gods"
-          className="mx-auto h-28 w-28 rounded-lg object-cover shadow-lg sm:h-32 sm:w-32"
-        />
-        <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-soft-foreground">
-          <Trophy size={14} /> 2026 season
-        </span>
-        <h1 className="mt-6 text-4xl font-semibold uppercase tracking-tight sm:text-6xl">
-          Gridiron Gods — NFL pick'em for your league
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
-          Pick winners straight up every week. Beat your league. No spreads, no points — just who
-          you think wins, with a Monday-night total to break the ties.
-        </p>
-        <div className="mt-8 grid gap-2.5 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
-          <Link
-            to="/auth"
-            className="flex min-h-12 items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-85"
-          >
-            Start a league
-          </Link>
-          <Link
-            to="/auth"
-            search={{ mode: "login" }}
-            className="flex min-h-12 items-center justify-center rounded-md border border-primary-foreground/40 px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10"
-          >
-            Log in
-          </Link>
-        </div>
-       </div>
-      </section>
+  const features = [
+    {
+      icon: Users,
+      title: "Invite with a code",
+      body: "Every league gets a six-character code. Share it and your friends are in.",
+    },
+    {
+      icon: ClipboardList,
+      title: "Pick all 16 games",
+      body: "Tap a team per matchup, add your tiebreaker total, done in a minute.",
+    },
+    {
+      icon: Trophy,
+      title: "Weekly and season standings",
+      body: "Records update for everyone automatically as official final scores arrive.",
+    },
+  ];
 
-      <section className="mx-auto grid max-w-4xl gap-3 px-5 py-8 sm:grid-cols-3 sm:gap-4 sm:py-12">
-        {[
-          {
-            icon: Users,
-            title: "Invite with a code",
-            body: "Every league gets a six-character code. Share it and your friends are in.",
-          },
-          {
-            icon: ClipboardList,
-            title: "Pick all 16 games",
-            body: "Tap a team per matchup, add your tiebreaker total, done in a minute.",
-          },
-          {
-            icon: Trophy,
-            title: "Weekly and season standings",
-            body: "Records update for everyone automatically as official final scores arrive.",
-          },
-        ].map((f) => (
-          <div key={f.title} className="rounded-lg border border-border bg-card p-5">
-            <f.icon size={18} className="text-accent" />
-            <h2 className="mt-3 text-lg font-semibold">{f.title}</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">{f.body}</p>
+  return (
+    <main className="min-h-screen bg-secondary px-0 py-0 sm:px-5 sm:py-8">
+      <div className="mx-auto w-full max-w-[720px] overflow-hidden border-border-strong bg-background sm:rounded-[30px] sm:border">
+        <section className="bg-primary px-4 pb-7 pt-4 text-primary-foreground sm:px-8 sm:pb-10 sm:pt-6">
+          <header className="flex min-h-12 items-center justify-between gap-3">
+            <Link to="/" aria-label="Gridiron Gods home" className="flex min-w-0 items-center gap-3">
+              <img
+                src={logoAsset.url}
+                alt=""
+                className="h-11 w-11 shrink-0 rounded-xl object-cover sm:h-12 sm:w-12"
+              />
+              <span className="font-display text-[1.7rem] font-semibold uppercase leading-none sm:text-[2rem]">
+                Gridiron Gods
+              </span>
+            </Link>
+            <Button asChild variant="outline" className="h-11 shrink-0 rounded-full border-primary-foreground/55 bg-transparent px-5 text-base font-semibold text-primary-foreground shadow-none hover:bg-primary-foreground/10 hover:text-primary-foreground">
+              <Link to="/auth" search={{ mode: "login" }}>Log in</Link>
+            </Button>
+          </header>
+
+          <div className="mt-10 sm:mt-12">
+            <span className="inline-flex h-10 items-center gap-2 rounded-full bg-primary-foreground/15 px-4 text-sm font-semibold">
+              <Trophy size={17} /> 2026 season
+            </span>
+            <h1 className="mt-6 max-w-[610px] font-display text-[3.5rem] font-semibold leading-[0.98] sm:text-[4.5rem]">
+              NFL pick’em for your league.
+            </h1>
+            <p className="mt-4 max-w-[590px] text-[1.1rem] leading-7 text-primary-foreground/80 sm:text-xl">
+              Pick winners straight up. No spreads, no points. A Monday-night total breaks ties.
+            </p>
           </div>
-        ))}
-      </section>
+
+          <div className="mt-7 rounded-[22px] bg-card p-4 text-card-foreground sm:p-5">
+            <div className="mb-3 flex items-center justify-between gap-3 text-sm font-semibold text-muted-foreground">
+              <span>Try a pick</span>
+              <span>Sun 1:00 PM</span>
+            </div>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+              {[
+                { name: "Panthers" as const, abbr: "CAR", badge: "bg-team-panthers" },
+                { name: "Falcons" as const, abbr: "ATL", badge: "bg-team-falcons" },
+              ].map((team, index) => (
+                <div key={team.name} className="contents">
+                  {index === 1 && <span className="text-sm font-semibold text-muted-foreground">@</span>}
+                  <button
+                    type="button"
+                    onClick={() => setSamplePick(team.name)}
+                    aria-pressed={samplePick === team.name}
+                    className={`flex min-h-[70px] min-w-0 items-center gap-2 rounded-xl border-2 px-2 text-left transition-colors sm:px-3 ${
+                      samplePick === team.name
+                        ? "border-accent bg-accent-soft"
+                        : "border-border bg-background hover:border-accent/60"
+                    }`}
+                  >
+                    <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full font-display text-base font-semibold text-primary-foreground ${team.badge}`}>
+                      {team.abbr}
+                    </span>
+                    <span className="min-w-0 text-[0.95rem] font-semibold sm:text-lg">{team.name}</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <div aria-hidden="true" className="grid min-w-0 flex-1 grid-cols-16 gap-1">
+                {Array.from({ length: 16 }).map((_, index) => (
+                  <span key={index} className={`h-2 rounded-sm ${samplePick && index === 0 ? "bg-accent" : "bg-border-strong"}`} />
+                ))}
+              </div>
+              <span className="shrink-0 text-sm text-muted-foreground">{samplePick ?? "Tap a team"}</span>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3">
+            <Button asChild className="h-14 rounded-xl bg-accent font-display text-xl font-semibold text-accent-foreground shadow-none hover:bg-accent/90">
+              <Link to="/auth">Start a league</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-14 rounded-xl border-2 border-primary-foreground/55 bg-transparent font-display text-lg font-medium text-primary-foreground shadow-none hover:bg-primary-foreground/10 hover:text-primary-foreground">
+              <Link to="/auth">I have an invite code</Link>
+            </Button>
+          </div>
+        </section>
+
+        <section className="px-5 pb-10 pt-7 sm:px-8 sm:pb-12 sm:pt-9">
+          <h2 className="font-display text-[2rem] font-semibold">How it works</h2>
+          <div className="mt-4 divide-y divide-border">
+            {features.map((feature) => (
+              <div key={feature.title} className="flex gap-4 py-5 first:pt-3">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-soft-foreground">
+                  <feature.icon size={22} />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-display text-[1.45rem] font-semibold leading-tight">{feature.title}</h3>
+                  <p className="mt-1 text-base leading-6 text-muted-foreground">{feature.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            Already playing?{" "}
+            <Link to="/auth" search={{ mode: "login" }} className="font-semibold text-primary underline underline-offset-4">
+              Log in
+            </Link>
+          </p>
+        </section>
+      </div>
     </main>
   );
 }
