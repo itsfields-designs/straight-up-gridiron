@@ -60,6 +60,8 @@ const TABS: { id: Tab; label: string }[] = [
 
 function CollegePage() {
   const { user } = Route.useRouteContext();
+  const { league: leagueParam } = Route.useSearch();
+  const navigate = useNavigate({ from: "/college" });
   const queryClient = useQueryClient();
   const runRefresh = useServerFn(refreshCfb);
   const [tab, setTab] = useState<Tab>("rankings");
