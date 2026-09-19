@@ -23,3 +23,4 @@
 - [x] Match every NCAA league pick board to the Top 25 pick'em screen
 - [x] Automatic refresh every five minutes during the season
 - [x] Top 25 pick'em promoted as a free platform-wide board for every user, league or not
+- [x] Visible weekly NCAA pick deadlines, live countdowns, and consistent locked states
