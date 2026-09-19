@@ -184,27 +184,8 @@ function LeaguePage() {
       </div>
 
 
-      {college && (
-        <Link
-          to="/college"
-          search={{ league: leagueId }}
-          className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4"
-        >
-          <span className="min-w-0">
-            <span className="block text-sm font-semibold">Picks & leaderboard</span>
-            <span className="block text-xs text-muted-foreground">
-              All college football lives on the College page.
-            </span>
-          </span>
-          <span className="shrink-0 rounded-xl bg-accent px-3.5 py-2 text-sm font-semibold text-accent-foreground">
-            Open College
-          </span>
-        </Link>
-      )}
-      {!college && tab === "picks" && (
-        <PicksPanel league={league.data} week={activeWeek} userId={user.id} />
-      )}
-      {!college && tab === "standings" && (
+      {tab === "picks" && <PicksPanel league={league.data} week={activeWeek} userId={user.id} />}
+      {tab === "standings" && (
         <StandingsPanel leagueId={leagueId} week={activeWeek} league={league.data} />
       )}
       {tab === "pot" && (
