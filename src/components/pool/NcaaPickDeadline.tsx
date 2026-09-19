@@ -15,6 +15,17 @@ export function ncaaWeekLocked(games: KickoffGame[], storedLocked = false, now =
   return storedLocked || (deadline != null && deadline <= now);
 }
 
+export function useNcaaWeekLocked(games: KickoffGame[], storedLocked = false) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return ncaaWeekLocked(games, storedLocked, now);
+}
+
 function countdown(deadline: number, now: number) {
   const seconds = Math.max(0, Math.ceil((deadline - now) / 1000));
   const days = Math.floor(seconds / 86_400);

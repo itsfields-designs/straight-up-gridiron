@@ -7,7 +7,7 @@ import { Globe, Lock, RefreshCw, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
-import { NcaaPickDeadline, ncaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
+import { NcaaPickDeadline, useNcaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
 import { refreshCfb } from "@/lib/cfb.functions";
 import {
   TOTAL_CFB_WEEKS,
@@ -266,7 +266,7 @@ function PicksTab({
   }, [picksQuery.data, week]);
 
   const games = weekQuery.data?.games ?? [];
-  const locked = ncaaWeekLocked(games, weekQuery.data?.week?.locked);
+  const locked = useNcaaWeekLocked(games, weekQuery.data?.week?.locked);
   const tbGameId = weekQuery.data?.week?.tiebreaker_game_id ?? null;
   const savedTiebreaker =
     picksQuery.data?.tiebreaker != null ? String(picksQuery.data.tiebreaker) : "";
