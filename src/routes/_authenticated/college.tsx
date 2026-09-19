@@ -131,11 +131,50 @@ function CollegePage() {
         ))}
       </div>
 
-      {tab === "rankings" && <RankingsTab />}
-      {tab === "picks" && (
-        <PicksTab userId={user.id} week={activeWeek} onWeekChange={setWeek} />
+      {tab !== "rankings" && collegeLeagues.length > 0 && (
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label="College board">
+          {[{ id: undefined as string | undefined, name: "Top 25 pick'em" }, ...collegeLeagues].map(
+            (opt) => {
+              const active = (selectedLeague?.id ?? undefined) === opt.id;
+              return (
+                <button
+                  key={opt.id ?? "top25"}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setScope(opt.id)}
+                  className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-medium ${
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-card text-muted-foreground"
+                  }`}
+                >
+                  {opt.name}
+                </button>
+              );
+            },
+          )}
+        </div>
       )}
-      {tab === "leaderboard" && <LeaderboardTab week={activeWeek} onWeekChange={setWeek} />}
+
+      {tab === "rankings" && <RankingsTab />}
+      {tab === "picks" &&
+        (selectedLeague ? (
+          <div className="grid gap-3">
+            <WeekPicker week={activeWeek} onChange={setWeek} />
+            <PicksPanel league={selectedLeague} week={activeWeek} userId={user.id} />
+          </div>
+        ) : (
+          <PicksTab userId={user.id} week={activeWeek} onWeekChange={setWeek} />
+        ))}
+      {tab === "leaderboard" &&
+        (selectedLeague ? (
+          <div className="grid gap-3">
+            <WeekPicker week={activeWeek} onChange={setWeek} />
+            <StandingsPanel leagueId={selectedLeague.id} week={activeWeek} league={selectedLeague} />
+          </div>
+        ) : (
+          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} />
+        ))}
     </div>
   );
 }
