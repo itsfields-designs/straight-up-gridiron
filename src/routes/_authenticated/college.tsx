@@ -103,7 +103,8 @@ function CollegePage() {
         </p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold">AP Top 25</h1>
         <p className="mt-1 text-sm text-primary-foreground/80">
-          Every game with a ranked team, and a pick'em board just for the Top 25.
+          Every game with a ranked team, plus the Top 25 pick'em — one free board open to every
+          player on Gridiron Gods, league or not.
         </p>
         <button
           onClick={sync}
@@ -173,7 +174,7 @@ function CollegePage() {
             <StandingsPanel leagueId={selectedLeague.id} week={activeWeek} league={selectedLeague} />
           </div>
         ) : (
-          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} />
+          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} userId={user.id} />
         ))}
     </div>
   );
@@ -386,9 +387,11 @@ function PicksTab({
 function LeaderboardTab({
   week,
   onWeekChange,
+  userId,
 }: {
   week: number;
   onWeekChange: (w: number) => void;
+  userId: string;
 }) {
   const [scope, setScope] = useState<"week" | "season">("week");
   const target = scope === "season" ? 0 : week;
@@ -396,10 +399,25 @@ function LeaderboardTab({
     queryKey: ["cfb-standings", target],
     queryFn: () => fetchCfbStandings(target),
   });
+  const rows = standings.data ?? [];
+  const me = rows.find((r) => r.userId === userId);
 
   return (
     <div className="grid gap-3">
+      <div className="rounded-2xl bg-accent-soft px-4 py-3">
+        <p className="text-sm font-semibold text-accent-soft-foreground">
+          Everyone on Gridiron Gods plays this board
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {rows.length > 0
+            ? `${rows.length} ${rows.length === 1 ? "player" : "players"} competing${
+                me ? ` · you're #${me.rank}` : ""
+              }`
+            : "No league needed — first picks put you on the board."}
+        </p>
+      </div>
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-secondary p-1">
+
         {(["week", "season"] as const).map((s) => (
           <button
             key={s}
@@ -427,12 +445,17 @@ function LeaderboardTab({
           {standings.data.map((row, i) => (
             <div
               key={`${row.userId}-${row.weekNum}`}
-              className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""} ${
+                row.userId === userId ? "bg-accent-soft" : ""
+              }`}
             >
               <span className="w-7 text-center font-display text-base font-semibold tabular-nums">
                 {row.rank}
               </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">{row.username}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                {row.username}
+                {row.userId === userId && <span className="text-faint"> · you</span>}
+              </span>
               {row.rank === 1 && <Trophy size={15} className="text-accent" />}
               <span className="shrink-0 text-sm tabular-nums">
                 {row.correct}

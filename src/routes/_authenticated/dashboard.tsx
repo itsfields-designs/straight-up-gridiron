@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { ChevronRight, Plus, Users } from "lucide-react";
+import { ChevronRight, Globe, Plus, Users } from "lucide-react";
+
+import { fetchCfbStandings } from "@/lib/cfb";
 
 import {
   fetchCurrentWeek,
@@ -76,6 +78,10 @@ function DashboardPage() {
   }, [navigate]);
 
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
+  const top25 = useQuery({ queryKey: ["cfb-standings", 0], queryFn: () => fetchCfbStandings(0) });
+  const top25Rows = top25.data ?? [];
+  const top25Me = top25Rows.find((r) => r.userId === user.id);
+  const top25Leader = top25Rows[0];
   const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
   const week = currentWeek.data ?? 1;
 
@@ -139,6 +145,50 @@ function DashboardPage() {
             Open picks
           </Link>
         )}
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-accent-soft-foreground">
+              <Globe size={13} aria-hidden="true" /> Open to everyone
+            </p>
+            <h2 className="mt-1 font-display text-lg font-semibold">Top 25 pick&rsquo;em</h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              One board, every player on Gridiron Gods. No league, no entry fee — just bragging
+              rights.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-xs font-semibold tabular-nums">
+            {top25Me ? `#${top25Me.rank}` : "—"}
+          </span>
+        </div>
+
+        <p className="mt-2 text-xs text-faint">
+          {top25Rows.length > 0
+            ? `${top25Rows.length} ${top25Rows.length === 1 ? "player" : "players"} in the running${
+                top25Leader ? ` · led by ${top25Leader.username}` : ""
+              }`
+            : "Be the first on the board this season."}
+          {top25Me ? ` · you're ${top25Me.correct}–${top25Me.missed}` : ""}
+        </p>
+
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Link
+            to="/college"
+            search={{ league: undefined }}
+            className="flex min-h-11 items-center justify-center rounded-xl bg-accent text-sm font-semibold text-accent-foreground"
+          >
+            Make your picks
+          </Link>
+          <Link
+            to="/college"
+            search={{ league: undefined }}
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border-strong text-sm font-medium"
+          >
+            Leaderboard
+          </Link>
+        </div>
       </section>
 
       {leagues.isLoading && <LoadingState label="Loading your leagues" />}
