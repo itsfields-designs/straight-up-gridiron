@@ -165,7 +165,7 @@ function LeaguePage() {
       </section>
 
       <div className="no-scrollbar sticky top-[3.5rem] z-20 -mx-4 mb-4 flex gap-2 overflow-x-auto bg-background/95 px-4 py-2 backdrop-blur">
-        {(college ? TABS.filter((t) => t.id !== "picks" && t.id !== "standings") : TABS).map((t) => (
+        {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
