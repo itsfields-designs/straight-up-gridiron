@@ -911,7 +911,7 @@ export function skipsEarlyGames(
 /** The games that count in this league for the given week. */
 export function leagueGames(
   games: Game[],
-  league: Pick<League, "sunday_only" | "sunday_only_from_week">,
+  league: Pick<League, "sunday_only" | "sunday_only_from_week"> & { sport?: string },
   weekNum: number,
 ): Game[] {
   if (!skipsEarlyGames(league, weekNum)) return games;
@@ -925,7 +925,7 @@ export function leagueGames(
 export function leagueWeekLocked(
   countingGames: Game[],
   week: Week | null | undefined,
-  league: Pick<League, "sunday_only" | "sunday_only_from_week">,
+  league: Pick<League, "sunday_only" | "sunday_only_from_week"> & { sport?: string },
   weekNum: number,
 ): boolean {
   if (!skipsEarlyGames(league, weekNum)) return Boolean(week?.locked);
