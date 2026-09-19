@@ -22,8 +22,9 @@ export const Route = createFileRoute("/api/public/cfb-sync")({
           const result = await runSync(url.searchParams.get("full") === "1");
           return Response.json({ ok: true, ...result });
         } catch (err) {
+          console.error("cfb-sync failed", err);
           return Response.json(
-            { ok: false, error: err instanceof Error ? err.message : "sync failed" },
+            { ok: false, error: err instanceof Error ? err.message : JSON.stringify(err) },
             { status: 502 },
           );
         }
@@ -33,8 +34,9 @@ export const Route = createFileRoute("/api/public/cfb-sync")({
           const result = await runSync(false);
           return Response.json({ ok: true, ...result });
         } catch (err) {
+          console.error("cfb-sync failed", err);
           return Response.json(
-            { ok: false, error: err instanceof Error ? err.message : "sync failed" },
+            { ok: false, error: err instanceof Error ? err.message : JSON.stringify(err) },
             { status: 502 },
           );
         }
