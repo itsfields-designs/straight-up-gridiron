@@ -103,7 +103,8 @@ function CollegePage() {
         </p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold">AP Top 25</h1>
         <p className="mt-1 text-sm text-primary-foreground/80">
-          Every game with a ranked team, and a pick'em board just for the Top 25.
+          Every game with a ranked team, plus the Top 25 pick'em — one free board open to every
+          player on Gridiron Gods, league or not.
         </p>
         <button
           onClick={sync}
