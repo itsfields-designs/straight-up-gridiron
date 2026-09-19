@@ -77,6 +77,10 @@ function CollegePage() {
 
   const leagues = useQuery({ queryKey: ["my-leagues"], queryFn: fetchMyLeagues });
   const collegeLeagues = (leagues.data ?? []).filter(isCollegeLeague);
+  const top25 = useQuery({ queryKey: ["cfb-standings", 0], queryFn: () => fetchCfbStandings(0) });
+  const top25Rows = top25.data ?? [];
+  const top25Me = top25Rows.find((r) => r.userId === user.id);
+  const top25Leader = top25Rows[0];
   const selectedLeague: League | null =
     collegeLeagues.find((l) => l.id === leagueParam) ?? null;
   const setScope = (id: string | undefined) => {
