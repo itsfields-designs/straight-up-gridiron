@@ -34,7 +34,12 @@ export type CfbGame = {
   home_score: number | null;
 };
 
-export type CfbWeek = { week_num: number; label: string; locked: boolean };
+export type CfbWeek = {
+  week_num: number;
+  label: string;
+  locked: boolean;
+  tiebreaker_game_id: string | null;
+};
 
 export type CfbStanding = {
   userId: string;
@@ -75,7 +80,7 @@ export async function fetchCfbWeek(
   const [{ data: week, error: we }, { data: games, error: ge }] = await Promise.all([
     supabase
       .from("cfb_weeks")
-      .select("week_num, label, locked")
+      .select("week_num, label, locked, tiebreaker_game_id")
       .eq("week_num", weekNum)
       .maybeSingle(),
     supabase
@@ -104,27 +109,32 @@ export async function fetchCfbCurrentWeek(): Promise<number> {
 export async function fetchMyCfbPicks(
   userId: string,
   weekNum: number,
-): Promise<Record<string, Side>> {
+): Promise<{ picks: Record<string, Side>; tiebreaker: number | null }> {
   const { data, error } = await supabase
     .from("cfb_pick_entries")
-    .select("picks")
+    .select("picks, tiebreaker")
     .eq("user_id", userId)
     .eq("week_num", weekNum)
     .maybeSingle();
   if (error) throw error;
-  return (data?.picks ?? {}) as Record<string, Side>;
+  return {
+    picks: (data?.picks ?? {}) as Record<string, Side>,
+    tiebreaker: data?.tiebreaker ?? null,
+  };
 }
 
 export async function saveCfbPicks(args: {
   userId: string;
   weekNum: number;
   picks: Record<string, Side>;
+  tiebreaker: number | null;
 }) {
   const { error } = await supabase.from("cfb_pick_entries").upsert(
     {
       user_id: args.userId,
       week_num: args.weekNum,
       picks: args.picks,
+      tiebreaker: args.tiebreaker,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id,week_num" },
