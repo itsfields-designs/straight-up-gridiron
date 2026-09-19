@@ -484,6 +484,7 @@ export type Database = {
           season_pot: number
           season_pot_auto: boolean
           season_pot_pct: number
+          sport: string
           sunday_only: boolean
           sunday_only_from_week: number
           weekly_pot: number
@@ -505,6 +506,7 @@ export type Database = {
           season_pot?: number
           season_pot_auto?: boolean
           season_pot_pct?: number
+          sport?: string
           sunday_only?: boolean
           sunday_only_from_week?: number
           weekly_pot?: number
@@ -526,6 +528,7 @@ export type Database = {
           season_pot?: number
           season_pot_auto?: boolean
           season_pot_pct?: number
+          sport?: string
           sunday_only?: boolean
           sunday_only_from_week?: number
           weekly_pot?: number
@@ -812,10 +815,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_create_league: {
-        Args: { _name: string; _rules: string; _user_id: string }
-        Returns: string
-      }
+      admin_create_league:
+        | {
+            Args: { _name: string; _rules: string; _user_id: string }
+            Returns: string
+          }
+        | {
+            Args: {
+              _name: string
+              _rules: string
+              _sport?: string
+              _user_id: string
+            }
+            Returns: string
+          }
       admin_join_league_by_code: {
         Args: { _code: string; _user_id: string }
         Returns: string
