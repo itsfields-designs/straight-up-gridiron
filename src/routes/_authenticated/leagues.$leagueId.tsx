@@ -14,8 +14,10 @@ import {
   Wallet,
 } from "lucide-react";
 
-import { fetchCurrentWeek, fetchLeague, fetchMembers, TOTAL_WEEKS } from "@/lib/pool";
+import { fetchLeague, fetchMembers } from "@/lib/pool";
+import { fetchLeagueCurrentWeek, isCollegeLeague, totalWeeksFor } from "@/lib/league-sport";
 import { refreshNfl } from "@/lib/nfl.functions";
+import { refreshCfb } from "@/lib/cfb.functions";
 import { useLiveScores } from "@/hooks/useLiveScores";
 import { PicksPanel } from "@/components/pool/PicksPanel";
 import { StandingsPanel } from "@/components/pool/StandingsPanel";
@@ -78,15 +80,21 @@ function LeaguePage() {
   const { leagueId } = Route.useParams();
   const { user } = Route.useRouteContext();
   const queryClient = useQueryClient();
-  const refresh = useServerFn(refreshNfl);
+  const refreshNflFn = useServerFn(refreshNfl);
+  const refreshCfbFn = useServerFn(refreshCfb);
   const [tab, setTab] = useState<Tab>("picks");
   const [week, setWeek] = useState<number | null>(null);
+
+  const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
+  const sport = league.data?.sport ?? "nfl";
+  const college = league.data ? isCollegeLeague(league.data) : false;
 
   // Scores stream in live; this is just a backstop pull when someone opens the page.
   useLiveScores();
   const sync = useQuery({
-    queryKey: ["nfl-sync"],
-    queryFn: () => refresh({ data: {} }),
+    queryKey: ["sport-sync", sport],
+    queryFn: () => (college ? refreshCfbFn({ data: {} }) : refreshNflFn({ data: {} })),
+    enabled: Boolean(league.data),
     staleTime: 300_000,
     refetchInterval: 300_000,
     retry: false,
@@ -99,15 +107,17 @@ function LeaguePage() {
     queryClient.invalidateQueries({ queryKey: ["standings"] });
   }, [sync.dataUpdatedAt, queryClient]);
 
-  const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
+  const currentWeek = useQuery({
+    queryKey: ["current-week", sport],
+    queryFn: () => fetchLeagueCurrentWeek(sport),
+    enabled: Boolean(league.data),
+  });
 
   useEffect(() => {
     if (week == null && currentWeek.data) setWeek(currentWeek.data);
   }, [currentWeek.data, week]);
 
   const activeWeek = week ?? currentWeek.data ?? 1;
-
-  const league = useQuery({ queryKey: ["league", leagueId], queryFn: () => fetchLeague(leagueId) });
   const members = useQuery({
     queryKey: ["members", leagueId],
     queryFn: () => fetchMembers(leagueId),
@@ -136,7 +146,7 @@ function LeaguePage() {
           role="group"
           aria-label="Week"
         >
-          {Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1).map((w) => (
+          {Array.from({ length: totalWeeksFor(sport) }, (_, i) => i + 1).map((w) => (
             <button
               key={w}
               type="button"

@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { LoadingState } from "@/components/ui/feedback";
 
-import { fetchWeek, gradeGame, isEarlyWeekGame, skipsEarlyGames, type Game, type League } from "@/lib/pool";
+import { gradeGame, isEarlyWeekGame, skipsEarlyGames, type Game, type League } from "@/lib/pool";
+import { fetchLeagueWeek, isCollegeLeague } from "@/lib/league-sport";
 import { refreshNfl } from "@/lib/nfl.functions";
+import { refreshCfb } from "@/lib/cfb.functions";
 
 function statusLabel(game: Game) {
   if (game.state === "post") return "Final";
@@ -15,12 +17,19 @@ function statusLabel(game: Game) {
 }
 
 export function SchedulePanel({ week, league }: { week: number; league?: League }) {
+  const college = league ? isCollegeLeague(league) : false;
+  const sport = league?.sport ?? "nfl";
   const skipsEarly = league ? skipsEarlyGames(league, week) : false;
   const queryClient = useQueryClient();
-  const refresh = useServerFn(refreshNfl);
+  const refreshNflFn = useServerFn(refreshNfl);
+  const refreshCfbFn = useServerFn(refreshCfb);
+  const refresh = college ? refreshCfbFn : refreshNflFn;
   const [syncing, setSyncing] = useState(false);
 
-  const weekQuery = useQuery({ queryKey: ["week", week], queryFn: () => fetchWeek(week) });
+  const weekQuery = useQuery({
+    queryKey: ["week", sport, week],
+    queryFn: () => fetchLeagueWeek(sport, week),
+  });
   const games = weekQuery.data?.games ?? [];
   const weekData = weekQuery.data?.week ?? null;
 
@@ -44,9 +53,9 @@ export function SchedulePanel({ week, league }: { week: number; league?: League 
       <div className="flex gap-2 rounded-lg bg-accent-soft p-3.5 text-sm text-accent-soft-foreground">
         <AlertCircle size={16} className="mt-0.5 shrink-0" />
         <span>
-          Matchups and scores come straight from the official NFL schedule for all 18 weeks. Picks
-          lock automatically when the week's first game kicks off, and standings recalculate as
-          results go final — nothing to type in.
+          {college
+            ? "Matchups and scores come straight from the college schedule — every game with an AP Top 25 team. Picks lock when a game kicks off, and standings recalculate as results go final."
+            : "Matchups and scores come straight from the official NFL schedule for all 18 weeks. Picks lock automatically when the week's first game kicks off, and standings recalculate as results go final — nothing to type in."}
         </span>
       </div>
 
