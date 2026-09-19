@@ -157,28 +157,28 @@ function AuthPage() {
     else setNotice("Check your email for a password reset link.");
   }
 
-  const fieldClass = "h-14 w-full rounded-xl border-2 border-border bg-card px-4 text-base outline-none transition-shadow placeholder:text-faint focus:border-accent focus:ring-2 focus:ring-accent/20";
+  const fieldClass = "h-[52px] w-full rounded-xl border-2 border-border bg-card px-4 text-base outline-none transition-shadow placeholder:text-faint focus:border-accent focus:ring-2 focus:ring-accent/20";
 
   return (
     <main className="min-h-screen bg-secondary px-0 py-0 sm:px-5 sm:py-8">
       <div className="mx-auto min-h-screen w-full max-w-[720px] overflow-hidden border-border-strong bg-background sm:min-h-0 sm:rounded-[30px] sm:border">
-        <header className="relative flex h-[86px] items-center justify-center bg-primary px-5 text-primary-foreground">
+        <header className="relative flex h-[70px] items-center justify-center bg-primary px-5 text-primary-foreground">
           <Link to="/" aria-label="Back to home" className="absolute left-5 grid h-11 w-11 place-items-center rounded-full transition-colors hover:bg-primary-foreground/10">
             <ChevronLeft size={29} />
           </Link>
           <Link to="/" className="flex items-center gap-3">
-            <img src={logoAsset.url} alt="" className="h-12 w-12 rounded-xl object-cover" />
-            <span className="font-display text-[1.7rem] font-semibold uppercase leading-none sm:text-[2rem]">Gridiron Gods</span>
+            <img src={logoAsset.url} alt="" className="h-11 w-11 rounded-xl object-cover" />
+            <span className="font-display text-[1.6rem] font-semibold uppercase leading-none sm:text-[2rem]">Gridiron Gods</span>
           </Link>
         </header>
 
-        <div className="px-5 pb-8 pt-7 sm:px-8 sm:pb-10 sm:pt-10">
-          <h1 className="font-display text-[3.5rem] font-semibold leading-none sm:text-[4.25rem]">
+        <div className="px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
+          <h1 className="whitespace-nowrap font-display text-[3rem] font-semibold leading-none sm:text-[4.25rem]">
             {mode === "login" ? "Log in" : "Create your account"}
           </h1>
           <p className="mt-3 text-lg text-muted-foreground sm:text-xl">Pick winners straight up. Beat your league.</p>
 
-          <div className="mt-7 flex rounded-xl bg-secondary p-1" role="tablist" aria-label="Account action">
+          <div className="mt-6 flex rounded-xl bg-secondary p-1" role="tablist" aria-label="Account action">
             {(["login", "signup"] as const).map((m) => (
               <button
                 key={m}
@@ -189,7 +189,7 @@ function AuthPage() {
                   setMode(m);
                   resetFlow();
                 }}
-                className={`h-14 flex-1 rounded-[10px] text-base font-semibold transition-colors ${
+                className={`h-[52px] flex-1 rounded-[10px] text-base font-semibold transition-colors ${
                   mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -198,12 +198,12 @@ function AuthPage() {
             ))}
           </div>
 
-          <Button type="button" variant="outline" onClick={googleSignIn} className="mt-5 h-14 w-full rounded-xl border-2 border-border bg-card text-base font-semibold shadow-none hover:bg-secondary">
+          <Button type="button" variant="outline" onClick={googleSignIn} className="mt-4 h-[52px] w-full rounded-xl border-2 border-border bg-card text-base font-semibold shadow-none hover:bg-secondary">
             <span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full border-2 border-border font-display text-sm text-foreground">G</span>
             Continue with Google
           </Button>
 
-          <div className="my-6 flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="my-5 flex items-center gap-4 text-sm text-muted-foreground">
             <span className="h-px flex-1 bg-border" /> or use <span className="h-px flex-1 bg-border" />
           </div>
 
@@ -227,7 +227,7 @@ function AuthPage() {
             ))}
           </div>
 
-          <form onSubmit={submit} className="mt-5">
+          <form onSubmit={submit} className="mt-4">
             {method === "email" ? (
               <>
                 <label className="field-label" htmlFor="email">
@@ -326,7 +326,7 @@ function AuthPage() {
             <Button
               type="submit"
               disabled={busy}
-              className="mt-6 h-14 w-full rounded-xl bg-accent font-display text-xl font-semibold text-accent-foreground shadow-none hover:bg-accent/90"
+              className="mt-5 h-[52px] w-full rounded-xl bg-accent font-display text-xl font-semibold text-accent-foreground shadow-none hover:bg-accent/90"
             >
               {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
             </Button>
