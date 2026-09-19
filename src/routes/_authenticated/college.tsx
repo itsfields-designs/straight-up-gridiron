@@ -20,10 +20,7 @@ import {
   saveCfbPicks,
   type CfbGame,
 } from "@/lib/cfb";
-import { fetchMyLeagues, type League, type Side } from "@/lib/pool";
-import { isCollegeLeague } from "@/lib/league-sport";
-import { PicksPanel } from "@/components/pool/PicksPanel";
-import { StandingsPanel } from "@/components/pool/StandingsPanel";
+import { type Side } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/college")({
   staticData: { sitemap: false },
