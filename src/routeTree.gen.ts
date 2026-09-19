@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as OfficeFootballPoolRouteImport } from './routes/office-football-pool'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthenticatedCollegeRouteImport } from './routes/_authenticated/college'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
@@ -48,6 +49,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCollegeRoute = AuthenticatedCollegeRouteImport.update({
+  id: '/college',
+  path: '/college',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommissionerRoute =
   AuthenticatedCommissionerRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/office-football-pool': typeof OfficeFootballPoolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/college': typeof AuthenticatedCollegeRoute
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/college'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/college'
     | '/commissioner'
     | '/dashboard'
     | '/leaderboard'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/office-football-pool'
     | '/sitemap.xml'
+    | '/_authenticated/college'
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
     | '/_authenticated/leaderboard'
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/college': {
+      id: '/_authenticated/college'
+      path: '/college'
+      fullPath: '/college'
+      preLoaderRoute: typeof AuthenticatedCollegeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/commissioner': {
       id: '/_authenticated/commissioner'
@@ -329,6 +348,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCollegeRoute: typeof AuthenticatedCollegeRoute
   AuthenticatedCommissionerRoute: typeof AuthenticatedCommissionerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
@@ -338,6 +358,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCollegeRoute: AuthenticatedCollegeRoute,
   AuthenticatedCommissionerRoute: AuthenticatedCommissionerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
