@@ -55,7 +55,7 @@ export type League = {
   commissioner_cut_enabled: boolean;
   commissioner_cut_pct: number;
   cashapp_handle: string;
-  sport: "nfl" | "ncaa";
+  sport: string;
 };
 
 const LEAGUE_COLS =
