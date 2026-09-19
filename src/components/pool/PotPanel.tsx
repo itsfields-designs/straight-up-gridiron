@@ -8,6 +8,7 @@ import {
   deletePayout,
   fetchEntryPayments,
   fetchPayouts,
+  fetchPickEntries,
   fetchSeasonEntryPayments,
   money,
   commissionerCut,
@@ -48,6 +49,10 @@ export function PotPanel({
   const seasonEntryPayments = useQuery({
     queryKey: ["season-entry-payments", league.id],
     queryFn: () => fetchSeasonEntryPayments(league.id),
+  });
+  const pickEntries = useQuery({
+    queryKey: ["pick-entries", league.id],
+    queryFn: () => fetchPickEntries(league.id),
   });
 
   const [userId, setUserId] = useState("");
@@ -110,12 +115,23 @@ export function PotPanel({
   const weeklyCut = commissionerCut(league, weeklyGross);
   const seasonCut = commissionerCut(league, seasonGross);
   const currentMember = members.find((member) => member.user_id === currentUserId);
-  const weeklyPaid = fees.some(
-    (payment) => payment.userId === currentUserId && payment.weekNum === week,
+  const myEntries = (pickEntries.data ?? []).filter((e) => e.user_id === currentUserId);
+  // Sets the player actually saved for this week, and across the season.
+  const weeklySets = Math.max(
+    1,
+    new Set(myEntries.filter((e) => e.week_num === week).map((e) => e.entry_no)).size,
   );
-  const seasonPaid = (seasonEntryPayments.data ?? []).some(
-    (payment) => payment.userId === currentUserId,
-  );
+  const seasonSets = Math.max(1, new Set(myEntries.map((e) => e.entry_no)).size);
+  const weeklySetsPaid = new Set(
+    fees
+      .filter((payment) => payment.userId === currentUserId && payment.weekNum === week)
+      .map((payment) => payment.entryNo),
+  ).size;
+  const seasonSetsPaid = new Set(
+    (seasonEntryPayments.data ?? [])
+      .filter((payment) => payment.userId === currentUserId)
+      .map((payment) => payment.entryNo),
+  ).size;
 
   const cards = [
     { label: "Weekly fee", value: league.entry_fee },
@@ -154,8 +170,10 @@ export function PotPanel({
             seasonFee={Number(league.season_entry_fee) || 0}
             week={week}
             username={currentMember?.username ?? "your username"}
-            weeklyPaid={weeklyPaid}
-            seasonPaid={seasonPaid}
+            weeklySets={weeklySets}
+            seasonSets={seasonSets}
+            weeklySetsPaid={weeklySetsPaid}
+            seasonSetsPaid={seasonSetsPaid}
           />
         )
       )}
@@ -319,22 +337,33 @@ function PlayerPayCard({
   seasonFee,
   week,
   username,
-  weeklyPaid,
-  seasonPaid,
+  weeklySets,
+  seasonSets,
+  weeklySetsPaid,
+  seasonSetsPaid,
 }: {
   handle: string;
   weeklyFee: number;
   seasonFee: number;
   week: number;
   username: string;
-  weeklyPaid: boolean;
-  seasonPaid: boolean;
+  weeklySets: number;
+  seasonSets: number;
+  weeklySetsPaid: number;
+  seasonSetsPaid: number;
 }) {
   const [kind, setKind] = useState<"weekly" | "season">("weekly");
-  const amount = kind === "weekly" ? weeklyFee : seasonFee;
-  const paid = kind === "weekly" ? weeklyPaid : seasonPaid;
+  const sets = kind === "weekly" ? weeklySets : seasonSets;
+  const setsPaid = Math.min(kind === "weekly" ? weeklySetsPaid : seasonSetsPaid, sets);
+  const weeklyTotal = weeklyFee * weeklySets;
+  const seasonTotal = seasonFee * seasonSets;
+  const amount = kind === "weekly" ? weeklyTotal : seasonTotal;
+  const paid = setsPaid >= sets;
+  const setsDue = Math.max(0, sets - setsPaid);
+  const dueAmount = paid ? amount : (kind === "weekly" ? weeklyFee : seasonFee) * setsDue;
   const cleanHandle = handle.replace(/^\$/, "");
-  const cashAppUrl = amount > 0 ? `https://cash.app/$${cleanHandle}/${amount}` : `https://cash.app/$${cleanHandle}`;
+  const payAmount = dueAmount > 0 ? dueAmount : amount;
+  const cashAppUrl = payAmount > 0 ? `https://cash.app/$${cleanHandle}/${payAmount}` : `https://cash.app/$${cleanHandle}`;
 
   const copyHandle = async () => {
     try {
@@ -352,13 +381,16 @@ function PlayerPayCard({
           <Clock3 className="shrink-0 text-accent" size={24} aria-hidden="true" />
           <div>
             <h2 id="your-entry-title" className="font-display text-lg font-semibold">Your entry</h2>
-            <p className="text-sm text-muted-foreground">Week {week} · {money(weeklyFee)}</p>
+            <p className="text-sm text-muted-foreground">
+              Week {week} · {weeklySets} {weeklySets === 1 ? "set" : "sets"} × {money(weeklyFee)}
+            </p>
           </div>
         </div>
         <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${paid ? "bg-secondary text-success" : "bg-accent-soft text-accent-foreground"}`}>
-          {paid ? "Paid" : "Due"}
+          {paid ? "Paid" : setsPaid > 0 ? `${setsPaid} of ${sets} paid` : "Due"}
         </span>
       </div>
+
 
       <div className="grid grid-cols-2 gap-3">
         <Button
@@ -371,8 +403,10 @@ function PlayerPayCard({
               : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <span className="font-display text-3xl font-semibold text-foreground">{money(weeklyFee)}</span>
-          <span className="text-sm font-normal text-muted-foreground">Just this week</span>
+          <span className="font-display text-3xl font-semibold text-foreground">{money(weeklyTotal)}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            Just this week{weeklySets > 1 ? ` · ${weeklySets} sets` : ""}
+          </span>
         </Button>
         <Button
           type="button"
@@ -385,16 +419,24 @@ function PlayerPayCard({
               : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <span className="font-display text-3xl font-semibold text-foreground">{money(seasonFee)}</span>
-          <span className="text-sm font-normal text-muted-foreground">Whole season</span>
+          <span className="font-display text-3xl font-semibold text-foreground">{money(seasonTotal)}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            Whole season{seasonSets > 1 ? ` · ${seasonSets} sets` : ""}
+          </span>
         </Button>
       </div>
 
       <Button asChild size="lg" className="mt-4 w-full text-base font-semibold">
         <a href={cashAppUrl} target="_blank" rel="noopener noreferrer">
-          Pay {money(amount)} on Cash App
+          Pay {money(payAmount)} on Cash App
         </a>
       </Button>
+      {setsPaid > 0 && !paid && (
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          {setsPaid} of {sets} already marked paid · {setsDue} left
+        </p>
+      )}
+
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-muted-foreground">Cash App · ${cleanHandle}</span>
