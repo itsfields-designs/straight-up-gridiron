@@ -834,6 +834,17 @@ export type Database = {
         Returns: string
       }
       generate_league_code: { Args: never; Returns: string }
+      get_cfb_standings: {
+        Args: { p_week_num: number }
+        Returns: {
+          correct: number
+          missed: number
+          rank: number
+          user_id: string
+          username: string
+          week_num: number
+        }[]
+      }
       recompute_all_league_standings: { Args: never; Returns: number }
       recompute_cfb_standings: { Args: never; Returns: undefined }
       recompute_league_standings: {
