@@ -112,7 +112,7 @@ export async function fetchMyCfbPicks(
     .eq("week_num", weekNum)
     .maybeSingle();
   if (error) throw error;
-  return ((data?.picks ?? {}) as Record<string, Side>) ?? {};
+  return (data?.picks ?? {}) as Record<string, Side>;
 }
 
 export async function saveCfbPicks(args: {
