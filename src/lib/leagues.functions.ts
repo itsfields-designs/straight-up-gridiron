@@ -7,7 +7,13 @@ import { assertEntitled } from "@/lib/membership.functions";
 export const createLeague = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ name: z.string().trim().min(1).max(80), rules: z.string().max(2000) }).parse(data),
+    z
+      .object({
+        name: z.string().trim().min(1).max(80),
+        rules: z.string().max(2000),
+        sport: z.enum(["nfl", "ncaa"]),
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }) => {
     await assertEntitled(context.userId, context.claims as Record<string, unknown>);
@@ -16,6 +22,7 @@ export const createLeague = createServerFn({ method: "POST" })
       _name: data.name,
       _rules: data.rules,
       _user_id: context.userId,
+      _sport: data.sport,
     });
     if (error) throw new Error(error.message);
     return id as string;

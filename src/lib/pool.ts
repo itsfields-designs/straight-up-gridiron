@@ -55,10 +55,11 @@ export type League = {
   commissioner_cut_enabled: boolean;
   commissioner_cut_pct: number;
   cashapp_handle: string;
+  sport: "nfl" | "ncaa";
 };
 
 const LEAGUE_COLS =
-  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week, commissioner_cut_enabled, commissioner_cut_pct, cashapp_handle";
+  "id, name, rules, code, owner_id, entry_fee, season_entry_fee, weekly_pot, season_pot, chat_locked, pots_auto, season_pot_auto, season_pot_pct, sunday_only, sunday_only_from_week, commissioner_cut_enabled, commissioner_cut_pct, cashapp_handle, sport";
 
 export type Member = { user_id: string; username: string };
 
