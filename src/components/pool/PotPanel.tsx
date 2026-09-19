@@ -403,8 +403,10 @@ function PlayerPayCard({
               : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <span className="font-display text-3xl font-semibold text-foreground">{money(weeklyFee)}</span>
-          <span className="text-sm font-normal text-muted-foreground">Just this week</span>
+          <span className="font-display text-3xl font-semibold text-foreground">{money(weeklyTotal)}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            Just this week{weeklySets > 1 ? ` · ${weeklySets} sets` : ""}
+          </span>
         </Button>
         <Button
           type="button"
