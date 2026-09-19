@@ -7,6 +7,10 @@ export type Game = {
   week_num: number;
   away: string;
   home: string;
+  away_rank?: number | null;
+  home_rank?: number | null;
+  away_logo?: string | null;
+  home_logo?: string | null;
   slot: string;
   sort_order: number;
   away_score: number | null;

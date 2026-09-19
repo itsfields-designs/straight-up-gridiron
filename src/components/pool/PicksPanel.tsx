@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Plus, Trash2, X } from "lucide-react";
+import { Check, Lock, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
@@ -28,6 +28,7 @@ export function PicksPanel({
   userId: string;
 }) {
   const leagueId = league.id;
+  const isCollege = league.sport === "ncaa";
   const queryClient = useQueryClient();
   const weekQuery = useQuery({
     queryKey: ["week", league.sport, week],
@@ -172,6 +173,8 @@ export function PicksPanel({
       }).format(new Date(nextKick))}`
     : "Picks closed";
 
+  const cleanCollegeName = (name: string) => name.replace(/^#\d+\s+/, "");
+
   return (
     <div>
       <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
@@ -214,33 +217,39 @@ export function PicksPanel({
         )}
       </div>
 
-      <div className="mb-4 rounded-2xl border border-border bg-card p-4" aria-live="polite">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="font-display text-base font-semibold">
-              {locked ? "Picks are locked" : lockLabel}
-            </p>
-            <p className="mt-0.5 text-xs text-faint">
-              Set {activeEntry} · each set stands on its own and costs one entry fee.
-            </p>
+      {isCollege ? (
+        <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
+          {picked} of {games.length} picked · Set {activeEntry}
+        </p>
+      ) : (
+        <div className="mb-4 rounded-2xl border border-border bg-card p-4" aria-live="polite">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-display text-base font-semibold">
+                {locked ? "Picks are locked" : lockLabel}
+              </p>
+              <p className="mt-0.5 text-xs text-faint">
+                Set {activeEntry} · each set stands on its own and costs one entry fee.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-sm font-semibold tabular-nums">
+              {picked}/{games.length}
+            </span>
           </div>
-          <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-sm font-semibold tabular-nums">
-            {picked}/{games.length}
-          </span>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
+            <div
+              className="h-full rounded-full bg-accent transition-[width]"
+              style={{ width: `${games.length ? (picked / games.length) * 100 : 0}%` }}
+            />
+          </div>
+          {skipsEarlyGames(league, week) && skipped > 0 && (
+            <p className="mt-2 text-xs text-faint">
+              This league skips games before Sunday, so {skipped}{" "}
+              {skipped === 1 ? "game is" : "games are"} left off.
+            </p>
+          )}
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
-          <div
-            className="h-full rounded-full bg-accent transition-[width]"
-            style={{ width: `${games.length ? (picked / games.length) * 100 : 0}%` }}
-          />
-        </div>
-        {skipsEarlyGames(league, week) && skipped > 0 && (
-          <p className="mt-2 text-xs text-faint">
-            This league skips games before Sunday, so {skipped}{" "}
-            {skipped === 1 ? "game is" : "games are"} left off.
-          </p>
-        )}
-      </div>
+      )}
 
       <div className="space-y-5">
         {groups.map((group) => (
@@ -253,6 +262,63 @@ export function PicksPanel({
                 const isTb = game.id === weekData.tiebreaker_game_id;
                 const winner = gradeGame(game);
                 const unpicked = !picks[game.id];
+                if (isCollege) {
+                  return (
+                    <article key={game.id} className="rounded-2xl border border-border bg-card p-3">
+                      <div className="flex items-center justify-between text-xs text-faint">
+                        <span>{game.slot}</span>
+                        <span className="flex items-center gap-1">
+                          {locked && <Lock size={11} />}
+                          {game.state === "post" ? "Final" : game.state === "in" ? "Live" : "Scheduled"}
+                        </span>
+                      </div>
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        {(["away", "home"] as const).map((side) => {
+                          const chosen = picks[game.id] === side;
+                          const isWinner = winner === side;
+                          const wrong = chosen && winner && winner !== "tie" && winner !== side;
+                          const logo = side === "away" ? game.away_logo : game.home_logo;
+                          const rank = side === "away" ? game.away_rank : game.home_rank;
+                          const score = side === "away" ? game.away_score : game.home_score;
+                          const team = cleanCollegeName(game[side]);
+                          return (
+                            <button
+                              key={side}
+                              type="button"
+                              aria-pressed={chosen}
+                              aria-label={`Pick ${team}${side === "home" ? ", home team" : ", away team"}`}
+                              disabled={locked}
+                              onClick={() => setPicks((p) => ({ ...p, [game.id]: side }))}
+                              className={`flex min-h-16 flex-col items-start gap-1 rounded-xl border p-2.5 text-left transition-colors disabled:opacity-70 ${
+                                chosen ? "border-accent bg-accent-soft" : "border-border hover:bg-secondary"
+                              }`}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                {logo ? <img src={logo} alt="" className="h-5 w-5 object-contain" /> : null}
+                                <span className="text-xs text-faint">
+                                  {side === "away" ? "Away" : "Home"}
+                                </span>
+                              </span>
+                              <span className="text-sm font-medium leading-tight">
+                                {rank ? (
+                                  <span className="mr-1 rounded bg-accent-soft px-1 py-0.5 text-[11px] font-bold text-accent-soft-foreground">
+                                    #{rank}
+                                  </span>
+                                ) : null}
+                                {team}
+                                {isWinner && " ✓"}
+                              </span>
+                              {score != null && (
+                                <span className="text-xs tabular-nums text-muted-foreground">{score}</span>
+                              )}
+                              {wrong && <X size={14} className="mt-auto self-end text-destructive" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </article>
+                  );
+                }
                 return (
                   <div
                     key={game.id}
