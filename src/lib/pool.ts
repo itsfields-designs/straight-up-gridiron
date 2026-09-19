@@ -900,7 +900,11 @@ export function isEarlyWeekGame(game: Game): boolean {
 }
 
 /** Whether this league skips pre-Sunday games for the given week. */
-export function skipsEarlyGames(league: Pick<League, "sunday_only" | "sunday_only_from_week">, weekNum: number) {
+export function skipsEarlyGames(
+  league: Pick<League, "sunday_only" | "sunday_only_from_week"> & { sport?: string },
+  weekNum: number,
+) {
+  if (league.sport === "ncaa") return false; // college plays Saturdays
   return Boolean(league.sunday_only) && weekNum >= (league.sunday_only_from_week ?? 1);
 }
 
