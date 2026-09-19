@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/public/cfb-sync")({
         } catch (err) {
           console.error("cfb-sync failed", err);
           return Response.json(
-            { ok: false, error: err instanceof Error ? err.message : JSON.stringify(err) },
+            { ok: false, error: err instanceof Error ? err.message : "sync failed" },
             { status: 502 },
           );
         }
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/api/public/cfb-sync")({
         } catch (err) {
           console.error("cfb-sync failed", err);
           return Response.json(
-            { ok: false, error: err instanceof Error ? err.message : JSON.stringify(err) },
+            { ok: false, error: err instanceof Error ? err.message : "sync failed" },
             { status: 502 },
           );
         }
