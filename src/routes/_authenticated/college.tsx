@@ -445,12 +445,17 @@ function LeaderboardTab({
           {standings.data.map((row, i) => (
             <div
               key={`${row.userId}-${row.weekNum}`}
-              className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
+              className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? "border-t border-border" : ""} ${
+                row.userId === userId ? "bg-accent-soft" : ""
+              }`}
             >
               <span className="w-7 text-center font-display text-base font-semibold tabular-nums">
                 {row.rank}
               </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">{row.username}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                {row.username}
+                {row.userId === userId && <span className="text-faint"> · you</span>}
+              </span>
               {row.rank === 1 && <Trophy size={15} className="text-accent" />}
               <span className="shrink-0 text-sm tabular-nums">
                 {row.correct}
