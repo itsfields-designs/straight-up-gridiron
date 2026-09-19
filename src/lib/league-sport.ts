@@ -54,7 +54,7 @@ export async function fetchLeagueWeek(
       ? {
           week_num: week.week_num,
           label: week.label,
-          tiebreaker_game_id: null,
+          tiebreaker_game_id: week.tiebreaker_game_id,
           locked: week.locked,
         }
       : null,

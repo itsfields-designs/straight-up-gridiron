@@ -221,11 +221,17 @@ export async function syncCfb(weekNums?: number[]): Promise<CfbSyncResult> {
       if (deleteError) throw deleteError;
 
       const firstKickoff = rows[0]?.kickoff;
+      const lastGameId = [...rows].sort((a, b) => {
+        const ta = a.kickoff ? new Date(a.kickoff).getTime() : 0;
+        const tb = b.kickoff ? new Date(b.kickoff).getTime() : 0;
+        return ta - tb || a.sort_order - b.sort_order;
+      })[rows.length - 1]?.id;
       const { error: weekError } = await supabaseAdmin.from("cfb_weeks").upsert(
         {
           week_num: week,
           label: `Week ${week}`,
           locked: firstKickoff ? new Date(firstKickoff).getTime() <= Date.now() : false,
+          tiebreaker_game_id: lastGameId ?? null,
         },
         { onConflict: "week_num" },
       );

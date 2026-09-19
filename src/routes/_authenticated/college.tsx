@@ -256,15 +256,24 @@ function PicksTab({
   });
 
   const [draft, setDraft] = useState<Record<string, Side>>({});
+  const [tiebreaker, setTiebreaker] = useState("");
   const [saving, setSaving] = useState(false);
   useEffect(() => {
-    setDraft(picksQuery.data ?? {});
+    setDraft(picksQuery.data?.picks ?? {});
+    setTiebreaker(
+      picksQuery.data?.tiebreaker != null ? String(picksQuery.data.tiebreaker) : "",
+    );
   }, [picksQuery.data, week]);
 
   const games = weekQuery.data?.games ?? [];
+  const tbGameId = weekQuery.data?.week?.tiebreaker_game_id ?? null;
+  const savedTiebreaker =
+    picksQuery.data?.tiebreaker != null ? String(picksQuery.data.tiebreaker) : "";
   const dirty = useMemo(
-    () => JSON.stringify(draft) !== JSON.stringify(picksQuery.data ?? {}),
-    [draft, picksQuery.data],
+    () =>
+      JSON.stringify(draft) !== JSON.stringify(picksQuery.data?.picks ?? {}) ||
+      tiebreaker !== savedTiebreaker,
+    [draft, picksQuery.data, tiebreaker, savedTiebreaker],
   );
 
   const choose = (game: CfbGame, side: Side) => {
@@ -275,7 +284,12 @@ function PicksTab({
   const save = async () => {
     setSaving(true);
     try {
-      await saveCfbPicks({ userId, weekNum: week, picks: draft });
+      await saveCfbPicks({
+        userId,
+        weekNum: week,
+        picks: draft,
+        tiebreaker: tiebreaker === "" ? null : Number(tiebreaker),
+      });
       await queryClient.invalidateQueries({ queryKey: ["cfb-picks", userId, week] });
       toast.success(`Week ${week} college picks saved`);
     } catch (e) {
@@ -308,7 +322,14 @@ function PicksTab({
               return (
                 <article key={g.id} className="rounded-2xl border border-border bg-card p-3">
                   <div className="flex items-center justify-between text-xs text-faint">
-                    <span>{g.slot}</span>
+                    <span className="flex items-center gap-2">
+                      {g.slot}
+                      {g.id === tbGameId && (
+                        <span className="rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-soft-foreground">
+                          Tiebreaker
+                        </span>
+                      )}
+                    </span>
                     <span className="flex items-center gap-1">
                       {locked && <Lock size={11} />}
                       {g.state === "post" ? "Final" : g.state === "in" ? "Live" : "Scheduled"}
@@ -356,6 +377,22 @@ function PicksTab({
                       );
                     })}
                   </div>
+                  {g.id === tbGameId && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <label className="text-sm text-muted-foreground" htmlFor="cfb-tb">
+                        Combined final score, both teams:
+                      </label>
+                      <input
+                        id="cfb-tb"
+                        type="number"
+                        disabled={locked}
+                        value={tiebreaker}
+                        onChange={(e) => setTiebreaker(e.target.value)}
+                        placeholder="52"
+                        className="min-h-11 w-24 rounded-xl border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    </div>
+                  )}
                 </article>
               );
             })}

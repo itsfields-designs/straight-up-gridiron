@@ -266,7 +266,14 @@ export function PicksPanel({
                   return (
                     <article key={game.id} className="rounded-2xl border border-border bg-card p-3">
                       <div className="flex items-center justify-between text-xs text-faint">
-                        <span>{game.slot}</span>
+                        <span className="flex items-center gap-2">
+                          {game.slot}
+                          {isTb && (
+                            <span className="rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-soft-foreground">
+                              Tiebreaker
+                            </span>
+                          )}
+                        </span>
                         <span className="flex items-center gap-1">
                           {locked && <Lock size={11} />}
                           {game.state === "post" ? "Final" : game.state === "in" ? "Live" : "Scheduled"}
@@ -316,6 +323,22 @@ export function PicksPanel({
                           );
                         })}
                       </div>
+                      {isTb && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <label className="text-sm text-muted-foreground" htmlFor="tb">
+                            Combined final score, both teams:
+                          </label>
+                          <input
+                            id="tb"
+                            type="number"
+                            disabled={locked}
+                            value={tiebreaker}
+                            onChange={(e) => setTiebreaker(e.target.value)}
+                            placeholder="52"
+                            className="min-h-11 w-24 rounded-xl border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+                      )}
                     </article>
                   );
                 }
