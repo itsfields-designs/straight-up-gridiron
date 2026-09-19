@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -20,16 +20,10 @@ import {
   saveCfbPicks,
   type CfbGame,
 } from "@/lib/cfb";
-import { fetchMyLeagues, type League, type Side } from "@/lib/pool";
-import { isCollegeLeague } from "@/lib/league-sport";
-import { PicksPanel } from "@/components/pool/PicksPanel";
-import { StandingsPanel } from "@/components/pool/StandingsPanel";
+import { type Side } from "@/lib/pool";
 
 export const Route = createFileRoute("/_authenticated/college")({
   staticData: { sitemap: false },
-  validateSearch: (search: Record<string, unknown>) => ({
-    league: typeof search['league'] === "string" ? (search['league'] as string) : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "College Top 25 — Gridiron Gods" },
@@ -61,8 +55,6 @@ const TABS: { id: Tab; label: string }[] = [
 
 function CollegePage() {
   const { user } = Route.useRouteContext();
-  const { league: leagueParam } = Route.useSearch();
-  const navigate = useNavigate({ from: "/college" });
   const queryClient = useQueryClient();
   const runRefresh = useServerFn(refreshCfb);
   const [tab, setTab] = useState<Tab>("rankings");
@@ -75,17 +67,10 @@ function CollegePage() {
   }, [currentWeek.data, week]);
   const activeWeek = week ?? currentWeek.data ?? 1;
 
-  const leagues = useQuery({ queryKey: ["my-leagues"], queryFn: fetchMyLeagues });
-  const collegeLeagues = (leagues.data ?? []).filter(isCollegeLeague);
   const top25 = useQuery({ queryKey: ["cfb-standings", 0], queryFn: () => fetchCfbStandings(0) });
   const top25Rows = top25.data ?? [];
   const top25Me = top25Rows.find((r) => r.userId === user.id);
   const top25Leader = top25Rows[0];
-  const selectedLeague: League | null =
-    collegeLeagues.find((l) => l.id === leagueParam) ?? null;
-  const setScope = (id: string | undefined) => {
-    navigate({ to: "/college", search: { league: id } });
-  };
 
   const sync = async () => {
     setSyncing(true);
@@ -179,50 +164,11 @@ function CollegePage() {
         ))}
       </div>
 
-      {tab !== "rankings" && collegeLeagues.length > 0 && (
-        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label="College board">
-          {[{ id: undefined as string | undefined, name: "Top 25 pick'em" }, ...collegeLeagues].map(
-            (opt) => {
-              const active = (selectedLeague?.id ?? undefined) === opt.id;
-              return (
-                <button
-                  key={opt.id ?? "top25"}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setScope(opt.id)}
-                  className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-medium ${
-                    active
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border bg-card text-muted-foreground"
-                  }`}
-                >
-                  {opt.name}
-                </button>
-              );
-            },
-          )}
-        </div>
-      )}
-
       {tab === "rankings" && <RankingsTab />}
-      {tab === "picks" &&
-        (selectedLeague ? (
-          <div className="grid gap-3">
-            <WeekPicker week={activeWeek} onChange={setWeek} />
-            <PicksPanel league={selectedLeague} week={activeWeek} userId={user.id} />
-          </div>
-        ) : (
-          <PicksTab userId={user.id} week={activeWeek} onWeekChange={setWeek} />
-        ))}
-      {tab === "leaderboard" &&
-        (selectedLeague ? (
-          <div className="grid gap-3">
-            <WeekPicker week={activeWeek} onChange={setWeek} />
-            <StandingsPanel leagueId={selectedLeague.id} week={activeWeek} league={selectedLeague} />
-          </div>
-        ) : (
-          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} userId={user.id} />
-        ))}
+      {tab === "picks" && <PicksTab userId={user.id} week={activeWeek} onWeekChange={setWeek} />}
+      {tab === "leaderboard" && (
+        <LeaderboardTab week={activeWeek} onWeekChange={setWeek} userId={user.id} />
+      )}
     </div>
   );
 }
