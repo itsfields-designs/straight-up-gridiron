@@ -174,7 +174,7 @@ function CollegePage() {
             <StandingsPanel leagueId={selectedLeague.id} week={activeWeek} league={selectedLeague} />
           </div>
         ) : (
-          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} />
+          <LeaderboardTab week={activeWeek} onWeekChange={setWeek} userId={user.id} />
         ))}
     </div>
   );
