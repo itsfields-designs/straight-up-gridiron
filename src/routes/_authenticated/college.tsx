@@ -312,7 +312,7 @@ function PicksTab({
         />
       ) : (
         <>
-          <NcaaPickDeadline games={games} storedLocked={weekQuery.data?.week?.locked} />
+          <NcaaPickDeadline games={games} storedLocked={weekQuery.data?.week?.locked ?? false} />
           <p className="text-sm text-muted-foreground">
             {Object.keys(draft).length} of {games.length} picked
           </p>
