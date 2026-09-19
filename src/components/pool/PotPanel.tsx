@@ -337,20 +337,30 @@ function PlayerPayCard({
   seasonFee,
   week,
   username,
-  weeklyPaid,
-  seasonPaid,
+  weeklySets,
+  seasonSets,
+  weeklySetsPaid,
+  seasonSetsPaid,
 }: {
   handle: string;
   weeklyFee: number;
   seasonFee: number;
   week: number;
   username: string;
-  weeklyPaid: boolean;
-  seasonPaid: boolean;
+  weeklySets: number;
+  seasonSets: number;
+  weeklySetsPaid: number;
+  seasonSetsPaid: number;
 }) {
   const [kind, setKind] = useState<"weekly" | "season">("weekly");
-  const amount = kind === "weekly" ? weeklyFee : seasonFee;
-  const paid = kind === "weekly" ? weeklyPaid : seasonPaid;
+  const sets = kind === "weekly" ? weeklySets : seasonSets;
+  const setsPaid = Math.min(kind === "weekly" ? weeklySetsPaid : seasonSetsPaid, sets);
+  const weeklyTotal = weeklyFee * weeklySets;
+  const seasonTotal = seasonFee * seasonSets;
+  const amount = kind === "weekly" ? weeklyTotal : seasonTotal;
+  const paid = setsPaid >= sets;
+  const setsDue = Math.max(0, sets - setsPaid);
+  const dueAmount = paid ? amount : (kind === "weekly" ? weeklyFee : seasonFee) * setsDue;
   const cleanHandle = handle.replace(/^\$/, "");
   const cashAppUrl = amount > 0 ? `https://cash.app/$${cleanHandle}/${amount}` : `https://cash.app/$${cleanHandle}`;
 
