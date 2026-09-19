@@ -419,16 +419,24 @@ function PlayerPayCard({
               : "border-border bg-secondary hover:bg-secondary"
           }`}
         >
-          <span className="font-display text-3xl font-semibold text-foreground">{money(seasonFee)}</span>
-          <span className="text-sm font-normal text-muted-foreground">Whole season</span>
+          <span className="font-display text-3xl font-semibold text-foreground">{money(seasonTotal)}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            Whole season{seasonSets > 1 ? ` · ${seasonSets} sets` : ""}
+          </span>
         </Button>
       </div>
 
       <Button asChild size="lg" className="mt-4 w-full text-base font-semibold">
         <a href={cashAppUrl} target="_blank" rel="noopener noreferrer">
-          Pay {money(amount)} on Cash App
+          Pay {money(payAmount)} on Cash App
         </a>
       </Button>
+      {setsPaid > 0 && !paid && (
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          {setsPaid} of {sets} already marked paid · {setsDue} left
+        </p>
+      )}
+
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-muted-foreground">Cash App · ${cleanHandle}</span>
