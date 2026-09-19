@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -19,10 +19,16 @@ import {
   saveCfbPicks,
   type CfbGame,
 } from "@/lib/cfb";
-import type { Side } from "@/lib/pool";
+import { fetchMyLeagues, type League, type Side } from "@/lib/pool";
+import { isCollegeLeague } from "@/lib/league-sport";
+import { PicksPanel } from "@/components/pool/PicksPanel";
+import { StandingsPanel } from "@/components/pool/StandingsPanel";
 
 export const Route = createFileRoute("/_authenticated/college")({
   staticData: { sitemap: false },
+  validateSearch: (search: Record<string, unknown>) => ({
+    league: typeof search.league === "string" ? search.league : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "College Top 25 — Gridiron Gods" },
