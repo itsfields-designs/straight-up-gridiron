@@ -78,6 +78,10 @@ function DashboardPage() {
   }, [navigate]);
 
   const leagues = useQuery({ queryKey: ["leagues"], queryFn: fetchMyLeagues });
+  const top25 = useQuery({ queryKey: ["cfb-standings", 0], queryFn: () => fetchCfbStandings(0) });
+  const top25Rows = top25.data ?? [];
+  const top25Me = top25Rows.find((r) => r.userId === user.id);
+  const top25Leader = top25Rows[0];
   const currentWeek = useQuery({ queryKey: ["current-week"], queryFn: fetchCurrentWeek });
   const week = currentWeek.data ?? 1;
 
