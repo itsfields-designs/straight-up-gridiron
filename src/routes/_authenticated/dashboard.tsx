@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { ChevronRight, Plus, Users } from "lucide-react";
+import { ChevronRight, Globe, Plus, Users } from "lucide-react";
+
+import { fetchCfbStandings } from "@/lib/cfb";
 
 import {
   fetchCurrentWeek,
