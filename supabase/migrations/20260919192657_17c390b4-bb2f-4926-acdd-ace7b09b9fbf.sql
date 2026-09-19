@@ -1,0 +1,1 @@
+drop function if exists public.get_cfb_standings(integer);

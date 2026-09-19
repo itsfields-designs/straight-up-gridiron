@@ -132,21 +132,8 @@ export async function saveCfbPicks(args: {
   if (error) throw error;
 }
 
-/** weekNum 0 = season total. */
+/** weekNum 0 = season total. Served through a server function: the table itself only exposes each user's own rows. */
 export async function fetchCfbStandings(weekNum: number): Promise<CfbStanding[]> {
-  const { data, error } = await supabase
-    .from("cfb_standings")
-    .select("user_id, username, week_num, correct, missed, rank")
-    .eq("week_num", weekNum)
-    .order("rank", { ascending: true })
-    .limit(100);
-  if (error) throw error;
-  return (data ?? []).map((r) => ({
-    userId: r.user_id,
-    username: r.username,
-    weekNum: r.week_num,
-    correct: r.correct,
-    missed: r.missed,
-    rank: r.rank,
-  }));
+  const { getCfbStandings } = await import("@/lib/cfb.functions");
+  return getCfbStandings({ data: { weekNum } });
 }
