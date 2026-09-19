@@ -21,6 +21,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as JoinCodeRouteImport } from './routes/join.$code'
 import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authenticated/leagues.index'
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
+import { Route as ApiPublicCfbSyncRouteImport } from './routes/api/public/cfb-sync'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
@@ -87,6 +88,11 @@ const AuthenticatedLeaguesLeagueIdRoute =
     path: '/leagues/$leagueId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCfbSyncRoute = ApiPublicCfbSyncRouteImport.update({
+  id: '/api/public/cfb-sync',
+  path: '/api/public/cfb-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
   id: '/api/public/nfl-sync',
   path: '/api/public/nfl-sync',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
+  '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/leagues/'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/join/$code'
     | '/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/leagues'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/join/$code'
     | '/_authenticated/leagues/$leagueId'
+    | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
     | '/_authenticated/leagues/'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   OfficeFootballPoolRoute: typeof OfficeFootballPoolRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   JoinCodeRoute: typeof JoinCodeRoute
+  ApiPublicCfbSyncRoute: typeof ApiPublicCfbSyncRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaguesLeagueIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cfb-sync': {
+      id: '/api/public/cfb-sync'
+      path: '/api/public/cfb-sync'
+      fullPath: '/api/public/cfb-sync'
+      preLoaderRoute: typeof ApiPublicCfbSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/nfl-sync': {
       id: '/api/public/nfl-sync'
       path: '/api/public/nfl-sync'
@@ -336,6 +356,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfficeFootballPoolRoute: OfficeFootballPoolRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   JoinCodeRoute: JoinCodeRoute,
+  ApiPublicCfbSyncRoute: ApiPublicCfbSyncRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
