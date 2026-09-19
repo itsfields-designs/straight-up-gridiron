@@ -173,7 +173,7 @@ function AuthPage() {
         </header>
 
         <div className="px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
-          <h1 className="whitespace-nowrap font-display text-[3rem] font-semibold leading-none sm:text-[4.25rem]">
+          <h1 className={`whitespace-nowrap font-display font-semibold leading-none ${mode === "login" ? "text-[3rem] sm:text-[4.25rem]" : "text-[2.35rem] sm:text-[4.25rem]"}`}>
             {mode === "login" ? "Log in" : "Create your account"}
           </h1>
           <p className="mt-3 text-lg text-muted-foreground sm:text-xl">Pick winners straight up. Beat your league.</p>
