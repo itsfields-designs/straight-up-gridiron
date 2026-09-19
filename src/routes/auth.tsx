@@ -62,7 +62,7 @@ function AuthPage() {
       });
       return;
     }
-    navigate({ to: "/leagues", replace: true });
+    navigate({ to: "/dashboard", replace: true });
   }
 
   useEffect(() => {
