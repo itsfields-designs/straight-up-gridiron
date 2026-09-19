@@ -110,6 +110,7 @@ export type Database = {
         Row: {
           id: string
           picks: Json
+          tiebreaker: number | null
           updated_at: string
           user_id: string
           week_num: number
@@ -117,6 +118,7 @@ export type Database = {
         Insert: {
           id?: string
           picks?: Json
+          tiebreaker?: number | null
           updated_at?: string
           user_id: string
           week_num: number
@@ -124,6 +126,7 @@ export type Database = {
         Update: {
           id?: string
           picks?: Json
+          tiebreaker?: number | null
           updated_at?: string
           user_id?: string
           week_num?: number
@@ -175,6 +178,7 @@ export type Database = {
           id: string
           missed: number
           rank: number
+          tb_diff: number | null
           updated_at: string
           user_id: string
           username: string
@@ -185,6 +189,7 @@ export type Database = {
           id?: string
           missed?: number
           rank?: number
+          tb_diff?: number | null
           updated_at?: string
           user_id: string
           username?: string
@@ -195,6 +200,7 @@ export type Database = {
           id?: string
           missed?: number
           rank?: number
+          tb_diff?: number | null
           updated_at?: string
           user_id?: string
           username?: string
@@ -206,16 +212,19 @@ export type Database = {
         Row: {
           label: string
           locked: boolean
+          tiebreaker_game_id: string | null
           week_num: number
         }
         Insert: {
           label: string
           locked?: boolean
+          tiebreaker_game_id?: string | null
           week_num: number
         }
         Update: {
           label?: string
           locked?: boolean
+          tiebreaker_game_id?: string | null
           week_num?: number
         }
         Relationships: []
