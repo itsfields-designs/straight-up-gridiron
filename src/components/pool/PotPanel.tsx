@@ -362,7 +362,8 @@ function PlayerPayCard({
   const setsDue = Math.max(0, sets - setsPaid);
   const dueAmount = paid ? amount : (kind === "weekly" ? weeklyFee : seasonFee) * setsDue;
   const cleanHandle = handle.replace(/^\$/, "");
-  const cashAppUrl = amount > 0 ? `https://cash.app/$${cleanHandle}/${amount}` : `https://cash.app/$${cleanHandle}`;
+  const payAmount = dueAmount > 0 ? dueAmount : amount;
+  const cashAppUrl = payAmount > 0 ? `https://cash.app/$${cleanHandle}/${payAmount}` : `https://cash.app/$${cleanHandle}`;
 
   const copyHandle = async () => {
     try {
