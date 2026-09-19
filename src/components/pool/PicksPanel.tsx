@@ -104,8 +104,6 @@ export function PicksPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (weekQuery.isLoading) return <LoadingState label="Loading matchups" />;
-
   const weekData = weekQuery.data?.week;
   const allGames = weekQuery.data?.games ?? [];
   const games = leagueGames(allGames, league, week);
@@ -114,6 +112,8 @@ export function PicksPanel({
   const locked = isCollege
     ? collegeLocked
     : leagueWeekLocked(games, weekData, league, week);
+
+  if (weekQuery.isLoading) return <LoadingState label="Loading matchups" />;
 
   if (!weekData || games.length === 0) {
     return (
