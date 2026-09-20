@@ -350,7 +350,16 @@ export function PicksPanel({
                         </span>
                         <span className="flex items-center gap-1">
                           {locked && <Lock size={11} />}
-                          {game.state === "post" ? "Final" : game.state === "in" ? "Live" : "Scheduled"}
+                          {liveOn && (
+                            <Radio size={11} className="animate-pulse text-accent" aria-label="Live" />
+                          )}
+                          {liveOn
+                            ? liveGame!.statusLabel
+                            : effGame.state === "post"
+                              ? "Final"
+                              : effGame.state === "in"
+                                ? "Live"
+                                : "Scheduled"}
                         </span>
                       </div>
                       <div className="mt-2 grid grid-cols-2 gap-2">
@@ -360,7 +369,7 @@ export function PicksPanel({
                           const wrong = chosen && winner && winner !== "tie" && winner !== side;
                           const logo = side === "away" ? game.away_logo : game.home_logo;
                           const rank = side === "away" ? game.away_rank : game.home_rank;
-                          const score = side === "away" ? game.away_score : game.home_score;
+                          const score = side === "away" ? effGame.away_score : effGame.home_score;
                           const team = cleanCollegeName(game[side]);
                           return (
                             <button
@@ -432,11 +441,16 @@ export function PicksPanel({
                           Tiebreaker
                         </span>
                       )}
-                      {winner && winner !== "tie" && (
-                        <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground tabular-nums">
-                          Final {game.away_score}–{game.home_score}
+                      {liveOn && liveAwayScore != null && liveHomeScore != null ? (
+                        <span className="flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-soft-foreground tabular-nums">
+                          <Radio size={11} className="animate-pulse" aria-label="Live" />
+                          {liveGame!.statusLabel} · {liveAwayScore}–{liveHomeScore}
                         </span>
-                      )}
+                      ) : winner && winner !== "tie" ? (
+                        <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground tabular-nums">
+                          Final {effGame.away_score}–{effGame.home_score}
+                        </span>
+                      ) : null}
                     </div>
                     <div className="grid gap-2">
                       {(["away", "home"] as const).map((side) => {
