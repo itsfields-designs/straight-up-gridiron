@@ -166,56 +166,6 @@ export function CashPanel({
       </div>
 
 
-      <div className="rounded-lg border border-border bg-card p-4">
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">Add money movement</h2>
-        <div className="flex w-fit gap-1 rounded-md bg-secondary p-1" role="tablist" aria-label="Money movement type">
-          {(["deposit", "withdrawal"] as const).map((k) => (
-            <button
-              key={k}
-              type="button"
-              role="tab"
-              aria-selected={kind === k}
-              onClick={() => setKind(k)}
-              className={`flex min-h-11 items-center gap-1.5 rounded px-3.5 text-sm font-medium ${
-                kind === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
-            >
-              {k === "deposit" ? <ArrowDownCircle size={14} /> : <ArrowUpCircle size={14} />}
-              {k === "deposit" ? "Deposit" : "Withdraw"}
-            </button>
-          ))}
-        </div>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="mb-1 block text-xs text-faint">Amount ($)</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1 block text-xs text-faint">Note (optional)</span>
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Venmo to commissioner"
-              className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-          </label>
-        </div>
-        <button
-          onClick={() => create.mutate()}
-          disabled={create.isPending}
-          className="mt-3 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
-        >
-          {create.isPending ? "Saving…" : kind === "deposit" ? "Add deposit" : "Add withdrawal"}
-        </button>
-      </div>
 
       <div>
         <h2 className="mb-2 text-sm font-medium text-muted-foreground">
