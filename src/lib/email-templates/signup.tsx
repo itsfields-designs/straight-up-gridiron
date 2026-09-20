@@ -1,16 +1,8 @@
 import * as React from 'react'
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from '@react-email/components'
+import { Button, Heading, Section, Text } from '@react-email/components'
+
+import { Fallback, Shell, button, colors, h1, text } from './brand'
 
 interface SignupEmailProps {
   siteName: string
@@ -19,77 +11,72 @@ interface SignupEmailProps {
   confirmationUrl: string
 }
 
+const steps = [
+  {
+    title: 'Start a league or join with a code',
+    body: 'Every league gets a six-character code. Share it and your friends are in.',
+  },
+  {
+    title: 'Pick all 16 games',
+    body: 'Tap a team per matchup, add your tiebreaker total, done in a minute.',
+  },
+  {
+    title: 'Follow the standings',
+    body: 'Records update for everyone as official final scores arrive.',
+  },
+]
+
 export const SignupEmail = ({
   siteName,
   siteUrl,
   recipient,
   confirmationUrl,
 }: SignupEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head>
-      <style>{darkModeCss}</style>
-    </Head>
-    <Preview>Confirm your email for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
-        <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
+  <Shell preview={`Confirm your email to join ${siteName}`} siteUrl={siteUrl}>
+    <Heading className="gg-h1" style={h1}>
+      Confirm your email
+    </Heading>
+    <Text className="gg-text" style={text}>
+      Thanks for signing up for {siteName}. Confirm {recipient} and your league
+      is one tap away.
+    </Text>
+
+    <Button style={button} href={confirmationUrl}>
+      Confirm my email
+    </Button>
+
+    <Fallback url={confirmationUrl} />
+
+    <Heading
+      as="h3"
+      className="gg-h1"
+      style={{ ...h1, fontSize: '17px', margin: '28px 0 12px' }}
+    >
+      What happens next
+    </Heading>
+
+    {steps.map((step, i) => (
+      <Section key={step.title} style={{ margin: '0 0 14px' }}>
+        <Text
+          style={{
+            margin: '0 0 4px',
+            fontSize: '15px',
+            fontWeight: 600 as const,
+            color: colors.ink,
+          }}
+        >
+          {i + 1}. {step.title}
         </Text>
-        <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
+        <Text className="gg-text" style={{ ...text, margin: '0' }}>
+          {step.body}
         </Text>
-        <Button className="dm-btn" style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
-        <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
+      </Section>
+    ))}
+
+    <Text className="gg-text" style={{ ...text, margin: '24px 0 0', fontSize: '13px' }}>
+      If you didn’t create an account, you can safely ignore this email.
+    </Text>
+  </Shell>
 )
 
 export default SignupEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  border: '1px solid #000000',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
-// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
-const darkModeCss = `
-  @media (prefers-color-scheme: dark) {
-    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  }
-  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-`
