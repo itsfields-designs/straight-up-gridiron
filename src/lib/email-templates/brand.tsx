@@ -2,16 +2,21 @@ import * as React from 'react'
 
 import {
   Body,
+  Column,
   Container,
   Head,
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
+  Row,
   Section,
   Text,
 } from '@react-email/components'
+
+import logoAsset from '@/assets/gridiron-gods-logo.png.asset.json'
 
 export const colors = {
   green: '#0E3B2A',
@@ -26,7 +31,7 @@ export const colors = {
 }
 
 export const main = {
-  backgroundColor: colors.cream,
+  backgroundColor: colors.card,
   fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif",
   margin: '0',
   padding: '0',
@@ -34,59 +39,59 @@ export const main = {
 
 export const container = {
   width: '100%',
-  maxWidth: '560px',
+  maxWidth: '600px',
   margin: '0 auto',
-  padding: '24px 16px 40px',
+  padding: '28px 16px 44px',
 }
 
 export const card = {
   backgroundColor: colors.card,
-  border: `1px solid ${colors.border}`,
-  borderRadius: '16px',
-  padding: '28px 24px',
+  padding: '52px 40px 36px',
 }
 
 export const h1 = {
-  fontSize: '24px',
-  lineHeight: '1.25',
-  fontWeight: 600 as const,
-  color: colors.ink,
-  margin: '0 0 14px',
+  fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif",
+  fontSize: '42px',
+  lineHeight: '1.08',
+  fontWeight: 800 as const,
+  color: colors.greenDark,
+  margin: '0 0 22px',
 }
 
 export const text = {
-  fontSize: '15px',
-  lineHeight: '1.6',
+  fontSize: '19px',
+  lineHeight: '1.55',
   color: colors.muted,
-  margin: '0 0 18px',
+  margin: '0 0 28px',
 }
 
 export const button = {
   display: 'block',
-  backgroundColor: colors.gold,
-  color: colors.greenDark,
-  fontSize: '16px',
-  fontWeight: 600 as const,
+  backgroundColor: colors.goldDark,
+  color: colors.card,
+  fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif",
+  fontSize: '20px',
+  fontWeight: 700 as const,
   textAlign: 'center' as const,
-  borderRadius: '12px',
-  padding: '15px 20px',
+  borderRadius: '14px',
+  padding: '18px 20px',
   textDecoration: 'none',
 }
 
 export const fallbackText = {
-  fontSize: '12px',
-  lineHeight: '1.6',
+  fontSize: '16px',
+  lineHeight: '1.5',
   color: colors.muted,
   wordBreak: 'break-all' as const,
-  margin: '16px 0 0',
+  margin: '28px 0 0',
 }
 
 export const footerText = {
-  fontSize: '12px',
+  fontSize: '15px',
   lineHeight: '1.6',
   color: colors.muted,
-  textAlign: 'center' as const,
-  margin: '18px 0 0',
+  textAlign: 'left' as const,
+  margin: '12px 0 0',
 }
 
 export const code = {
@@ -101,13 +106,9 @@ export const code = {
   color: colors.ink,
 }
 
-// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
 const darkModeCss = `
   @media (prefers-color-scheme: dark) {
-    .gg-body { background-color: #0B1A13 !important; }
-    .gg-card { background-color: #12241B !important; border-color: #234033 !important; }
-    .gg-h1 { color: #F6F1E4 !important; }
-    .gg-text { color: #BFCCC4 !important; }
+    .gg-frame { border-color: #29483A !important; }
   }
 `
 
@@ -120,62 +121,41 @@ export function Shell({
   siteUrl?: string
   children: React.ReactNode
 }) {
+  const rootUrl = siteUrl ?? 'https://gridirongods.app'
+  const logoUrl = new URL(logoAsset.url, rootUrl).toString()
+
   return (
     <Html lang="en" dir="ltr">
       <Head>
         <style>{darkModeCss}</style>
       </Head>
       <Preview>{preview}</Preview>
-      <Body className="gg-body" style={main}>
+      <Body style={main}>
         <Container style={container}>
-          <Section
-            style={{
-              backgroundColor: colors.green,
-              borderRadius: '16px',
-              padding: '22px 24px',
-              marginBottom: '16px',
-            }}
-          >
-            <Heading
-              as="h2"
-              style={{
-                margin: '0',
-                fontSize: '20px',
-                letterSpacing: '2px',
-                fontWeight: 600 as const,
-                color: colors.gold,
-                textTransform: 'uppercase' as const,
-              }}
-            >
-              Gridiron Gods
-            </Heading>
-            <Text
-              style={{
-                margin: '6px 0 0',
-                fontSize: '12px',
-                letterSpacing: '2px',
-                color: '#D8E5DD',
-                textTransform: 'uppercase' as const,
-              }}
-            >
-              Pick. Compete. Conquer.
-            </Text>
+          <Section className="gg-frame" style={{ border: `1px solid ${colors.border}`, borderRadius: '24px', overflow: 'hidden', backgroundColor: colors.cream }}>
+          <Section style={{ backgroundColor: colors.green, padding: '28px 40px' }}>
+            <Row>
+              <Column style={{ width: '72px', verticalAlign: 'middle' }}>
+                <Img src={logoUrl} width="64" height="64" alt="Gridiron Gods" style={{ display: 'block', borderRadius: '14px' }} />
+              </Column>
+              <Column style={{ verticalAlign: 'middle' }}>
+                <Heading as="h2" style={{ margin: '0', fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif", fontSize: '26px', lineHeight: '1', fontWeight: 700 as const, letterSpacing: '2px', color: colors.card, textTransform: 'uppercase' as const }}>
+                  Gridiron Gods
+                </Heading>
+              </Column>
+            </Row>
           </Section>
 
           <Section className="gg-card" style={card}>
             {children}
+            <Text style={footerText}>
+              Gridiron Gods · NFL pick’em for your league ·{' '}
+              <Link href={rootUrl} style={{ color: colors.muted, textDecoration: 'none' }}>
+                gridirongods.app
+              </Link>
+            </Text>
           </Section>
-
-          <Hr style={{ borderColor: colors.border, margin: '24px 0 0' }} />
-          <Text style={footerText}>
-            Gridiron Gods · NFL pick’em for your league ·{' '}
-            <Link
-              href={siteUrl ?? 'https://gridirongods.app'}
-              style={{ color: colors.muted }}
-            >
-              gridirongods.app
-            </Link>
-          </Text>
+          </Section>
         </Container>
       </Body>
     </Html>
@@ -185,9 +165,9 @@ export function Shell({
 export function Fallback({ url }: { url: string }) {
   return (
     <Text style={fallbackText}>
-      If the button doesn’t work, copy and paste this link into your browser:
+      Button not working? Copy and paste this link into your browser:
       <br />
-      {url}
+      <Link href={url} style={{ color: colors.green, textDecoration: 'underline' }}>{url}</Link>
     </Text>
   )
 }

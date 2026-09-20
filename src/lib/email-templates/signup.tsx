@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Button, Heading, Section, Text } from '@react-email/components'
+import { Button, Column, Heading, Hr, Row, Section, Text } from '@react-email/components'
 
 import { Fallback, Shell, button, colors, h1, text } from './brand'
 
@@ -34,11 +34,10 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Shell preview={`Confirm your email to join ${siteName}`} siteUrl={siteUrl}>
     <Heading className="gg-h1" style={h1}>
-      Confirm your email
+      Confirm your email.
     </Heading>
     <Text className="gg-text" style={text}>
-      Thanks for signing up for {siteName}. Confirm {recipient} and your league
-      is one tap away.
+      Thanks for signing up for {siteName}. Confirm <strong style={{ color: colors.ink }}>{recipient}</strong> to finish creating your account.
     </Text>
 
     <Button style={button} href={confirmationUrl}>
@@ -47,33 +46,37 @@ export const SignupEmail = ({
 
     <Fallback url={confirmationUrl} />
 
+    <Hr style={{ borderColor: colors.border, margin: '38px 0 34px' }} />
+
     <Heading
       as="h3"
       className="gg-h1"
-      style={{ ...h1, fontSize: '17px', margin: '28px 0 12px' }}
+      style={{ ...h1, fontSize: '26px', margin: '36px 0 24px' }}
     >
       What happens next
     </Heading>
 
     {steps.map((step, i) => (
-      <Section key={step.title} style={{ margin: '0 0 14px' }}>
-        <Text
-          style={{
-            margin: '0 0 4px',
-            fontSize: '15px',
-            fontWeight: 600 as const,
-            color: colors.ink,
-          }}
-        >
-          {i + 1}. {step.title}
-        </Text>
-        <Text className="gg-text" style={{ ...text, margin: '0' }}>
-          {step.body}
-        </Text>
+      <Section key={step.title} style={{ margin: '0 0 24px' }}>
+        <Row>
+          <Column style={{ width: '58px', verticalAlign: 'top' }}>
+            <Text style={{ width: '42px', height: '42px', lineHeight: '42px', margin: '0', borderRadius: '999px', backgroundColor: '#F8EAC9', color: colors.goldDark, fontSize: '18px', fontWeight: 700 as const, textAlign: 'center' as const }}>
+              {i + 1}
+            </Text>
+          </Column>
+          <Column style={{ verticalAlign: 'top' }}>
+            <Text style={{ margin: '0 0 4px', fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif", fontSize: '20px', lineHeight: '1.25', fontWeight: 700 as const, color: colors.greenDark }}>
+              {step.title}
+            </Text>
+            <Text className="gg-text" style={{ ...text, fontSize: '17px', margin: '0' }}>
+              {step.body}
+            </Text>
+          </Column>
+        </Row>
       </Section>
     ))}
 
-    <Text className="gg-text" style={{ ...text, margin: '24px 0 0', fontSize: '13px' }}>
+    <Text className="gg-text" style={{ ...text, margin: '46px 0 18px', fontSize: '15px' }}>
       If you didn’t create an account, you can safely ignore this email.
     </Text>
   </Shell>
