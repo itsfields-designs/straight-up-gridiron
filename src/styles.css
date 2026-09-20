@@ -177,6 +177,19 @@
   }
 }
 
+@keyframes gg-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@utility ticker-track {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: var(--spacing, 0.75rem);
+  animation: gg-ticker 36s linear infinite;
+  will-change: transform;
+}
+
 @utility app-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
