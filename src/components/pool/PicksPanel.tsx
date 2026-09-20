@@ -35,15 +35,24 @@ function teamKey(name: string): string {
 function matchLiveGame(
   away: string,
   home: string,
+  kickoff: string | null,
   liveGames: LiveScoreGame[],
 ): { game: LiveScoreGame; flipped: boolean } | undefined {
   const a = teamKey(away);
   const h = teamKey(home);
+  const kickMs = kickoff ? new Date(kickoff).getTime() : null;
   for (const lg of liveGames) {
     const la = teamKey(lg.away.name);
     const lh = teamKey(lg.home.name);
-    if (la === a && lh === h) return { game: lg, flipped: false };
-    if (la === h && lh === a) return { game: lg, flipped: true };
+    const direct = la === a && lh === h;
+    const flipped = la === h && lh === a;
+    if (!direct && !flipped) continue;
+    // Same teams can meet in different weeks — only trust a kickoff within 48 hours.
+    const liveMs = lg.kickoff ? new Date(lg.kickoff).getTime() : null;
+    if (kickMs != null && liveMs != null && Math.abs(kickMs - liveMs) > 48 * 3600 * 1000) {
+      continue;
+    }
+    return { game: lg, flipped };
   }
   return undefined;
 }
@@ -308,7 +317,7 @@ export function PicksPanel({
             <div className="space-y-2.5">
               {group.games.map((game) => {
                 const isTb = game.id === weekData.tiebreaker_game_id;
-                const liveMatch = matchLiveGame(game.away, game.home, liveGames);
+                const liveMatch = matchLiveGame(game.away, game.home, game.kickoff, liveGames);
                 const liveGame = liveMatch?.game;
                 const liveOn = liveGame?.status === "live";
                 const liveAwayScore = liveGame
