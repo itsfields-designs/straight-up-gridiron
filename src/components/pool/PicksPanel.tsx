@@ -69,6 +69,18 @@ export function PicksPanel({
     queryFn: () => fetchPickEntries(leagueId, week),
   });
 
+  // Live scores for this league's sport, refreshed every 30 seconds.
+  const fetchLive = useServerFn(fetchLiveScores);
+  const liveLeague = isCollege ? "college-football" : "nfl";
+  const liveQuery = useQuery({
+    queryKey: ["live-scores", liveLeague, 50],
+    queryFn: () => fetchLive({ data: { league: liveLeague, limit: 50 } }),
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    retry: false,
+  });
+  const liveGames = liveQuery.data?.games ?? [];
+
   const [picks, setPicks] = useState<Record<string, Side>>({});
   const [tiebreaker, setTiebreaker] = useState("");
   const [savedPicks, setSavedPicks] = useState<Record<string, Side>>({});
