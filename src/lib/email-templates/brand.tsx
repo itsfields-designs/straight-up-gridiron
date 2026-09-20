@@ -148,11 +148,6 @@ export function Shell({
 
           <Section className="gg-card" style={card}>
             {children}
-
-            <Hr style={{ borderColor: colors.border, margin: '40px 0 28px' }} />
-            <Text className="gg-text" style={{ ...text, margin: '0 0 20px', fontSize: '15px' }}>
-              If you didn’t request this email, you can safely ignore it.
-            </Text>
             <Text style={footerText}>
               Gridiron Gods · NFL pick’em for your league ·{' '}
               <Link href={rootUrl} style={{ color: colors.muted, textDecoration: 'none' }}>

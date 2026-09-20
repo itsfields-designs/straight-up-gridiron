@@ -34,7 +34,7 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Shell preview={`Confirm your email to join ${siteName}`} siteUrl={siteUrl}>
     <Heading className="gg-h1" style={h1}>
-      Confirm your email
+      Confirm your email.
     </Heading>
     <Text className="gg-text" style={text}>
       Thanks for signing up for {siteName}. Confirm <strong style={{ color: colors.ink }}>{recipient}</strong> to finish creating your account.
@@ -45,6 +45,8 @@ export const SignupEmail = ({
     </Button>
 
     <Fallback url={confirmationUrl} />
+
+    <Hr style={{ borderColor: colors.border, margin: '38px 0 34px' }} />
 
     <Heading
       as="h3"
@@ -73,6 +75,10 @@ export const SignupEmail = ({
         </Row>
       </Section>
     ))}
+
+    <Text className="gg-text" style={{ ...text, margin: '46px 0 18px', fontSize: '15px' }}>
+      If you didn’t create an account, you can safely ignore this email.
+    </Text>
   </Shell>
 )
 
