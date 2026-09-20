@@ -15,6 +15,17 @@ const ROOT_DOMAIN = "gridirongods.app"
 const FROM_DOMAIN = "gridirongods.app"
 const SITE_URL = `https://${ROOT_DOMAIN}`
 
+function siteActionUrl(actionUrl: string) {
+  try {
+    const url = new URL(actionUrl)
+    url.protocol = 'https:'
+    url.host = ROOT_DOMAIN
+    return url.toString()
+  } catch {
+    return SITE_URL
+  }
+}
+
 // The SDK handler owns verification, dispatch, and retry semantics; this file
 // owns only the email decisions: subjects, templates, and per-type props.
 export const Route = createFileRoute("/lovable/email/auth/webhook")({
@@ -35,7 +46,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
                   siteName: SITE_NAME,
                   siteUrl: SITE_URL,
                   recipient: data.email,
-                  confirmationUrl: data.url,
+                  confirmationUrl: siteActionUrl(data.url),
                 }),
             },
             invite: {
@@ -44,7 +55,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
                 React.createElement(InviteEmail, {
                   siteName: SITE_NAME,
                   siteUrl: SITE_URL,
-                  confirmationUrl: data.url,
+                  confirmationUrl: siteActionUrl(data.url),
                 }),
             },
             magiclink: {
@@ -52,7 +63,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
               render: (data) =>
                 React.createElement(MagicLinkEmail, {
                   siteName: SITE_NAME,
-                  confirmationUrl: data.url,
+                  confirmationUrl: siteActionUrl(data.url),
                 }),
             },
             recovery: {
@@ -60,7 +71,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
               render: (data) =>
                 React.createElement(RecoveryEmail, {
                   siteName: SITE_NAME,
-                  confirmationUrl: data.url,
+                  confirmationUrl: siteActionUrl(data.url),
                 }),
             },
             email_change: {
@@ -71,7 +82,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
                   oldEmail: data.old_email ?? '',
                   email: data.email,
                   newEmail: data.new_email ?? '',
-                  confirmationUrl: data.url,
+                  confirmationUrl: siteActionUrl(data.url),
                 }),
             },
             reauthentication: {
