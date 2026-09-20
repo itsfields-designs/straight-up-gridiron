@@ -90,26 +90,6 @@ export function CashPanel({
     queryClient.invalidateQueries({ queryKey: ["bank", league.id] });
   };
 
-  const create = useMutation({
-    mutationFn: async () => {
-      const n = Number(amount);
-      if (!Number.isFinite(n) || n <= 0) throw new Error("Enter an amount greater than zero");
-      await addCashTxn({
-        leagueId: league.id,
-        userId: currentUserId,
-        kind,
-        amount: Math.round(n * 100) / 100,
-        note: note.trim(),
-      });
-    },
-    onSuccess: () => {
-      setAmount("");
-      setNote("");
-      toast.success(kind === "deposit" ? "Deposit added" : "Withdrawal added");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   const remove = useMutation({
     mutationFn: deleteCashTxn,
