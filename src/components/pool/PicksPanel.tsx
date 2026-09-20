@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Lock, Plus, Trash2, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, Lock, Plus, Radio, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
@@ -18,6 +19,34 @@ import {
   type League,
   type Side,
 } from "@/lib/pool";
+import { fetchLiveScores, type LiveScoreGame } from "@/lib/livescores.functions";
+
+/** Mascot-style key ("Kansas City Chiefs" / "#5 Miami (FL)" -> "chiefs"/"(fl)" tolerant). */
+function teamKey(name: string): string {
+  const clean = name
+    .replace(/^#\d+\s+/, "")
+    .toLowerCase()
+    .replace(/[^a-z ]/g, "")
+    .trim();
+  return clean.split(/\s+/).pop() ?? clean;
+}
+
+/** Match a live feed game to a schedule game by the two team names (either order). */
+function matchLiveGame(
+  away: string,
+  home: string,
+  liveGames: LiveScoreGame[],
+): { game: LiveScoreGame; flipped: boolean } | undefined {
+  const a = teamKey(away);
+  const h = teamKey(home);
+  for (const lg of liveGames) {
+    const la = teamKey(lg.away.name);
+    const lh = teamKey(lg.home.name);
+    if (la === a && lh === h) return { game: lg, flipped: false };
+    if (la === h && lh === a) return { game: lg, flipped: true };
+  }
+  return undefined;
+}
 
 export function PicksPanel({
   league,
