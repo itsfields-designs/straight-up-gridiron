@@ -308,7 +308,33 @@ export function PicksPanel({
             <div className="space-y-2.5">
               {group.games.map((game) => {
                 const isTb = game.id === weekData.tiebreaker_game_id;
-                const winner = gradeGame(game);
+                const liveMatch = matchLiveGame(game.away, game.home, liveGames);
+                const liveGame = liveMatch?.game;
+                const liveOn = liveGame?.status === "live";
+                const liveAwayScore = liveGame
+                  ? liveMatch!.flipped
+                    ? liveGame.homeScore
+                    : liveGame.awayScore
+                  : null;
+                const liveHomeScore = liveGame
+                  ? liveMatch!.flipped
+                    ? liveGame.awayScore
+                    : liveGame.homeScore
+                  : null;
+                // Live feed wins over the synced schedule so players see scores move in real time.
+                const effGame =
+                  liveGame &&
+                  liveGame.status !== "scheduled" &&
+                  liveAwayScore != null &&
+                  liveHomeScore != null
+                    ? {
+                        ...game,
+                        away_score: liveAwayScore,
+                        home_score: liveHomeScore,
+                        state: liveGame.status === "finished" ? "post" : "in",
+                      }
+                    : game;
+                const winner = gradeGame(effGame);
                 const unpicked = !picks[game.id];
                 if (isCollege) {
                   return (
