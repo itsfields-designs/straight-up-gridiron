@@ -19,6 +19,7 @@ import { InviteFriends } from "@/components/InviteFriends";
 import { TeamBadge } from "@/components/pool/TeamBadge";
 import { readInvite } from "@/lib/invite";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
+import { fetchLeagueCurrentWeek, fetchLeagueWeek } from "@/lib/league-sport";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   staticData: { sitemap: false },
@@ -201,7 +202,8 @@ function DashboardPage() {
             const myPicks = (picks[i]?.data ?? []).filter(
               (e) => e.user_id === user.id && e.entry_no === 1,
             )[0];
-            const games = leagueGames(allGames, league, week);
+            const leagueWeek = leagueWeeks[i]?.data ?? week;
+            const games = leagueGames(leagueWeekData[i]?.data?.games ?? [], league, leagueWeek);
             const made = myPicks ? Object.keys(myPicks.picks ?? {}).length : 0;
             const pct = games.length ? Math.round((made / games.length) * 100) : 0;
             return (
@@ -221,7 +223,7 @@ function DashboardPage() {
 
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Your Week {week} picks</span>
+                    <span>Your Week {leagueWeek} picks</span>
                     <span className="tabular-nums">
                       {made} of {games.length}
                     </span>
