@@ -95,11 +95,34 @@ function DashboardPage() {
     })),
   });
 
-  const picks = useQueries({
+  // Each league follows its own sport's schedule — college weeks run ahead of the NFL.
+  const leagueWeeks = useQueries({
     queries: (leagues.data ?? []).map((l) => ({
-      queryKey: ["picks", l.id, week],
-      queryFn: () => fetchPickEntries(l.id, week),
+      queryKey: ["current-week", l.sport ?? "nfl"],
+      queryFn: () => fetchLeagueCurrentWeek(l.sport ?? "nfl"),
     })),
+  });
+
+  const leagueWeekData = useQueries({
+    queries: (leagues.data ?? []).map((l, i) => {
+      const w = leagueWeeks[i]?.data ?? 0;
+      return {
+        queryKey: ["week", l.sport ?? "nfl", w],
+        queryFn: () => fetchLeagueWeek(l.sport ?? "nfl", w),
+        enabled: w > 0,
+      };
+    }),
+  });
+
+  const picks = useQueries({
+    queries: (leagues.data ?? []).map((l, i) => {
+      const w = leagueWeeks[i]?.data ?? 0;
+      return {
+        queryKey: ["picks", l.id, w],
+        queryFn: () => fetchPickEntries(l.id, w),
+        enabled: w > 0,
+      };
+    }),
   });
 
   const allGames = weekData.data?.games ?? [];
