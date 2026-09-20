@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Lock, Plus, Trash2, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, Lock, Plus, Radio, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
@@ -18,6 +19,43 @@ import {
   type League,
   type Side,
 } from "@/lib/pool";
+import { fetchLiveScores, type LiveScoreGame } from "@/lib/livescores.functions";
+
+/** Mascot-style key ("Kansas City Chiefs" / "#5 Miami (FL)" -> "chiefs"/"(fl)" tolerant). */
+function teamKey(name: string): string {
+  const clean = name
+    .replace(/^#\d+\s+/, "")
+    .toLowerCase()
+    .replace(/[^a-z ]/g, "")
+    .trim();
+  return clean.split(/\s+/).pop() ?? clean;
+}
+
+/** Match a live feed game to a schedule game by the two team names (either order). */
+function matchLiveGame(
+  away: string,
+  home: string,
+  kickoff: string | null,
+  liveGames: LiveScoreGame[],
+): { game: LiveScoreGame; flipped: boolean } | undefined {
+  const a = teamKey(away);
+  const h = teamKey(home);
+  const kickMs = kickoff ? new Date(kickoff).getTime() : null;
+  for (const lg of liveGames) {
+    const la = teamKey(lg.away.name);
+    const lh = teamKey(lg.home.name);
+    const direct = la === a && lh === h;
+    const flipped = la === h && lh === a;
+    if (!direct && !flipped) continue;
+    // Same teams can meet in different weeks — only trust a kickoff within 48 hours.
+    const liveMs = lg.kickoff ? new Date(lg.kickoff).getTime() : null;
+    if (kickMs != null && liveMs != null && Math.abs(kickMs - liveMs) > 48 * 3600 * 1000) {
+      continue;
+    }
+    return { game: lg, flipped };
+  }
+  return undefined;
+}
 
 export function PicksPanel({
   league,
@@ -39,6 +77,18 @@ export function PicksPanel({
     queryKey: ["picks", leagueId, week],
     queryFn: () => fetchPickEntries(leagueId, week),
   });
+
+  // Live scores for this league's sport, refreshed every 30 seconds.
+  const fetchLive = useServerFn(fetchLiveScores);
+  const liveLeague = isCollege ? "college-football" : "nfl";
+  const liveQuery = useQuery({
+    queryKey: ["live-scores", liveLeague, 50],
+    queryFn: () => fetchLive({ data: { league: liveLeague, limit: 50 } }),
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    retry: false,
+  });
+  const liveGames = liveQuery.data?.games ?? [];
 
   const [picks, setPicks] = useState<Record<string, Side>>({});
   const [tiebreaker, setTiebreaker] = useState("");
@@ -267,7 +317,33 @@ export function PicksPanel({
             <div className="space-y-2.5">
               {group.games.map((game) => {
                 const isTb = game.id === weekData.tiebreaker_game_id;
-                const winner = gradeGame(game);
+                const liveMatch = matchLiveGame(game.away, game.home, game.kickoff, liveGames);
+                const liveGame = liveMatch?.game;
+                const liveOn = liveGame?.status === "live";
+                const liveAwayScore = liveGame
+                  ? liveMatch!.flipped
+                    ? liveGame.homeScore
+                    : liveGame.awayScore
+                  : null;
+                const liveHomeScore = liveGame
+                  ? liveMatch!.flipped
+                    ? liveGame.awayScore
+                    : liveGame.homeScore
+                  : null;
+                // Live feed wins over the synced schedule so players see scores move in real time.
+                const effGame =
+                  liveGame &&
+                  liveGame.status !== "scheduled" &&
+                  liveAwayScore != null &&
+                  liveHomeScore != null
+                    ? {
+                        ...game,
+                        away_score: liveAwayScore,
+                        home_score: liveHomeScore,
+                        state: liveGame.status === "finished" ? "post" : "in",
+                      }
+                    : game;
+                const winner = gradeGame(effGame);
                 const unpicked = !picks[game.id];
                 if (isCollege) {
                   return (
@@ -283,7 +359,16 @@ export function PicksPanel({
                         </span>
                         <span className="flex items-center gap-1">
                           {locked && <Lock size={11} />}
-                          {game.state === "post" ? "Final" : game.state === "in" ? "Live" : "Scheduled"}
+                          {liveOn && (
+                            <Radio size={11} className="animate-pulse text-accent" aria-label="Live" />
+                          )}
+                          {liveOn
+                            ? liveGame!.statusLabel
+                            : effGame.state === "post"
+                              ? "Final"
+                              : effGame.state === "in"
+                                ? "Live"
+                                : "Scheduled"}
                         </span>
                       </div>
                       <div className="mt-2 grid grid-cols-2 gap-2">
@@ -293,7 +378,7 @@ export function PicksPanel({
                           const wrong = chosen && winner && winner !== "tie" && winner !== side;
                           const logo = side === "away" ? game.away_logo : game.home_logo;
                           const rank = side === "away" ? game.away_rank : game.home_rank;
-                          const score = side === "away" ? game.away_score : game.home_score;
+                          const score = side === "away" ? effGame.away_score : effGame.home_score;
                           const team = cleanCollegeName(game[side]);
                           return (
                             <button
@@ -365,11 +450,16 @@ export function PicksPanel({
                           Tiebreaker
                         </span>
                       )}
-                      {winner && winner !== "tie" && (
-                        <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground tabular-nums">
-                          Final {game.away_score}–{game.home_score}
+                      {liveOn && liveAwayScore != null && liveHomeScore != null ? (
+                        <span className="flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-soft-foreground tabular-nums">
+                          <Radio size={11} className="animate-pulse" aria-label="Live" />
+                          {liveGame!.statusLabel} · {liveAwayScore}–{liveHomeScore}
                         </span>
-                      )}
+                      ) : winner && winner !== "tie" ? (
+                        <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground tabular-nums">
+                          Final {effGame.away_score}–{effGame.home_score}
+                        </span>
+                      ) : null}
                     </div>
                     <div className="grid gap-2">
                       {(["away", "home"] as const).map((side) => {
