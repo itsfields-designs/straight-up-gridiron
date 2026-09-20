@@ -49,10 +49,6 @@ export function CashPanel({
   });
 
 
-  const [kind, setKind] = useState<"deposit" | "withdrawal">("deposit");
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-
   const allTxns = txns.data ?? [];
   const allPayouts = payouts.data ?? [];
   const allEntryPayments = entryPayments.data ?? [];
