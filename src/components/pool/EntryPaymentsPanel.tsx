@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Plus } from "lucide-react";
+import { Check, Copy, Plus } from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
 
 import {
   autoPots,
@@ -45,12 +47,16 @@ export function EntryPaymentsPanel({
   const [manualWeekly, setManualWeekly] = useState(String(league.weekly_pot ?? 0));
   // Extra payable sets the commissioner has opened up by hand, per member.
   const [extraSets, setExtraSets] = useState<Record<string, number>>({});
+  const [showAllPaid, setShowAllPaid] = useState(false);
 
   useEffect(() => {
     setManualWeekly(String(league.weekly_pot ?? 0));
   }, [league.weekly_pot]);
 
-  useEffect(() => setExtraSets({}), [week, league.id]);
+  useEffect(() => {
+    setExtraSets({});
+    setShowAllPaid(false);
+  }, [week, league.id]);
 
   const refresh = () => {
     for (const key of [
@@ -171,122 +177,176 @@ export function EntryPaymentsPanel({
     weekPayments.some((p) => p.userId === userId && p.entryNo === entryNo);
 
   const totalSets = members.reduce((s, m) => s + setsFor(m.user_id).length, 0);
+  const paymentEntries = members.flatMap((member) =>
+    setsFor(member.user_id).map((entryNo) => ({
+      member,
+      entryNo,
+      paid: isPaid(member.user_id, entryNo),
+    })),
+  );
+  const paidCount = paymentEntries.filter((entry) => entry.paid).length;
+  const unpaidEntries = paymentEntries.filter((entry) => !entry.paid);
+  const paidEntries = paymentEntries.filter((entry) => entry.paid);
+  const visibleEntries = showAllPaid ? paymentEntries : [...unpaidEntries, ...paidEntries.slice(0, 5)];
+  const hiddenPaidCount = showAllPaid ? 0 : Math.max(0, paidEntries.length - 5);
+  const collectedAmount = paidCount * fee;
+
+  const copyReminder = async () => {
+    const names = Array.from(new Set(unpaidEntries.map((entry) => entry.member.username)));
+    const message = `Friendly reminder: ${names.join(", ")} — your Week ${week} entry payment of ${money(fee)} per set is still due for ${league.name}.`;
+    try {
+      await navigator.clipboard.writeText(message);
+      toast.success("Payment reminder copied");
+    } catch {
+      toast.error("Could not copy the reminder");
+    }
+  };
 
   return (
-    <div className="space-y-4 rounded-lg border border-border bg-card p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-          <CheckCircle2 size={15} /> Week {week} entry payments
-        </h2>
-        <div className="text-xs text-faint">
-          {auto.weekPaid} of {totalSets} sets paid · {money(auto.weekPaid * fee)} collected
+    <div className="space-y-4">
+      <section className="app-card p-5 sm:p-6" aria-labelledby="entries-summary-heading">
+        <h2 id="entries-summary-heading" className="text-2xl font-semibold">Entries</h2>
+        <div className="mt-4 flex items-baseline gap-2">
+          <span className="font-display text-5xl font-semibold leading-none">{paidCount}</span>
+          <span className="text-lg text-muted-foreground">of {totalSets} paid</span>
         </div>
-      </div>
+        <progress
+          className="mt-5 h-3 w-full overflow-hidden rounded-full accent-success"
+          max={Math.max(totalSets, 1)}
+          value={paidCount}
+          aria-label={`${paidCount} of ${totalSets} entries paid`}
+        />
+        <p className="mt-2 text-base text-muted-foreground">
+          {money(collectedAmount)} of {money(totalSets * fee)} collected for Week {week}
+        </p>
+      </section>
 
-      <div className="overflow-hidden rounded-md border border-border">
-        {members.map((m, i) => {
-          const sets = setsFor(m.user_id);
-          return (
-            <div
-              key={m.user_id}
-              className={`px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm font-medium">{m.username}</span>
-                <span className="text-xs text-faint">
-                  {sets.filter((n) => isPaid(m.user_id, n)).length} of {sets.length} sets paid
+      <section className="app-card p-5 sm:p-6" aria-labelledby="paid-heading">
+        <h2 id="paid-heading" className="text-2xl font-semibold">Who’s paid</h2>
+
+        <div className="mt-4 divide-y divide-border">
+          {visibleEntries.map(({ member, entryNo, paid }) => {
+            const setCount = setsFor(member.user_id).length;
+            return (
+              <div key={`${member.user_id}-${entryNo}`} className="flex min-h-16 items-center justify-between gap-3 py-2">
+                <span className="min-w-0 truncate text-base font-semibold">
+                  {member.username}{setCount > 1 ? ` #${entryNo}` : ""}
                 </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!isOwner || toggle.isPending}
+                  aria-pressed={paid}
+                  aria-label={`Mark ${member.username} set ${entryNo} ${paid ? "unpaid" : "paid"}`}
+                  onClick={() => toggle.mutate({ userId: member.user_id, entryNo, paid: !paid })}
+                  className={`h-11 min-w-28 rounded-full border-2 px-5 text-base shadow-none ${
+                    paid
+                      ? "border-success bg-secondary text-foreground hover:bg-secondary"
+                      : "border-accent bg-accent-soft text-foreground hover:bg-accent-soft"
+                  }`}
+                >
+                  {paid && <Check aria-hidden="true" />}
+                  {paid ? "Paid" : "Unpaid"}
+                </Button>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                {sets.map((n) => (
-                  <label
-                    key={n}
-                    className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-xs transition-opacity ${isPaid(m.user_id, n) ? "border-accent bg-accent-soft" : "border-border"} ${toggle.isPending ? "opacity-60" : ""}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 accent-[hsl(var(--accent))]"
-                      checked={isPaid(m.user_id, n)}
-                      disabled={!isOwner || toggle.isPending}
-                      onChange={(e) =>
-                        toggle.mutate({ userId: m.user_id, entryNo: n, paid: e.target.checked })
-                      }
-                    />
-                    Set {n}
-                    <span className="text-faint">
-                      {isPaid(m.user_id, n) ? money(fee) : "unpaid"}
-                    </span>
-                  </label>
-                ))}
-                {isOwner && (
-                  <button
-                    onClick={() =>
-                      setExtraSets((s) => ({ ...s, [m.user_id]: sets.length + 1 }))
-                    }
-                    className="flex min-h-11 items-center gap-1 px-2 text-xs font-medium text-muted-foreground"
-                  >
-                    <Plus size={13} /> Add set
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-        {members.length === 0 && (
-          <p className="px-4 py-6 text-center text-sm text-faint">No members yet.</p>
+            );
+          })}
+
+          {members.length === 0 && (
+            <p className="py-6 text-center text-sm text-faint">No members yet.</p>
+          )}
+        </div>
+
+        {hiddenPaidCount > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAllPaid(true)}
+            className="mt-3 w-full border-dashed bg-card text-muted-foreground shadow-none"
+          >
+            {hiddenPaidCount} more {hiddenPaidCount === 1 ? "set" : "sets"} · all paid
+          </Button>
         )}
-      </div>
+
+        {isOwner && members.length > 0 && (
+          <div className="mt-4 flex flex-col gap-2">
+            {unpaidEntries.length > 0 && (
+              <Button type="button" onClick={copyReminder} className="w-full text-base">
+                <Copy aria-hidden="true" />
+                Copy reminder for {unpaidEntries.length} unpaid
+              </Button>
+            )}
+            <div className="flex flex-wrap gap-1">
+              {members.map((member) => (
+                <Button
+                  key={member.user_id}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setExtraSets((current) => ({
+                      ...current,
+                      [member.user_id]: setsFor(member.user_id).length + 1,
+                    }))
+                  }
+                  className="text-muted-foreground"
+                >
+                  <Plus aria-hidden="true" /> Add set for {member.username}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {isOwner && (
-        <div className="space-y-3 border-t border-border pt-4">
-          <label className="flex min-h-11 items-center gap-2 text-sm">
+        <section className="app-card p-5 sm:p-6" aria-labelledby="pot-calculation-heading">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 id="pot-calculation-heading" className="text-xl font-semibold">Week {week} pot</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {league.pots_auto ? "Updates as payments are marked paid." : "Using a manual amount."}
+              </p>
+            </div>
+            <strong className="font-display text-3xl font-semibold">{money(league.pots_auto ? auto.weekly : league.weekly_pot)}</strong>
+          </div>
+
+          <label className="mt-5 flex min-h-12 cursor-pointer items-center gap-3 border-t border-border pt-4 text-sm font-medium">
             <input
               type="checkbox"
-              className="h-5 w-5 accent-[hsl(var(--accent))]"
+              className="h-5 w-5 accent-primary"
               checked={league.pots_auto}
-              onChange={(e) => setAuto.mutate(e.target.checked)}
+              disabled={setAuto.isPending}
+              onChange={(event) => setAuto.mutate(event.target.checked)}
             />
             Calculate pot amounts automatically from payments received
           </label>
 
-          {league.pots_auto ? (
-            <div className="grid grid-cols-1 gap-3">
-              <div className="rounded-md border border-border p-3">
-                <div className="text-xs text-faint">Weekly pot (auto)</div>
-                <div className="font-display text-lg font-medium">{money(auto.weekly)}</div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {!league.pots_auto && (
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
               <label className="block">
-                <span className="mb-1 block text-xs text-faint">Weekly pot ($)</span>
+                <span className="field-label">Weekly pot ($)</span>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
                   inputMode="decimal"
                   value={manualWeekly}
-                  onChange={(e) => setManualWeekly(e.target.value)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  onChange={(event) => setManualWeekly(event.target.value)}
+                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={() => saveManual.mutate()}
-                  disabled={saveManual.isPending}
-                  className="w-full min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
-                >
-                  {saveManual.isPending ? "Saving…" : "Save weekly pot"}
-                </button>
-              </div>
+              <Button
+                type="button"
+                onClick={() => saveManual.mutate()}
+                disabled={saveManual.isPending}
+                className="self-end"
+              >
+                {saveManual.isPending ? "Saving…" : "Save weekly pot"}
+              </Button>
             </div>
           )}
-          <p className="text-xs text-faint">
-            Suggested from payments: {money(auto.weekPaid * fee)} collected this week
-            {fee > 0 ? ` (${auto.weekPaid} × ${money(fee)})` : ""}.
-          </p>
-        </div>
+        </section>
       )}
     </div>
   );
