@@ -20,6 +20,7 @@ import { TeamBadge } from "@/components/pool/TeamBadge";
 import { readInvite } from "@/lib/invite";
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
 import { fetchLeagueCurrentWeek, fetchLeagueWeek } from "@/lib/league-sport";
+import { LiveScoreboard } from "@/components/pool/LiveScoreboard";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   staticData: { sitemap: false },
@@ -168,6 +169,8 @@ function DashboardPage() {
         )}
       </section>
 
+
+      <LiveScoreboard />
 
       {leagues.isLoading && <LoadingState label="Loading your leagues" />}
 
