@@ -186,7 +186,12 @@ function LeaguePage() {
 
       {tab === "picks" && <PicksPanel league={league.data} week={activeWeek} userId={user.id} />}
       {tab === "standings" && (
-        <StandingsPanel leagueId={leagueId} week={activeWeek} league={league.data} />
+        <StandingsPanel
+          leagueId={leagueId}
+          week={activeWeek}
+          league={league.data}
+          currentUserId={user.id}
+        />
       )}
       {tab === "pot" && (
         <PotPanel
