@@ -83,7 +83,7 @@ export function OddsPanel({
     const all = Array.from(list.values());
     if (!all.length) return [];
     return simulateOdds(all, remaining).sort(
-      (a, b) => b.first - a.first || b.second - a.second || b.base - a.base,
+      (a, b) => b.first - a.first || b.second - a.second || b.third - a.third || b.base - a.base,
     );
   }, [games, remaining, entries.data, members.data, weekStandings.data, seasonStandings.data, mode]);
 
@@ -99,7 +99,7 @@ export function OddsPanel({
         </span>
         <div>
           <h3 className="text-sm font-semibold">
-            Chances of finishing 1st or 2nd
+            Chances of Finishing Top 3
           </h3>
           <p className="text-xs text-faint">
             {mode === "season"
