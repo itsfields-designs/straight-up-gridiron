@@ -17,6 +17,7 @@ export type OddsRow = {
   ceiling: number;
   first: number;
   second: number;
+  third: number;
 };
 
 /** Games in a week that have no winner yet. */
@@ -38,7 +39,7 @@ export function decidedCorrect(games: Game[], picks: Record<string, Side>): numb
 const TB_LAST = Number.POSITIVE_INFINITY;
 
 /**
- * Monte Carlo odds of finishing 1st and 2nd. Every remaining game is treated as
+ * Monte Carlo odds of finishing 1st, 2nd and 3rd. Every remaining game is treated as
  * a coin flip; ties are settled by the tiebreaker guess when both are known and
  * split evenly otherwise.
  */
@@ -46,6 +47,7 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
   const n = entries.length;
   const first = new Array<number>(n).fill(0);
   const second = new Array<number>(n).fill(0);
+  const third = new Array<number>(n).fill(0);
   const tb = entries.map((e) => (e.tbDiff == null ? TB_LAST : e.tbDiff));
   const runs = remaining.length === 0 ? 1 : sims;
 
@@ -74,16 +76,18 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
       else groups.push([idx]);
     }
 
-    const g1 = groups[0] ?? [];
-    if (g1.length === 1) {
-      first[g1[0]!] = (first[g1[0]!] ?? 0) + 1;
-      const g2 = groups[1] ?? [];
-      for (const idx of g2) second[idx] = (second[idx] ?? 0) + 1 / g2.length;
-    } else {
-      for (const idx of g1) {
-        first[idx] = (first[idx] ?? 0) + 1 / g1.length;
-        second[idx] = (second[idx] ?? 0) + 1 / g1.length;
+    // Each group of genuinely tied entries is equally likely to fill any of
+    // the ranks it spans, so award each rank in the span a 1/size share.
+    let rank = 1;
+    for (const group of groups) {
+      if (rank > 3) break;
+      const share = 1 / group.length;
+      for (const idx of group) {
+        if (rank <= 1 && rank + group.length - 1 >= 1) first[idx] = (first[idx] ?? 0) + share;
+        if (rank <= 2 && rank + group.length - 1 >= 2) second[idx] = (second[idx] ?? 0) + share;
+        if (rank <= 3 && rank + group.length - 1 >= 3) third[idx] = (third[idx] ?? 0) + share;
       }
+      rank += group.length;
     }
   }
 
@@ -94,6 +98,7 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
     ceiling: e.base + remaining.filter((g) => e.picks[g.id]).length,
     first: (first[i] ?? 0) / runs,
     second: (second[i] ?? 0) / runs,
+    third: (third[i] ?? 0) / runs,
   }));
 }
 
