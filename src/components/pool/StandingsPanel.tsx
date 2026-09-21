@@ -11,8 +11,19 @@ import {
   weeklyPotFor,
   type League,
 } from "@/lib/pool";
+import { OddsPanel } from "@/components/pool/OddsPanel";
 
-export function StandingsPanel({ leagueId, week, league }: { leagueId: string; week: number; league?: League }) {
+export function StandingsPanel({
+  leagueId,
+  week,
+  league,
+  currentUserId,
+}: {
+  leagueId: string;
+  week: number;
+  league?: League;
+  currentUserId?: string | undefined;
+}) {
   const [mode, setMode] = useState<"season" | "week">("season");
   const weekNum = mode === "season" ? 0 : week;
 
@@ -177,6 +188,16 @@ export function StandingsPanel({ leagueId, week, league }: { leagueId: string; w
         total-points guess on the tiebreaker game breaks ties.
         {updatedAt ? ` Last updated ${new Date(updatedAt).toLocaleString()}.` : ""}
       </p>
+
+      {league && (
+        <OddsPanel
+          leagueId={leagueId}
+          league={league}
+          week={week}
+          mode={mode}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }
