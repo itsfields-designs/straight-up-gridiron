@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
-import { GraduationCap, Home, ListOrdered, User } from "lucide-react";
+import { GraduationCap, Home, ListOrdered, Swords, User } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";

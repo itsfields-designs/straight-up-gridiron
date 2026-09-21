@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedCollegeRouteImport } from './routes/_authenticated/college'
 import { Route as AuthenticatedCommissionerRouteImport } from './routes/_authenticated/commissioner'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDuelsRouteImport } from './routes/_authenticated/duels'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as JoinCodeRouteImport } from './routes/join.$code'
@@ -66,6 +67,11 @@ const AuthenticatedCommissionerRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDuelsRoute = AuthenticatedDuelsRouteImport.update({
+  id: '/duels',
+  path: '/duels',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLeaderboardRoute =
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/duels': typeof AuthenticatedDuelsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/college': typeof AuthenticatedCollegeRoute
   '/commissioner': typeof AuthenticatedCommissionerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/duels': typeof AuthenticatedDuelsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/college': typeof AuthenticatedCollegeRoute
   '/_authenticated/commissioner': typeof AuthenticatedCommissionerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/duels': typeof AuthenticatedDuelsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/join/$code': typeof JoinCodeRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/college'
     | '/commissioner'
     | '/dashboard'
+    | '/duels'
     | '/leaderboard'
     | '/profile'
     | '/join/$code'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/college'
     | '/commissioner'
     | '/dashboard'
+    | '/duels'
     | '/leaderboard'
     | '/profile'
     | '/join/$code'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/_authenticated/college'
     | '/_authenticated/commissioner'
     | '/_authenticated/dashboard'
+    | '/_authenticated/duels'
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
     | '/join/$code'
@@ -314,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/duels': {
+      id: '/_authenticated/duels'
+      path: '/duels'
+      fullPath: '/duels'
+      preLoaderRoute: typeof AuthenticatedDuelsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leaderboard': {
       id: '/_authenticated/leaderboard'
       path: '/leaderboard'
@@ -391,6 +410,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCollegeRoute: typeof AuthenticatedCollegeRoute
   AuthenticatedCommissionerRoute: typeof AuthenticatedCommissionerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDuelsRoute: typeof AuthenticatedDuelsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedLeaguesLeagueIdRoute: typeof AuthenticatedLeaguesLeagueIdRoute
@@ -401,6 +421,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCollegeRoute: AuthenticatedCollegeRoute,
   AuthenticatedCommissionerRoute: AuthenticatedCommissionerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDuelsRoute: AuthenticatedDuelsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedLeaguesLeagueIdRoute: AuthenticatedLeaguesLeagueIdRoute,
