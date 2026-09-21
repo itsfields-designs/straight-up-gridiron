@@ -6,6 +6,7 @@ import { Crown, Flame, Lock, Swords, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
+import { SznPassGate, useEntitled } from "@/components/SznPassGate";
 import { TeamBadge } from "@/components/pool/TeamBadge";
 import {
   createDuel,
@@ -44,6 +45,7 @@ type Tab = "duels" | "leaderboard";
 function DuelsPage() {
   const { user } = Route.useRouteContext();
   const queryClient = useQueryClient();
+  const { entitled, loading: entitlementLoading } = useEntitled();
   const [tab, setTab] = useState<Tab>("duels");
   const [openDuelId, setOpenDuelId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, Side>>({});
@@ -100,6 +102,7 @@ function DuelsPage() {
   });
 
   const data = board.data;
+  const gated = !entitled;
   const games = data?.games ?? [];
   const duels = data?.duels ?? [];
 
@@ -142,6 +145,8 @@ function DuelsPage() {
           </p>
         )}
       </section>
+
+      {gated && !entitlementLoading && <SznPassGate what="Starting or joining a duel" />}
 
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-secondary p-1">
         {(["duels", "leaderboard"] as Tab[]).map((id) => (
@@ -204,7 +209,7 @@ function DuelsPage() {
             <div className="mt-3 grid gap-2">
               <button
                 type="button"
-                disabled={data?.locked || create.isPending}
+                disabled={gated || data?.locked || create.isPending}
                 onClick={() => create.mutate({ vsGods: true })}
                 className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-accent-foreground disabled:opacity-50"
               >
@@ -212,7 +217,7 @@ function DuelsPage() {
               </button>
               <button
                 type="button"
-                disabled={data?.locked || create.isPending}
+                disabled={gated || data?.locked || create.isPending}
                 onClick={() => create.mutate({ vsGods: false, opponentId: null })}
                 className="flex min-h-12 items-center justify-center rounded-xl border border-border-strong text-sm font-medium disabled:opacity-50"
               >
@@ -237,7 +242,7 @@ function DuelsPage() {
                     <span className="min-w-0 flex-1 truncate text-sm">{o.username}</span>
                     <button
                       type="button"
-                      disabled={data?.locked || create.isPending}
+                      disabled={gated || data?.locked || create.isPending}
                       onClick={() => create.mutate({ vsGods: false, opponentId: o.userId })}
                       className="min-h-10 shrink-0 rounded-lg bg-secondary px-3 text-xs font-semibold disabled:opacity-50"
                     >
@@ -265,8 +270,9 @@ function DuelsPage() {
                   </div>
                   <button
                     type="button"
+                    disabled={gated}
                     onClick={() => respond.mutate({ duelId: d.id, accept: true })}
-                    className="min-h-10 shrink-0 rounded-lg bg-accent px-3 text-xs font-semibold text-accent-foreground"
+                    className="disabled:opacity-50 min-h-10 shrink-0 rounded-lg bg-accent px-3 text-xs font-semibold text-accent-foreground"
                   >
                     Accept
                   </button>
@@ -338,7 +344,7 @@ function DuelsPage() {
                         {games.map((g) => {
                           const myPick = draft[g.id] ?? me.picks[g.id];
                           const theirPick = them.picks[g.id];
-                          const editable = !data?.locked && d.status !== "final";
+                          const editable = !gated && !data?.locked && d.status !== "final";
                           return (
                             <div key={g.id} className="rounded-xl border border-border p-2.5">
                               <div className="grid grid-cols-2 gap-2">
@@ -373,7 +379,7 @@ function DuelsPage() {
                           );
                         })}
 
-                        {!data?.locked && d.status !== "final" && (
+                        {!gated && !data?.locked && d.status !== "final" && (
                           <button
                             type="button"
                             disabled={save.isPending}

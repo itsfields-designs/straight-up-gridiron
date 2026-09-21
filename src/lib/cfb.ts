@@ -123,23 +123,17 @@ export async function fetchMyCfbPicks(
   };
 }
 
+/** Saved through a server function so the SZN Pass requirement is enforced. */
 export async function saveCfbPicks(args: {
   userId: string;
   weekNum: number;
   picks: Record<string, Side>;
   tiebreaker: number | null;
 }) {
-  const { error } = await supabase.from("cfb_pick_entries").upsert(
-    {
-      user_id: args.userId,
-      week_num: args.weekNum,
-      picks: args.picks,
-      tiebreaker: args.tiebreaker,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,week_num" },
-  );
-  if (error) throw error;
+  const { saveMyCfbPicks } = await import("@/lib/cfb.functions");
+  await saveMyCfbPicks({
+    data: { weekNum: args.weekNum, picks: args.picks, tiebreaker: args.tiebreaker },
+  });
 }
 
 /** weekNum 0 = season total. Served through a server function: the table itself only exposes each user's own rows. */

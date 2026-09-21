@@ -7,6 +7,7 @@ import { Globe, Lock, RefreshCw, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState, LoadingState } from "@/components/ui/feedback";
+import { SznPassGate, useEntitled } from "@/components/SznPassGate";
 import { NcaaPickDeadline, useNcaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
 import { refreshCfb } from "@/lib/cfb.functions";
 import {
@@ -249,6 +250,7 @@ function PicksTab({
   onWeekChange: (w: number) => void;
 }) {
   const queryClient = useQueryClient();
+  const { entitled, loading: entitlementLoading } = useEntitled();
   const weekQuery = useQuery({ queryKey: ["cfb-week", week], queryFn: () => fetchCfbWeek(week) });
   const picksQuery = useQuery({
     queryKey: ["cfb-picks", userId, week],
@@ -266,7 +268,7 @@ function PicksTab({
   }, [picksQuery.data, week]);
 
   const games = weekQuery.data?.games ?? [];
-  const locked = useNcaaWeekLocked(games, weekQuery.data?.week?.locked);
+  const locked = useNcaaWeekLocked(games, weekQuery.data?.week?.locked) || !entitled;
   const tbGameId = weekQuery.data?.week?.tiebreaker_game_id ?? null;
   const savedTiebreaker =
     picksQuery.data?.tiebreaker != null ? String(picksQuery.data.tiebreaker) : "";
@@ -303,6 +305,9 @@ function PicksTab({
   return (
     <div className="grid gap-3">
       <WeekPicker week={week} onChange={onWeekChange} />
+      {!entitled && !entitlementLoading && (
+        <SznPassGate what="Making Top 25 pick'em picks" />
+      )}
       {weekQuery.isLoading ? (
         <LoadingState label="Loading matchups" />
       ) : !games.length ? (

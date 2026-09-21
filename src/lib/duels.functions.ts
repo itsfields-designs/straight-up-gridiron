@@ -83,6 +83,8 @@ export const createDuel = createServerFn({ method: "POST" })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
+    const { assertEntitled } = await import("@/lib/membership.functions");
+    await assertEntitled(context.userId, context.claims as Record<string, unknown>);
     const { currentNflWeek, weekGames, weekLocked, buildGodsPicks } = await import(
       "@/lib/duels.server"
     );
@@ -127,6 +129,10 @@ export const respondToDuel = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    if (data.accept) {
+      const { assertEntitled } = await import("@/lib/membership.functions");
+      await assertEntitled(context.userId, context.claims as Record<string, unknown>);
+    }
     const { weekGames, weekLocked } = await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -167,6 +173,8 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { assertEntitled } = await import("@/lib/membership.functions");
+    await assertEntitled(context.userId, context.claims as Record<string, unknown>);
     const { weekGames, weekLocked } = await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
