@@ -23,7 +23,7 @@ export function OddsPanel({
   league: League;
   week: number;
   mode: "week" | "season";
-  currentUserId?: string;
+  currentUserId?: string | undefined;
 }) {
   const sport = league.sport ?? "nfl";
   const weekData = useQuery({

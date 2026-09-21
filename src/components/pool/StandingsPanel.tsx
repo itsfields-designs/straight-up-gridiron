@@ -22,7 +22,7 @@ export function StandingsPanel({
   leagueId: string;
   week: number;
   league?: League;
-  currentUserId?: string;
+  currentUserId?: string | undefined;
 }) {
   const [mode, setMode] = useState<"season" | "week">("season");
   const weekNum = mode === "season" ? 0 : week;
