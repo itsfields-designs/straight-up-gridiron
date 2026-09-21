@@ -190,12 +190,19 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
       if (valid.has(gameId)) picks[gameId] = side;
     }
 
-    const { error } = await supabaseAdmin
+    // The uniqueness rule here is a partial index, so update-or-insert by hand.
+    const { data: existing } = await supabaseAdmin
       .from("duel_picks")
-      .upsert(
-        { duel_id: duel.id, user_id: context.userId, picks },
-        { onConflict: "duel_id,user_id" },
-      );
+      .select("id")
+      .eq("duel_id", duel.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    const { error } = existing
+      ? await supabaseAdmin.from("duel_picks").update({ picks }).eq("id", existing.id)
+      : await supabaseAdmin
+          .from("duel_picks")
+          .insert({ duel_id: duel.id, user_id: context.userId, picks });
     if (error) throw new Error(error.message);
     return { saved: Object.keys(picks).length };
   });
