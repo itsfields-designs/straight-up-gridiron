@@ -229,6 +229,128 @@ export type Database = {
         }
         Relationships: []
       }
+      duel_picks: {
+        Row: {
+          created_at: string
+          duel_id: string
+          id: string
+          picks: Json
+          reasoning: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duel_id: string
+          id?: string
+          picks?: Json
+          reasoning?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duel_id?: string
+          id?: string
+          picks?: Json
+          reasoning?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_picks_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "duels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_records: {
+        Row: {
+          best_streak: number
+          created_at: string
+          gods_wins: number
+          losses: number
+          streak: number
+          ties: number
+          updated_at: string
+          user_id: string
+          wins: number
+        }
+        Insert: {
+          best_streak?: number
+          created_at?: string
+          gods_wins?: number
+          losses?: number
+          streak?: number
+          ties?: number
+          updated_at?: string
+          user_id: string
+          wins?: number
+        }
+        Update: {
+          best_streak?: number
+          created_at?: string
+          gods_wins?: number
+          losses?: number
+          streak?: number
+          ties?: number
+          updated_at?: string
+          user_id?: string
+          wins?: number
+        }
+        Relationships: []
+      }
+      duels: {
+        Row: {
+          challenger_correct: number
+          challenger_id: string
+          created_at: string
+          gods_won: boolean
+          id: string
+          opponent_correct: number
+          opponent_id: string | null
+          settled_at: string | null
+          status: string
+          updated_at: string
+          vs_gods: boolean
+          week_num: number
+          winner_id: string | null
+        }
+        Insert: {
+          challenger_correct?: number
+          challenger_id: string
+          created_at?: string
+          gods_won?: boolean
+          id?: string
+          opponent_correct?: number
+          opponent_id?: string | null
+          settled_at?: string | null
+          status?: string
+          updated_at?: string
+          vs_gods?: boolean
+          week_num: number
+          winner_id?: string | null
+        }
+        Update: {
+          challenger_correct?: number
+          challenger_id?: string
+          created_at?: string
+          gods_won?: boolean
+          id?: string
+          opponent_correct?: number
+          opponent_id?: string | null
+          settled_at?: string | null
+          status?: string
+          updated_at?: string
+          vs_gods?: boolean
+          week_num?: number
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       entry_payments: {
         Row: {
           amount: number
