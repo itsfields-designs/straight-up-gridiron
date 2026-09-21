@@ -32,16 +32,24 @@ async function admin() {
   return supabaseAdmin;
 }
 
-/** The next week people can still duel over: the earliest week whose first kickoff is ahead. */
+/** The next duelable week: the earliest week that has not kicked off yet. */
 export async function currentNflWeek(): Promise<number> {
   const db = await admin();
+  const now = new Date().toISOString();
   const { data } = await db
     .from("games")
     .select("week_num, kickoff")
-    .gt("kickoff", new Date().toISOString())
-    .order("kickoff", { ascending: true })
-    .limit(1);
-  if (data?.[0]?.week_num) return data[0].week_num;
+    .not("kickoff", "is", null)
+    .order("kickoff", { ascending: true });
+
+  const first = new Map<number, string>();
+  for (const g of data ?? []) {
+    if (g.kickoff && !first.has(g.week_num)) first.set(g.week_num, g.kickoff);
+  }
+  const upcoming = [...first.entries()]
+    .filter(([, k]) => k > now)
+    .sort((a, b) => a[0] - b[0])[0];
+  if (upcoming) return upcoming[0];
 
   const { data: fallback } = await db
     .from("games")
