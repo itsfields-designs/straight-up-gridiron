@@ -39,7 +39,7 @@ export function decidedCorrect(games: Game[], picks: Record<string, Side>): numb
 const TB_LAST = Number.POSITIVE_INFINITY;
 
 /**
- * Monte Carlo odds of finishing 1st and 2nd. Every remaining game is treated as
+ * Monte Carlo odds of finishing 1st, 2nd and 3rd. Every remaining game is treated as
  * a coin flip; ties are settled by the tiebreaker guess when both are known and
  * split evenly otherwise.
  */
