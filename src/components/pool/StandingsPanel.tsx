@@ -11,6 +11,7 @@ import {
   weeklyPotFor,
   type League,
 } from "@/lib/pool";
+import { OddsPanel } from "@/components/pool/OddsPanel";
 
 export function StandingsPanel({
   leagueId,
