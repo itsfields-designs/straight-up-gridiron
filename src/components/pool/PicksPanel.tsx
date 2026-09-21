@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { LoadingState } from "@/components/ui/feedback";
 import { TeamBadge } from "@/components/pool/TeamBadge";
 import { NcaaPickDeadline, useNcaaWeekLocked } from "@/components/pool/NcaaPickDeadline";
+import { LeaguePicksReveal } from "@/components/pool/LeaguePicksReveal";
 
 import { fetchLeagueWeek } from "@/lib/league-sport";
 import {
