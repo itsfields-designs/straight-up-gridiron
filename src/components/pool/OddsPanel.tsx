@@ -140,6 +140,10 @@ export function OddsPanel({
                 <p className="text-sm font-semibold tabular-nums">{pct(r.second)}</p>
                 <p className="text-xs text-faint">2nd</p>
               </div>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-semibold tabular-nums">{pct(r.third)}</p>
+                <p className="text-xs text-faint">3rd</p>
+              </div>
             </li>
           ))}
         </ul>
