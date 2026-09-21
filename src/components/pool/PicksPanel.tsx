@@ -539,6 +539,16 @@ export function PicksPanel({
           {saveHint}
         </p>
       </div>
+
+      {locked && (
+        <LeaguePicksReveal
+          leagueId={leagueId}
+          week={week}
+          games={games}
+          entries={entriesQuery.data ?? []}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }
