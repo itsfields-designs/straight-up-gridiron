@@ -98,6 +98,7 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
     ceiling: e.base + remaining.filter((g) => e.picks[g.id]).length,
     first: (first[i] ?? 0) / runs,
     second: (second[i] ?? 0) / runs,
+    third: (third[i] ?? 0) / runs,
   }));
 }
 
