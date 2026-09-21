@@ -32,15 +32,24 @@ async function admin() {
   return supabaseAdmin;
 }
 
+/** The next week people can still duel over: the earliest week whose first kickoff is ahead. */
 export async function currentNflWeek(): Promise<number> {
   const db = await admin();
   const { data } = await db
     .from("games")
-    .select("week_num, state")
+    .select("week_num, kickoff")
+    .gt("kickoff", new Date().toISOString())
+    .order("kickoff", { ascending: true })
+    .limit(1);
+  if (data?.[0]?.week_num) return data[0].week_num;
+
+  const { data: fallback } = await db
+    .from("games")
+    .select("week_num")
     .neq("state", "post")
     .order("week_num", { ascending: true })
     .limit(1);
-  return data?.[0]?.week_num ?? 18;
+  return fallback?.[0]?.week_num ?? 18;
 }
 
 export async function weekGames(weekNum: number): Promise<GameRow[]> {
