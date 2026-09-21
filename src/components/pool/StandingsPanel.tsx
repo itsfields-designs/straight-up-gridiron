@@ -12,7 +12,17 @@ import {
   type League,
 } from "@/lib/pool";
 
-export function StandingsPanel({ leagueId, week, league }: { leagueId: string; week: number; league?: League }) {
+export function StandingsPanel({
+  leagueId,
+  week,
+  league,
+  currentUserId,
+}: {
+  leagueId: string;
+  week: number;
+  league?: League;
+  currentUserId?: string;
+}) {
   const [mode, setMode] = useState<"season" | "week">("season");
   const weekNum = mode === "season" ? 0 : week;
 
