@@ -76,16 +76,18 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
       else groups.push([idx]);
     }
 
-    const g1 = groups[0] ?? [];
-    if (g1.length === 1) {
-      first[g1[0]!] = (first[g1[0]!] ?? 0) + 1;
-      const g2 = groups[1] ?? [];
-      for (const idx of g2) second[idx] = (second[idx] ?? 0) + 1 / g2.length;
-    } else {
-      for (const idx of g1) {
-        first[idx] = (first[idx] ?? 0) + 1 / g1.length;
-        second[idx] = (second[idx] ?? 0) + 1 / g1.length;
+    // Each group of genuinely tied entries is equally likely to fill any of
+    // the ranks it spans, so award each rank in the span a 1/size share.
+    let rank = 1;
+    for (const group of groups) {
+      if (rank > 3) break;
+      const share = 1 / group.length;
+      for (const idx of group) {
+        if (rank <= 1 && rank + group.length - 1 >= 1) first[idx] = (first[idx] ?? 0) + share;
+        if (rank <= 2 && rank + group.length - 1 >= 2) second[idx] = (second[idx] ?? 0) + share;
+        if (rank <= 3 && rank + group.length - 1 >= 3) third[idx] = (third[idx] ?? 0) + share;
       }
+      rank += group.length;
     }
   }
 
