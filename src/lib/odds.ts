@@ -17,6 +17,7 @@ export type OddsRow = {
   ceiling: number;
   first: number;
   second: number;
+  third: number;
 };
 
 /** Games in a week that have no winner yet. */
@@ -46,6 +47,7 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
   const n = entries.length;
   const first = new Array<number>(n).fill(0);
   const second = new Array<number>(n).fill(0);
+  const third = new Array<number>(n).fill(0);
   const tb = entries.map((e) => (e.tbDiff == null ? TB_LAST : e.tbDiff));
   const runs = remaining.length === 0 ? 1 : sims;
 
