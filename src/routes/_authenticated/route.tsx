@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
-import { GraduationCap, Home, ListOrdered, User } from "lucide-react";
+import { GraduationCap, Home, ListOrdered, Swords, User } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/dashboard", label: "Home", icon: Home },
   { to: "/leagues", label: "Leagues", icon: ListOrdered },
   { to: "/college", label: "College", icon: GraduationCap },
+  { to: "/duels", label: "Duels", icon: Swords },
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
@@ -58,7 +59,7 @@ function AuthedLayout() {
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)]"
       >
-        <div className="mx-auto grid max-w-3xl grid-cols-4">
+        <div className="mx-auto grid max-w-3xl grid-cols-5">
           {NAV.map((item) => (
             <Link
               key={item.to}
