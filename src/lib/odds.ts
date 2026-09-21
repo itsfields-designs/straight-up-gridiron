@@ -76,7 +76,6 @@ export function simulateOdds(entries: OddsEntry[], remaining: Game[], sims = 400
 
     const g1 = groups[0] ?? [];
     if (g1.length === 1) {
-      first[g1[0]!]! ;
       first[g1[0]!] = (first[g1[0]!] ?? 0) + 1;
       const g2 = groups[1] ?? [];
       for (const idx of g2) second[idx] = (second[idx] ?? 0) + 1 / g2.length;
