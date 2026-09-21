@@ -188,6 +188,16 @@ export function StandingsPanel({
         total-points guess on the tiebreaker game breaks ties.
         {updatedAt ? ` Last updated ${new Date(updatedAt).toLocaleString()}.` : ""}
       </p>
+
+      {league && (
+        <OddsPanel
+          leagueId={leagueId}
+          league={league}
+          week={week}
+          mode={mode}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }
