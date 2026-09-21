@@ -364,7 +364,7 @@ function DuelsPage() {
                               <p className="mt-1.5 text-xs text-faint">
                                 {theirPick
                                   ? `${them.username}: ${theirPick === "home" ? g.home : g.away}`
-                                  : `${them.username}'s pick hidden until kickoff`}
+                                  : `Hidden until kickoff`}
                                 {g.away_score != null && g.home_score != null
                                   ? ` · ${g.away_score}–${g.home_score}`
                                   : ""}
