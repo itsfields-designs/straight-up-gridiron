@@ -129,8 +129,10 @@ export const respondToDuel = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { assertEntitled } = await import("@/lib/membership.functions");
-    await assertEntitled(context.userId, context.claims as Record<string, unknown>);
+    if (data.accept) {
+      const { assertEntitled } = await import("@/lib/membership.functions");
+      await assertEntitled(context.userId, context.claims as Record<string, unknown>);
+    }
     const { weekGames, weekLocked } = await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
