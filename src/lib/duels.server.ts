@@ -44,7 +44,6 @@ async function admin() {
   return supabaseAdmin;
 }
 
-
 /** The next duelable week: the earliest week that has not kicked off yet. */
 export async function currentDuelWeek(sport: DuelSport = "nfl"): Promise<number> {
   const db = await admin();
@@ -59,9 +58,7 @@ export async function currentDuelWeek(sport: DuelSport = "nfl"): Promise<number>
   for (const g of data ?? []) {
     if (g.kickoff && !first.has(g.week_num)) first.set(g.week_num, g.kickoff);
   }
-  const upcoming = [...first.entries()]
-    .filter(([, k]) => k > now)
-    .sort((a, b) => a[0] - b[0])[0];
+  const upcoming = [...first.entries()].filter(([, k]) => k > now).sort((a, b) => a[0] - b[0])[0];
   if (upcoming) return upcoming[0];
 
   const { data: fallback } = await db
@@ -168,8 +165,7 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: D
   };
 
   // College adds the AP poll: a top ranking is worth more than a tidy record.
-  const pollWeight = (rank: number | null | undefined) =>
-    rank && rank > 0 ? (26 - rank) / 50 : 0;
+  const pollWeight = (rank: number | null | undefined) => (rank && rank > 0 ? (26 - rank) / 50 : 0);
 
   const picks: Record<string, Side> = {};
   const reasoning: Record<string, string> = {};
@@ -185,13 +181,16 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: D
     const gap = Math.abs(homeScore - awayScore);
 
     if (sport === "cfb" && chosenRank && otherRank && otherRank < chosenRank) {
-      reasoning[g.id] = `The poll says No. ${otherRank} ${other}. The Gods say No. ${chosenRank} ${chosen}. Polls lie.`;
+      reasoning[g.id] =
+        `The poll says No. ${otherRank} ${other}. The Gods say No. ${chosenRank} ${chosen}. Polls lie.`;
     } else if (sport === "cfb" && chosenRank && !otherRank) {
-      reasoning[g.id] = `No. ${chosenRank} ${chosen} are ranked for a reason. ${other} are just the opponent on the poster.`;
+      reasoning[g.id] =
+        `No. ${chosenRank} ${chosen} are ranked for a reason. ${other} are just the opponent on the poster.`;
     } else if (gap > 0.3) {
       reasoning[g.id] = `${chosen} are simply the better team right now. ${other} have no answer.`;
     } else if (gap > 0.1) {
-      reasoning[g.id] = `${chosen} have the form edge${side === "home" ? " and the home crowd" : ""}.`;
+      reasoning[g.id] =
+        `${chosen} have the form edge${side === "home" ? " and the home crowd" : ""}.`;
     } else {
       reasoning[g.id] = `A coin flip the mortals will agonise over. The Gods take ${chosen}.`;
     }
@@ -207,7 +206,6 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: D
 
   return { picks, reasoning, tiebreaker };
 }
-
 
 async function usernames(ids: string[]): Promise<Map<string, string>> {
   const clean = [...new Set(ids.filter(Boolean))];
@@ -250,15 +248,13 @@ export async function settleWeek(weekNum: number, sport: DuelSport = "nfl") {
     .eq("status", "active");
   if (!duels || duels.length === 0) return;
 
-
   for (const duel of duels as DuelRow[]) {
     const { data: rows } = await db
       .from("duel_picks")
       .select("user_id, picks, tiebreaker")
       .eq("duel_id", duel.id);
     const rowFor = (uid: string | null) => (rows ?? []).find((r) => r.user_id === uid);
-    const pickFor = (uid: string | null) =>
-      (rowFor(uid)?.picks ?? {}) as Record<string, Side>;
+    const pickFor = (uid: string | null) => (rowFor(uid)?.picks ?? {}) as Record<string, Side>;
 
     const opponentKey = duel.vs_gods ? null : duel.opponent_id;
     const challengerCorrect = scorePicks(games, pickFor(duel.challenger_id));
@@ -327,7 +323,8 @@ async function bumpRecord(userId: string, result: "win" | "loss" | "tie", beatGo
     best_streak: 0,
     gods_wins: 0,
   };
-  const streak = result === "win" ? Math.max(0, row.streak) + 1 : result === "loss" ? 0 : row.streak;
+  const streak =
+    result === "win" ? Math.max(0, row.streak) + 1 : result === "loss" ? 0 : row.streak;
   await db.from("duel_records").upsert({
     user_id: userId,
     wins: row.wins + (result === "win" ? 1 : 0),
@@ -373,7 +370,8 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
   const tbTotal = tiebreakerTotal(games);
 
   return rows.map((d) => {
-    const mine = d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
+    const mine =
+      d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
     const challengerPicks = picksOf(d.id, d.challenger_id);
     const opponentPicks = picksOf(d.id, d.vs_gods ? null : d.opponent_id);
     const reveal = locked || d.status === "final";
@@ -402,7 +400,11 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
       },
       opponent: {
         userId: d.vs_gods ? null : d.opponent_id,
-        username: d.vs_gods ? "The Gods" : d.opponent_id ? (names.get(d.opponent_id) ?? "Player") : "Open seat",
+        username: d.vs_gods
+          ? "The Gods"
+          : d.opponent_id
+            ? (names.get(d.opponent_id) ?? "Player")
+            : "Open seat",
         picks: reveal || mine === "opponent" ? opponentPicks : {},
         picked: Object.keys(opponentPicks).length,
         correct: d.status === "final" ? d.opponent_correct : scorePicks(games, opponentPicks),
@@ -415,5 +417,4 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
       godsWon: d.gods_won,
     };
   });
-
 }

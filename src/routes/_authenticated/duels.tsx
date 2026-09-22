@@ -47,7 +47,6 @@ type Sport = "nfl" | "cfb";
 
 const SPORT_LABEL: Record<Sport, string> = { nfl: "NFL", cfb: "College" };
 
-
 const AVATAR_STYLES = [
   "bg-destructive text-destructive-foreground",
   "bg-success text-primary-foreground",
@@ -626,7 +625,6 @@ function DuelsPage() {
                               </div>
                             );
                           })}
-
 
                           <div className="rounded-xl border-2 border-accent bg-accent-soft p-3">
                             <p className="font-display text-sm font-bold uppercase text-accent-soft-foreground">
