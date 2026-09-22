@@ -628,10 +628,43 @@ function DuelsPage() {
                           })}
 
 
+                          <div className="rounded-xl border-2 border-accent bg-accent-soft p-3">
+                            <p className="font-display text-sm font-bold uppercase text-accent-soft-foreground">
+                              Tiebreaker
+                            </p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              Combined score of {d.tiebreakerLabel ?? "the final game"} — closest
+                              guess wins if you are level on picks.
+                            </p>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              min={0}
+                              max={300}
+                              value={tiebreaker}
+                              disabled={gated || data?.locked || d.status === "final"}
+                              onChange={(e) => setTiebreaker(e.target.value)}
+                              placeholder="Total points"
+                              className="mt-2 min-h-12 w-full rounded-lg border border-border-strong bg-background px-3 text-base"
+                            />
+                            <p className="mt-1.5 text-xs text-faint">
+                              {them.tiebreaker != null
+                                ? `${them.username}: ${them.tiebreaker}`
+                                : "Their guess is hidden until kickoff"}
+                              {d.tiebreakerTotal != null ? ` · actual ${d.tiebreakerTotal}` : ""}
+                            </p>
+                          </div>
+
                           {!gated && !data?.locked && d.status !== "final" && (
                             <Button
                               disabled={save.isPending}
-                              onClick={() => save.mutate({ duelId: d.id, picks: draft })}
+                              onClick={() =>
+                                save.mutate({
+                                  duelId: d.id,
+                                  picks: draft,
+                                  tiebreaker: tiebreaker === "" ? null : Number(tiebreaker),
+                                })
+                              }
                               className="min-h-12 rounded-xl bg-success text-primary"
                             >
                               Save {Object.keys(draft).length} of {games.length} picks
