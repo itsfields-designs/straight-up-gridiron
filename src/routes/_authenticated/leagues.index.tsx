@@ -86,7 +86,7 @@ function LeagueHub() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold sm:text-2xl">Your leagues</h1>
+      <h1 className="font-display text-4xl font-semibold">Your leagues</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Join a league to make weekly picks against friends, or start your own.
       </p>
@@ -130,10 +130,10 @@ function LeagueHub() {
             key={l.id}
             to="/leagues/$leagueId"
             params={{ leagueId: l.id }}
-            className="flex min-h-[3.5rem] items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3.5 transition-colors hover:bg-secondary"
+            className="flex min-h-[4.5rem] items-center justify-between gap-3 rounded-xl border border-border-strong bg-card px-4 py-4 transition-colors hover:bg-secondary"
           >
             <div className="min-w-0">
-              <div className="truncate font-medium">
+              <div className="truncate font-display text-xl font-semibold">
                 {l.name}{" "}
                 <span className="ml-1 rounded-sm bg-secondary px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {l.sport === "ncaa" ? "NCAA" : "NFL"}
@@ -147,7 +147,7 @@ function LeagueHub() {
       </div>
 
       {locked ? (
-        <div className="mt-6 rounded-lg border border-accent bg-accent-soft p-5">
+        <div className="mt-6 rounded-xl border border-accent bg-accent-soft p-5">
           <div className="flex items-center gap-2">
             <Lock size={15} />
             <h2 className="text-sm font-semibold">{SZN_PASS.name} required</h2>
@@ -176,7 +176,7 @@ function LeagueHub() {
 
       {!locked && panel === "create" && (
         <form
-          className="mt-5 max-w-md rounded-lg border border-border bg-card p-5"
+           className="mt-5 max-w-md rounded-xl border border-border-strong bg-card p-5"
           onSubmit={(e) => {
             e.preventDefault();
             create.mutate();
@@ -240,7 +240,7 @@ function LeagueHub() {
 
       {!locked && panel === "join" && (
         <form
-          className="mt-5 max-w-md rounded-lg border border-border bg-card p-5"
+           className="mt-5 max-w-md rounded-xl border border-border-strong bg-card p-5"
           onSubmit={(e) => {
             e.preventDefault();
             join.mutate();
