@@ -224,11 +224,7 @@ function DuelsPage() {
                   )}
                 </span>
                 <p className="mt-3 font-display text-xl font-semibold text-accent">You</p>
-                <p className="font-display text-3xl font-bold">
-                  {featuredDuel.mySide === "challenger"
-                    ? featuredDuel.challenger.correct
-                    : featuredDuel.opponent.correct}
-                </p>
+                <p className="font-display text-3xl font-bold tabular-nums">{myScore}</p>
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-accent">VS</p>
