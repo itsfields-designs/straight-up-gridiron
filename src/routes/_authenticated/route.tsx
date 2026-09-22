@@ -64,7 +64,7 @@ function AuthedLayout() {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-accent/35 bg-primary text-primary-foreground pb-[env(safe-area-inset-bottom)]"
       >
         <div className="mx-auto grid max-w-3xl grid-cols-5">
-          {nav.map((item) => (
+          {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
