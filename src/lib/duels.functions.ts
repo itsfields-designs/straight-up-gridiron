@@ -141,6 +141,7 @@ export const createDuel = createServerFn({ method: "POST" })
         user_id: null,
         picks: gods.picks,
         reasoning: gods.reasoning,
+        tiebreaker: gods.tiebreaker,
       });
     }
     return { duelId: duel.id, weekNum, sport };
