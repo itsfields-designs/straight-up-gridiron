@@ -398,6 +398,7 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
         correct: d.status === "final" ? d.challenger_correct : scorePicks(games, challengerPicks),
         isGods: false,
         reasoning: {} as Record<string, string>,
+        tiebreaker: reveal || mine === "challenger" ? challengerTb : null,
       },
       opponent: {
         userId: d.vs_gods ? null : d.opponent_id,
