@@ -254,18 +254,34 @@ export async function settleWeek(weekNum: number, sport: DuelSport = "nfl") {
   for (const duel of duels as DuelRow[]) {
     const { data: rows } = await db
       .from("duel_picks")
-      .select("user_id, picks")
+      .select("user_id, picks, tiebreaker")
       .eq("duel_id", duel.id);
+    const rowFor = (uid: string | null) => (rows ?? []).find((r) => r.user_id === uid);
     const pickFor = (uid: string | null) =>
-      ((rows ?? []).find((r) => r.user_id === uid)?.picks ?? {}) as Record<string, Side>;
+      (rowFor(uid)?.picks ?? {}) as Record<string, Side>;
 
+    const opponentKey = duel.vs_gods ? null : duel.opponent_id;
     const challengerCorrect = scorePicks(games, pickFor(duel.challenger_id));
-    const opponentCorrect = scorePicks(games, pickFor(duel.vs_gods ? null : duel.opponent_id));
+    const opponentCorrect = scorePicks(games, pickFor(opponentKey));
 
     let winnerId: string | null = null;
     let godsWon = false;
-    if (challengerCorrect > opponentCorrect) winnerId = duel.challenger_id;
-    else if (opponentCorrect > challengerCorrect) {
+    let challengerAhead: boolean | null = null;
+    if (challengerCorrect > opponentCorrect) challengerAhead = true;
+    else if (opponentCorrect > challengerCorrect) challengerAhead = false;
+    else {
+      // Level on picks: the final game's combined score settles it.
+      const actual = tiebreakerTotal(games);
+      const diff = (guess: number | null | undefined) =>
+        actual != null && guess != null ? Math.abs(guess - actual) : Infinity;
+      const cDiff = diff(rowFor(duel.challenger_id)?.tiebreaker as number | null);
+      const oDiff = diff(rowFor(opponentKey)?.tiebreaker as number | null);
+      if (cDiff < oDiff) challengerAhead = true;
+      else if (oDiff < cDiff) challengerAhead = false;
+    }
+
+    if (challengerAhead === true) winnerId = duel.challenger_id;
+    else if (challengerAhead === false) {
       if (duel.vs_gods) godsWon = true;
       else winnerId = duel.opponent_id;
     }
