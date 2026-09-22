@@ -530,11 +530,14 @@ function DuelsPage() {
                             const myPick = draft[g.id] ?? me.picks[g.id];
                             const theirPick = them.picks[g.id];
                             const editable = !gated && !data?.locked && d.status !== "final";
+                            const godTalk = them.isGods ? them.reasoning?.[g.id] : undefined;
                             return (
                               <div key={g.id} className="rounded-xl border border-border p-2.5">
                                 <div className="grid grid-cols-2 gap-2">
                                   {(["away", "home"] as Side[]).map((side) => {
                                     const team = side === "away" ? g.away : g.home;
+                                    const rank = side === "away" ? g.away_rank : g.home_rank;
+                                    const logo = side === "away" ? g.away_logo : g.home_logo;
                                     const chosen = myPick === side;
                                     return (
                                       <Button
@@ -546,7 +549,20 @@ function DuelsPage() {
                                           chosen ? "border-accent bg-accent-soft" : "border-border"
                                         } disabled:opacity-80`}
                                       >
-                                        <TeamBadge name={team} size={24} />
+                                        {logo ? (
+                                          <img
+                                            src={logo}
+                                            alt=""
+                                            className="size-6 shrink-0 object-contain"
+                                          />
+                                        ) : (
+                                          <TeamBadge name={team} size={24} />
+                                        )}
+                                        {rank ? (
+                                          <span className="shrink-0 text-xs font-bold text-accent-soft-foreground">
+                                            #{rank}
+                                          </span>
+                                        ) : null}
                                         <span className="min-w-0 truncate font-medium">{team}</span>
                                       </Button>
                                     );
@@ -560,9 +576,18 @@ function DuelsPage() {
                                     ? ` · ${g.away_score}–${g.home_score}`
                                     : ""}
                                 </p>
+                                {godTalk && (
+                                  <p className="mt-2 rounded-lg border-l-4 border-accent bg-accent-soft px-3 py-2 text-xs italic leading-relaxed text-accent-soft-foreground">
+                                    <span className="mr-1 font-display font-bold not-italic uppercase">
+                                      The Gods:
+                                    </span>
+                                    “{godTalk}”
+                                  </p>
+                                )}
                               </div>
                             );
                           })}
+
 
                           {!gated && !data?.locked && d.status !== "final" && (
                             <Button
