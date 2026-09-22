@@ -377,7 +377,12 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
     const challengerPicks = picksOf(d.id, d.challenger_id);
     const opponentPicks = picksOf(d.id, d.vs_gods ? null : d.opponent_id);
     const reveal = locked || d.status === "final";
+    const challengerTb = tiebreakerOf(d.id, d.challenger_id);
+    const opponentTb = tiebreakerOf(d.id, d.vs_gods ? null : d.opponent_id);
     return {
+      tiebreakerGameId: tbGame?.id ?? null,
+      tiebreakerLabel: tbGame ? `${tbGame.away} at ${tbGame.home}` : null,
+      tiebreakerTotal: tbTotal,
       id: d.id,
       weekNum: d.week_num,
       sport: (d.sport === "cfb" ? "cfb" : "nfl") as DuelSport,
