@@ -197,7 +197,11 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ duelId: z.string().uuid(), picks: z.record(z.string(), sideSchema) })
+      .object({
+        duelId: z.string().uuid(),
+        picks: z.record(z.string(), sideSchema),
+        tiebreaker: z.number().int().min(0).max(300).nullable().optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
