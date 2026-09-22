@@ -18,8 +18,16 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { currentDuelWeek, weekGames, weekLocked, lockLabel, settleWeek, duelViews } =
-      await import("@/lib/duels.server");
+    const {
+      currentDuelWeek,
+      weekGames,
+      weekLocked,
+      lockLabel,
+      settleWeek,
+      duelViews,
+      tiebreakerGame,
+      tiebreakerTotal,
+    } = await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const sport = data.sport;
