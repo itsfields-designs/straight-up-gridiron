@@ -46,11 +46,11 @@ async function admin() {
 
 
 /** The next duelable week: the earliest week that has not kicked off yet. */
-export async function currentNflWeek(): Promise<number> {
+export async function currentDuelWeek(sport: DuelSport = "nfl"): Promise<number> {
   const db = await admin();
   const now = new Date().toISOString();
   const { data } = await db
-    .from("games")
+    .from(gamesTable(sport))
     .select("week_num, kickoff")
     .not("kickoff", "is", null)
     .order("kickoff", { ascending: true });
@@ -65,23 +65,30 @@ export async function currentNflWeek(): Promise<number> {
   if (upcoming) return upcoming[0];
 
   const { data: fallback } = await db
-    .from("games")
+    .from(gamesTable(sport))
     .select("week_num")
     .neq("state", "post")
     .order("week_num", { ascending: true })
     .limit(1);
-  return fallback?.[0]?.week_num ?? 18;
+  return fallback?.[0]?.week_num ?? MAX_WEEK[sport];
 }
 
-export async function weekGames(weekNum: number): Promise<GameRow[]> {
+/** Kept for callers that only ever duel over the NFL slate. */
+export const currentNflWeek = () => currentDuelWeek("nfl");
+
+export async function weekGames(weekNum: number, sport: DuelSport = "nfl"): Promise<GameRow[]> {
   const db = await admin();
+  const cols =
+    sport === "cfb"
+      ? "id, week_num, away, home, slot, sort_order, away_score, home_score, kickoff, state, away_rank, home_rank, away_logo, home_logo"
+      : "id, week_num, away, home, slot, sort_order, away_score, home_score, kickoff, state";
   const { data, error } = await db
-    .from("games")
-    .select("id, week_num, away, home, slot, sort_order, away_score, home_score, kickoff, state")
+    .from(gamesTable(sport))
+    .select(cols)
     .eq("week_num", weekNum)
     .order("sort_order", { ascending: true });
   if (error) throw new Error(error.message);
-  return (data ?? []) as GameRow[];
+  return (data ?? []) as unknown as GameRow[];
 }
 
 export function weekLocked(games: GameRow[]): boolean {
@@ -114,11 +121,11 @@ export function scorePicks(games: GameRow[], picks: Record<string, Side>): numbe
   return correct;
 }
 
-/** The Gods pick on season form plus home field, with a line of trash talk. */
-export async function buildGodsPicks(weekNum: number, games: GameRow[]) {
+/** The Gods pick on season form, poll rank and home field, with a line of trash talk. */
+export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: DuelSport = "nfl") {
   const db = await admin();
   const { data } = await db
-    .from("games")
+    .from(gamesTable(sport))
     .select("away, home, away_score, home_score, state, week_num")
     .lt("week_num", weekNum)
     .eq("state", "post");
@@ -142,25 +149,38 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[]) {
     return row.w / (row.w + row.l);
   };
 
+  // College adds the AP poll: a top ranking is worth more than a tidy record.
+  const pollWeight = (rank: number | null | undefined) =>
+    rank && rank > 0 ? (26 - rank) / 50 : 0;
+
   const picks: Record<string, Side> = {};
   const reasoning: Record<string, string> = {};
   for (const g of games) {
-    const homeScore = rate(g.home) + 0.08;
-    const awayScore = rate(g.away);
+    const homeScore = rate(g.home) + 0.08 + (sport === "cfb" ? pollWeight(g.home_rank) : 0);
+    const awayScore = rate(g.away) + (sport === "cfb" ? pollWeight(g.away_rank) : 0);
     const side: Side = homeScore >= awayScore ? "home" : "away";
     picks[g.id] = side;
     const chosen = side === "home" ? g.home : g.away;
     const other = side === "home" ? g.away : g.home;
+    const chosenRank = side === "home" ? g.home_rank : g.away_rank;
+    const otherRank = side === "home" ? g.away_rank : g.home_rank;
     const gap = Math.abs(homeScore - awayScore);
-    reasoning[g.id] =
-      gap > 0.3
-        ? `${chosen} are simply the better team right now. ${other} have no answer.`
-        : gap > 0.1
-          ? `${chosen} have the form edge${side === "home" ? " and the home crowd" : ""}.`
-          : `A coin flip the mortals will agonise over. The Gods take ${chosen}.`;
+
+    if (sport === "cfb" && chosenRank && otherRank && otherRank < chosenRank) {
+      reasoning[g.id] = `The poll says No. ${otherRank} ${other}. The Gods say No. ${chosenRank} ${chosen}. Polls lie.`;
+    } else if (sport === "cfb" && chosenRank && !otherRank) {
+      reasoning[g.id] = `No. ${chosenRank} ${chosen} are ranked for a reason. ${other} are just the opponent on the poster.`;
+    } else if (gap > 0.3) {
+      reasoning[g.id] = `${chosen} are simply the better team right now. ${other} have no answer.`;
+    } else if (gap > 0.1) {
+      reasoning[g.id] = `${chosen} have the form edge${side === "home" ? " and the home crowd" : ""}.`;
+    } else {
+      reasoning[g.id] = `A coin flip the mortals will agonise over. The Gods take ${chosen}.`;
+    }
   }
   return { picks, reasoning };
 }
+
 
 async function usernames(ids: string[]): Promise<Map<string, string>> {
   const clean = [...new Set(ids.filter(Boolean))];
