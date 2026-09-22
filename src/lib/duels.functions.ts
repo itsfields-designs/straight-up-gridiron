@@ -151,7 +151,7 @@ export const respondToDuel = createServerFn({ method: "POST" })
 
     const { data: duel, error } = await supabaseAdmin
       .from("duels")
-      .select("id, week_num, challenger_id, opponent_id, vs_gods, status")
+      .select("id, week_num, sport, challenger_id, opponent_id, vs_gods, status")
       .eq("id", data.duelId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -160,8 +160,9 @@ export const respondToDuel = createServerFn({ method: "POST" })
     if (duel.opponent_id && duel.opponent_id !== context.userId)
       throw new Error("That challenge was sent to someone else.");
 
-    const games = await weekGames(duel.week_num);
+    const games = await weekGames(duel.week_num, duel.sport === "cfb" ? "cfb" : "nfl");
     if (weekLocked(games)) throw new Error("This week has already kicked off.");
+
 
     if (!data.accept) {
       if (!duel.opponent_id) throw new Error("Only the invited player can decline.");
