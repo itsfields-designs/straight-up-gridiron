@@ -296,17 +296,16 @@ async function bumpRecord(userId: string, result: "win" | "loss" | "tie", beatGo
   });
 }
 
-export async function duelViews(userId: string, weekNum: number) {
+export async function duelViews(userId: string, weekNum: number, sport: DuelSport = "nfl") {
   const db = await admin();
-  const games = await weekGames(weekNum);
+  const games = await weekGames(weekNum, sport);
   const locked = weekLocked(games);
 
   const { data: duels } = await db
     .from("duels")
-    .select(
-      "id, week_num, challenger_id, opponent_id, vs_gods, status, winner_id, gods_won, challenger_correct, opponent_correct, created_at",
-    )
+    .select(`${DUEL_COLS}, created_at`)
     .eq("week_num", weekNum)
+    .eq("sport", sport)
     .order("created_at", { ascending: false })
     .limit(80);
 
@@ -315,12 +314,15 @@ export async function duelViews(userId: string, weekNum: number) {
 
   const { data: pickRows } = await db
     .from("duel_picks")
-    .select("duel_id, user_id, picks")
+    .select("duel_id, user_id, picks, reasoning")
     .in("duel_id", rows.length ? rows.map((d) => d.id) : ["none"]);
 
+  const rowFor = (duelId: string, uid: string | null) =>
+    (pickRows ?? []).find((r) => r.duel_id === duelId && r.user_id === uid);
   const picksOf = (duelId: string, uid: string | null) =>
-    ((pickRows ?? []).find((r) => r.duel_id === duelId && r.user_id === uid)?.picks ??
-      {}) as Record<string, Side>;
+    (rowFor(duelId, uid)?.picks ?? {}) as Record<string, Side>;
+  const reasoningOf = (duelId: string) =>
+    (rowFor(duelId, null)?.reasoning ?? {}) as Record<string, string>;
 
   return rows.map((d) => {
     const mine = d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
@@ -330,6 +332,7 @@ export async function duelViews(userId: string, weekNum: number) {
     return {
       id: d.id,
       weekNum: d.week_num,
+      sport: (d.sport === "cfb" ? "cfb" : "nfl") as DuelSport,
       status: d.status,
       vsGods: d.vs_gods,
       createdAt: d.created_at,
@@ -341,6 +344,7 @@ export async function duelViews(userId: string, weekNum: number) {
         picked: Object.keys(challengerPicks).length,
         correct: d.status === "final" ? d.challenger_correct : scorePicks(games, challengerPicks),
         isGods: false,
+        reasoning: {} as Record<string, string>,
       },
       opponent: {
         userId: d.vs_gods ? null : d.opponent_id,
@@ -349,9 +353,12 @@ export async function duelViews(userId: string, weekNum: number) {
         picked: Object.keys(opponentPicks).length,
         correct: d.status === "final" ? d.opponent_correct : scorePicks(games, opponentPicks),
         isGods: d.vs_gods,
+        // The Gods only talk once the slate is locked, so nobody can copy them.
+        reasoning: d.vs_gods && reveal ? reasoningOf(d.id) : ({} as Record<string, string>),
       },
       winnerId: d.winner_id,
       godsWon: d.gods_won,
     };
   });
+
 }
