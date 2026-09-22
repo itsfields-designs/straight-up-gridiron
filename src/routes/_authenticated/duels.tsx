@@ -193,6 +193,12 @@ function DuelsPage() {
     setOpenDuelId(duelId);
     setDraft(picks);
     setTiebreaker(savedTiebreaker != null ? String(savedTiebreaker) : "");
+    // Wait for the editor to render, then bring it into view.
+    setTimeout(() => {
+      document
+        .getElementById(`duel-${duelId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   };
 
   if (board.isLoading) return <LoadingState label="Loading duels" />;
@@ -312,7 +318,7 @@ function DuelsPage() {
                 }
                 className="min-w-36"
               >
-                Make picks
+                {data?.locked || featuredDuel.status === "final" ? "View picks" : "Make picks"}
               </Button>
             </div>
           </section>
@@ -528,7 +534,8 @@ function DuelsPage() {
                   return (
                     <article
                       key={d.id}
-                      className="rounded-xl border border-border-strong bg-card p-4"
+                      id={`duel-${d.id}`}
+                      className="scroll-mt-24 rounded-xl border border-border-strong bg-card p-4"
                     >
                       <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
