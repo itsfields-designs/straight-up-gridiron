@@ -198,9 +198,17 @@ function DuelsPage() {
         {featuredDuel && tab === "duels" && (
           <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
             <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-destructive-soft px-4 py-2 text-xs font-bold uppercase text-destructive">
-                <span className="size-2.5 rounded-full bg-destructive" />{" "}
-                {featuredDuel.status === "final" ? "Final" : "Live"}
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase ${
+                  isLive
+                    ? "bg-destructive-soft text-destructive"
+                    : "bg-primary-foreground/10 text-primary-foreground/70"
+                }`}
+              >
+                <span
+                  className={`size-2.5 rounded-full ${isLive ? "animate-pulse bg-destructive" : "bg-primary-foreground/50"}`}
+                />{" "}
+                {statusLabel}
               </span>
               <span className="text-sm font-semibold text-primary-foreground/45">
                 Week {featuredDuel.weekNum} · {decidedGames} of {games.length} decided
