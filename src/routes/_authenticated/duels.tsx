@@ -135,9 +135,45 @@ function DuelsPage() {
     () => duels.find((d) => d.id === openDuelId) ?? null,
     [duels, openDuelId],
   );
-  const featuredDuel = mine.find((d) => d.status === "active") ?? mine[0] ?? null;
+  const featuredDuel =
+    mine.find((d) => d.status === "active" && d.weekNum === data?.weekNum) ??
+    mine.find((d) => d.status === "active") ??
+    mine[0] ??
+    null;
   const recordByUser = new Map((data?.leaderboard ?? []).map((row) => [row.userId, row]));
   const decidedGames = games.filter((game) => game.state === "post").length;
+  const liveGames = games.filter((game) => game.state === "in").length;
+
+  // Real head-to-head scoreboard numbers for the featured duel.
+  const myScore = featuredDuel
+    ? featuredDuel.mySide === "challenger"
+      ? featuredDuel.challenger.correct
+      : featuredDuel.opponent.correct
+    : 0;
+  const theirScore = featuredDuel
+    ? featuredDuel.mySide === "challenger"
+      ? featuredDuel.opponent.correct
+      : featuredDuel.challenger.correct
+    : 0;
+  const scoreTotal = myScore + theirScore;
+  const sharePct = scoreTotal > 0 ? Math.round((myScore / scoreTotal) * 100) : 50;
+  const leadLabel =
+    myScore === theirScore
+      ? "All square"
+      : myScore > theirScore
+        ? `You’re ahead by ${myScore - theirScore}`
+        : `You’re behind by ${theirScore - myScore}`;
+  const isLive = featuredDuel?.status === "active" && liveGames > 0;
+  const statusLabel =
+    featuredDuel?.status === "final"
+      ? "Final"
+      : isLive
+        ? "Live"
+        : featuredDuel?.status === "active"
+          ? decidedGames > 0
+            ? "In progress"
+            : "Locked in"
+          : "Pending";
 
   const startEditing = (duelId: string, picks: Record<string, Side>) => {
     setOpenDuelId(duelId);
