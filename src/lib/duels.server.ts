@@ -366,6 +366,11 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
     (rowFor(duelId, uid)?.picks ?? {}) as Record<string, Side>;
   const reasoningOf = (duelId: string) =>
     (rowFor(duelId, null)?.reasoning ?? {}) as Record<string, string>;
+  const tiebreakerOf = (duelId: string, uid: string | null) =>
+    (rowFor(duelId, uid)?.tiebreaker ?? null) as number | null;
+
+  const tbGame = tiebreakerGame(games);
+  const tbTotal = tiebreakerTotal(games);
 
   return rows.map((d) => {
     const mine = d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
