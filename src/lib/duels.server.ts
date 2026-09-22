@@ -1,12 +1,14 @@
 /**
- * Face The Gods — head-to-head NFL pick'em duels.
+ * Face The Gods — head-to-head pick'em duels for the NFL and college football.
  *
  * All writes happen here with the admin client after the caller has been
  * verified, because a duel always touches two people's rows.
  */
 import type { Side } from "@/lib/pool";
 
-type GameRow = {
+export type DuelSport = "nfl" | "cfb";
+
+export type GameRow = {
   id: string;
   week_num: number;
   away: string;
@@ -17,6 +19,10 @@ type GameRow = {
   home_score: number | null;
   kickoff: string | null;
   state: string;
+  away_rank?: number | null;
+  home_rank?: number | null;
+  away_logo?: string | null;
+  home_logo?: string | null;
 };
 
 export type DuelSideView = {
@@ -27,10 +33,17 @@ export type DuelSideView = {
   isGods: boolean;
 };
 
+export const MAX_WEEK: Record<DuelSport, number> = { nfl: 18, cfb: 15 };
+
+function gamesTable(sport: DuelSport) {
+  return sport === "cfb" ? ("cfb_games" as const) : ("games" as const);
+}
+
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin;
 }
+
 
 /** The next duelable week: the earliest week that has not kicked off yet. */
 export async function currentNflWeek(): Promise<number> {
