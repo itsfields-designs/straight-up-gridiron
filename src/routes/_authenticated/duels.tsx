@@ -9,6 +9,7 @@ import { EmptyState, LoadingState } from "@/components/ui/feedback";
 import { Button } from "@/components/ui/button";
 import { SznPassGate, useEntitled } from "@/components/SznPassGate";
 import { TeamBadge } from "@/components/pool/TeamBadge";
+import { LiveScoreboard } from "@/components/pool/LiveScoreboard";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 import {
   createDuel,
@@ -78,7 +79,7 @@ function DuelsPage() {
   const board = useQuery({
     queryKey: ["duel-board"],
     queryFn: () => loadBoard({ data: {} }),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
   });
 
   const opponents = useQuery({
@@ -135,9 +136,45 @@ function DuelsPage() {
     () => duels.find((d) => d.id === openDuelId) ?? null,
     [duels, openDuelId],
   );
-  const featuredDuel = mine.find((d) => d.status === "active") ?? mine[0] ?? null;
+  const featuredDuel =
+    mine.find((d) => d.status === "active" && d.weekNum === data?.weekNum) ??
+    mine.find((d) => d.status === "active") ??
+    mine[0] ??
+    null;
   const recordByUser = new Map((data?.leaderboard ?? []).map((row) => [row.userId, row]));
   const decidedGames = games.filter((game) => game.state === "post").length;
+  const liveGames = games.filter((game) => game.state === "in").length;
+
+  // Real head-to-head scoreboard numbers for the featured duel.
+  const myScore = featuredDuel
+    ? featuredDuel.mySide === "challenger"
+      ? featuredDuel.challenger.correct
+      : featuredDuel.opponent.correct
+    : 0;
+  const theirScore = featuredDuel
+    ? featuredDuel.mySide === "challenger"
+      ? featuredDuel.opponent.correct
+      : featuredDuel.challenger.correct
+    : 0;
+  const scoreTotal = myScore + theirScore;
+  const sharePct = scoreTotal > 0 ? Math.round((myScore / scoreTotal) * 100) : 50;
+  const leadLabel =
+    myScore === theirScore
+      ? "All square"
+      : myScore > theirScore
+        ? `You’re ahead by ${myScore - theirScore}`
+        : `You’re behind by ${theirScore - myScore}`;
+  const isLive = featuredDuel?.status === "active" && liveGames > 0;
+  const statusLabel =
+    featuredDuel?.status === "final"
+      ? "Final"
+      : isLive
+        ? "Live"
+        : featuredDuel?.status === "active"
+          ? decidedGames > 0
+            ? "In progress"
+            : "Locked in"
+          : "Pending";
 
   const startEditing = (duelId: string, picks: Record<string, Side>) => {
     setOpenDuelId(duelId);
@@ -162,9 +199,17 @@ function DuelsPage() {
         {featuredDuel && tab === "duels" && (
           <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
             <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-destructive-soft px-4 py-2 text-xs font-bold uppercase text-destructive">
-                <span className="size-2.5 rounded-full bg-destructive" />{" "}
-                {featuredDuel.status === "final" ? "Final" : "Live"}
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase ${
+                  isLive
+                    ? "bg-destructive-soft text-destructive"
+                    : "bg-primary-foreground/10 text-primary-foreground/70"
+                }`}
+              >
+                <span
+                  className={`size-2.5 rounded-full ${isLive ? "animate-pulse bg-destructive" : "bg-primary-foreground/50"}`}
+                />{" "}
+                {statusLabel}
               </span>
               <span className="text-sm font-semibold text-primary-foreground/45">
                 Week {featuredDuel.weekNum} · {decidedGames} of {games.length} decided
@@ -180,11 +225,7 @@ function DuelsPage() {
                   )}
                 </span>
                 <p className="mt-3 font-display text-xl font-semibold text-accent">You</p>
-                <p className="font-display text-3xl font-bold">
-                  {featuredDuel.mySide === "challenger"
-                    ? featuredDuel.challenger.correct
-                    : featuredDuel.opponent.correct}
-                </p>
+                <p className="font-display text-3xl font-bold tabular-nums">{myScore}</p>
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-accent">VS</p>
@@ -203,19 +244,21 @@ function DuelsPage() {
                     ? featuredDuel.opponent.username
                     : featuredDuel.challenger.username}
                 </p>
-                <p className="font-display text-3xl font-bold">
-                  {featuredDuel.mySide === "challenger"
-                    ? featuredDuel.opponent.correct
-                    : featuredDuel.challenger.correct}
-                </p>
+                <p className="font-display text-3xl font-bold tabular-nums">{theirScore}</p>
               </div>
             </div>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-primary-foreground/20">
-              <div className="h-full w-[58%] bg-accent" />
+              <div
+                className="h-full bg-accent transition-all duration-500"
+                style={{ width: `${sharePct}%` }}
+              />
             </div>
             <div className="mt-2 flex justify-between text-xs text-primary-foreground/50">
-              <span>You’re ahead</span>
+              <span>{leadLabel}</span>
               <span>{Math.max(games.length - decidedGames, 0)} games left</span>
+            </div>
+            <div className="mt-5">
+              <LiveScoreboard league="nfl" limit={16} />
             </div>
             <div className="mt-5 flex items-center justify-between border-t border-accent/40 pt-4">
               <span className="flex items-center gap-2 text-sm text-primary-foreground/55">
