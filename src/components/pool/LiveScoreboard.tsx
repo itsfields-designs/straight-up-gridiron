@@ -18,14 +18,14 @@ function Chip({ game }: { game: LiveScoreGame }) {
   const live = game.status === "live";
   const hasScore = game.awayScore != null && game.homeScore != null;
   return (
-    <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs">
+    <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-r border-primary-foreground/20 px-4 py-1.5 text-xs text-primary-foreground">
       {live && (
-        <Radio size={11} className="animate-pulse text-primary" aria-hidden />
+         <Radio size={11} className="animate-pulse text-success" aria-hidden />
       )}
       <span className="font-medium">{game.away.short}</span>
       {hasScore ? (
         <span
-          className={`tabular-nums font-semibold ${live ? "text-primary" : "text-muted-foreground"}`}
+           className={`tabular-nums font-semibold ${live ? "text-accent" : "text-primary-foreground/70"}`}
         >
           {game.awayScore}
         </span>
@@ -36,7 +36,7 @@ function Chip({ game }: { game: LiveScoreGame }) {
       <span className="font-medium">{game.home.short}</span>
       {hasScore ? (
         <span
-          className={`tabular-nums font-semibold ${live ? "text-primary" : "text-muted-foreground"}`}
+           className={`tabular-nums font-semibold ${live ? "text-accent" : "text-primary-foreground/70"}`}
         >
           {game.homeScore}
         </span>
@@ -60,14 +60,14 @@ function CollegeChip({ game }: { game: LiveScoreGame }) {
   const final = game.status === "finished";
   const hasScore = game.awayScore != null && game.homeScore != null;
   return (
-    <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs">
+    <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-r border-primary-foreground/20 px-4 py-1.5 text-xs text-primary-foreground">
       {live && (
-        <Radio size={11} className="animate-pulse text-primary" aria-hidden />
+         <Radio size={11} className="animate-pulse text-success" aria-hidden />
       )}
       <span className="font-medium">{game.away.name}</span>
       {hasScore ? (
         <span
-          className={`tabular-nums font-semibold ${live ? "text-primary" : "text-muted-foreground"}`}
+           className={`tabular-nums font-semibold ${live ? "text-accent" : "text-primary-foreground/70"}`}
         >
           {game.awayScore}
         </span>
@@ -78,7 +78,7 @@ function CollegeChip({ game }: { game: LiveScoreGame }) {
       <span className="font-medium">{game.home.name}</span>
       {hasScore ? (
         <span
-          className={`tabular-nums font-semibold ${live ? "text-primary" : "text-muted-foreground"}`}
+           className={`tabular-nums font-semibold ${live ? "text-accent" : "text-primary-foreground/70"}`}
         >
           {game.homeScore}
         </span>
@@ -117,7 +117,7 @@ export function LiveScoreboard({
 
   if (scores.isLoading) {
     return (
-      <div className="flex items-center gap-2 overflow-hidden rounded-full border border-border bg-secondary/60 px-4 py-2 text-xs text-faint">
+      <div className="flex items-center gap-2 overflow-hidden rounded-lg bg-primary px-4 py-2 text-xs text-primary-foreground/60">
         <Radio size={13} className="animate-pulse" />
         <span>Loading live scores…</span>
       </div>
@@ -126,7 +126,7 @@ export function LiveScoreboard({
 
   if (scores.isError || !games.length) {
     return (
-      <div className="flex items-center gap-2 overflow-hidden rounded-full border border-border bg-secondary/60 px-4 py-2 text-xs text-faint">
+      <div className="flex items-center gap-2 overflow-hidden rounded-lg bg-primary px-4 py-2 text-xs text-primary-foreground/60">
         <Radio size={13} />
         <span>
           {scores.isError ? "Scores unavailable right now." : "No games on the board yet."}
@@ -140,12 +140,12 @@ export function LiveScoreboard({
   const ChipComp = isCollege ? CollegeChip : Chip;
 
   return (
-    <div className="group relative overflow-hidden rounded-full border border-border bg-card">
+    <div className="group relative overflow-hidden rounded-lg border border-accent/40 bg-primary">
       {/* Left label — pinned, fades into the ticker */}
-      <div className="absolute left-0 top-0 z-10 flex h-full items-center gap-1.5 rounded-l-full bg-card pl-3 pr-2">
+      <div className="absolute left-0 top-0 z-10 flex h-full items-center gap-1.5 bg-accent pl-3 pr-2 text-accent-foreground">
         <Radio
           size={13}
-          className={liveCount ? "animate-pulse text-primary" : "text-faint"}
+          className={liveCount ? "animate-pulse text-success" : "text-accent-foreground/60"}
         />
         <span className="text-xs font-semibold tabular-nums">
           {liveCount > 0 ? `${liveCount} live` : "Live"}
@@ -153,8 +153,8 @@ export function LiveScoreboard({
       </div>
 
       {/* Fade edges */}
-      <div className="pointer-events-none absolute inset-y-0 left-9 z-10 w-6 bg-gradient-to-r from-card to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-card to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-9 z-10 w-6 bg-gradient-to-r from-accent to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-primary to-transparent" />
 
       {/* Scrolling track */}
       <div className="no-scrollbar overflow-hidden py-1.5 pl-14 pr-4">

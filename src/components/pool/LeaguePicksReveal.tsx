@@ -40,7 +40,7 @@ export function LeaguePicksReveal({
 
   return (
     <section className="mt-6">
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-faint">
+      <h3 className="mb-3 flex items-center gap-2 font-display text-2xl font-semibold">
         <Eye size={13} /> Everyone's picks · Week {week}
       </h3>
       <div className="space-y-2">
@@ -57,7 +57,7 @@ export function LeaguePicksReveal({
             if (entry.picks[g.id] === winner) correct += 1;
           }
           return (
-            <div key={key} className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div key={key} className="overflow-hidden rounded-xl border border-border-strong bg-card">
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : key)}
@@ -72,7 +72,7 @@ export function LeaguePicksReveal({
                   {mine && <span className="ml-1.5 text-xs font-medium text-accent">You</span>}
                 </span>
                 {decided > 0 && (
-                  <span className="shrink-0 rounded-lg bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums">
+                   <span className="shrink-0 rounded-lg bg-accent-soft px-2 py-0.5 text-xs font-semibold tabular-nums">
                     {correct}/{decided}
                   </span>
                 )}

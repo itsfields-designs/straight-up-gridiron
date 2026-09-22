@@ -133,18 +133,18 @@ export function MembersPanel({
           { label: `Week ${shownWeek} pot`, value: weeklyPotFor(league, fees, shownWeek) },
           { label: "Season pot", value: seasonPotFor(league, seasonEntryPayments.data ?? []) },
         ].map((item) => (
-          <div key={item.label} className="rounded-lg border border-border bg-card p-4">
+          <div key={item.label} className="rounded-xl border border-border-strong bg-card p-4">
             <div className="text-xs text-faint">{item.label}</div>
-            <div className="font-display text-lg font-medium">{money(item.value ?? 0)}</div>
+            <div className="font-display text-2xl font-semibold">{money(item.value ?? 0)}</div>
           </div>
         ))}
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-medium text-muted-foreground">
+          <h2 className="mb-2 font-display text-3xl font-semibold">
           Members ({members.length})
         </h2>
-        <div className="rounded-lg border border-border bg-card">
+        <div className="rounded-xl border border-border-strong bg-card">
           {members.map((m, i) => (
             <div
               key={m.user_id}
@@ -174,7 +174,7 @@ export function MembersPanel({
 
       {isOwner ? (
         <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+          <h2 className="mb-3 flex items-center gap-1.5 font-display text-3xl font-semibold">
             <Shield size={14} /> Commissioner settings
           </h2>
           <label className="field-label" htmlFor="league-house-rules">House rules</label>
@@ -183,7 +183,7 @@ export function MembersPanel({
             rows={3}
             value={rules}
             onChange={(e) => setRules(e.target.value)}
-            className="min-h-11 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="min-h-12 w-full rounded-lg border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {[
@@ -201,7 +201,7 @@ export function MembersPanel({
                   inputMode="decimal"
                   value={f.value}
                   onChange={(e) => f.set(e.target.value)}
-                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                   className="min-h-12 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
             ))}
@@ -217,7 +217,7 @@ export function MembersPanel({
                 value={cashapp}
                 onChange={(e) => setCashapp(e.target.value)}
                 placeholder="thehoodinvestor"
-                className="min-h-11 w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                 className="min-h-12 w-full rounded-lg border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <span className="mt-1 block text-xs text-faint">
@@ -225,7 +225,7 @@ export function MembersPanel({
             </span>
           </label>
 
-          <label className="mt-4 flex items-start gap-3 rounded-lg border border-border bg-card p-3.5">
+           <label className="mt-4 flex items-start gap-3 rounded-xl border border-border-strong bg-card p-3.5">
             <input
               type="checkbox"
               checked={sundayOnly}
@@ -245,7 +245,7 @@ export function MembersPanel({
             </span>
           </label>
 
-          <div className="mt-4 rounded-lg border border-border bg-card p-3.5">
+           <div className="mt-4 rounded-xl border border-border-strong bg-card p-3.5">
             <label className="flex items-start gap-3">
               <input
                 type="checkbox"
@@ -272,7 +272,7 @@ export function MembersPanel({
                   inputMode="decimal"
                   value={cutPct}
                   onChange={(e) => setCutPct(e.target.value)}
-                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring sm:w-40"
+                   className="min-h-12 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring sm:w-40"
                 />
               </label>
             )}
@@ -282,7 +282,7 @@ export function MembersPanel({
             type="button"
             onClick={() => saveRules.mutate()}
             disabled={saveRules.isPending}
-            className="mt-3 min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+             className="mt-3 min-h-12 rounded-lg bg-accent px-5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
             {saveRules.isPending ? "Saving…" : "Save settings"}
           </button>

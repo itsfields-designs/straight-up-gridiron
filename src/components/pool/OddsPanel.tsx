@@ -92,13 +92,13 @@ export function OddsPanel({
     (mode === "season" && seasonStandings.isLoading);
 
   return (
-    <section className="mt-5 rounded-2xl border border-border bg-card p-4">
+    <section className="mt-5 rounded-xl border border-border-strong bg-card p-4">
       <div className="flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">
           <Percent size={15} />
         </span>
         <div>
-          <h3 className="text-sm font-semibold">
+           <h3 className="font-display text-2xl font-semibold">
             Chances of Finishing Top 3
           </h3>
           <p className="text-xs text-faint">
@@ -120,10 +120,10 @@ export function OddsPanel({
           {rows.map((r) => (
             <li
               key={r.key}
-              className={`flex items-center gap-3 rounded-xl border p-2.5 ${
+               className={`flex items-center gap-3 border-b p-2.5 last:border-b-0 ${
                 currentUserId && r.key.startsWith(`${currentUserId}:`)
-                  ? "border-accent bg-accent/10"
-                  : "border-border"
+                   ? "border-accent bg-accent-soft"
+                   : "border-border"
               }`}
             >
               <div className="min-w-0 flex-1">

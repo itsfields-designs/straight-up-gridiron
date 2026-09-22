@@ -195,7 +195,7 @@ export function SeasonPotPanel({
   return (
     <div className="space-y-4">
       <section className="app-card p-5 sm:p-6" aria-labelledby="season-entries-summary-heading">
-        <h2 id="season-entries-summary-heading" className="flex items-center gap-1.5 text-2xl font-semibold">
+        <h2 id="season-entries-summary-heading" className="flex items-center gap-1.5 font-display text-3xl font-semibold">
           <Trophy size={20} className="text-accent" /> Season entries
         </h2>
         <div className="mt-4 flex items-baseline gap-2">
@@ -214,7 +214,7 @@ export function SeasonPotPanel({
       </section>
 
       <section className="app-card p-5 sm:p-6" aria-labelledby="season-paid-heading">
-        <h2 id="season-paid-heading" className="text-2xl font-semibold">Who’s paid</h2>
+        <h2 id="season-paid-heading" className="font-display text-3xl font-semibold">Who’s paid</h2>
 
         <div className="mt-4 divide-y divide-border">
           {visibleEntries.map(({ member, entryNo, paid }) => {
@@ -231,9 +231,9 @@ export function SeasonPotPanel({
                   aria-pressed={paid}
                   aria-label={`Mark ${member.username} season set ${entryNo} ${paid ? "unpaid" : "paid"}`}
                   onClick={() => toggle.mutate({ userId: member.user_id, entryNo, paid: !paid })}
-                  className={`h-11 min-w-28 rounded-full border-2 px-5 text-base shadow-none ${
+                   className={`h-11 min-w-28 rounded-lg border-2 px-5 text-base shadow-none ${
                     paid
-                      ? "border-success bg-secondary text-foreground hover:bg-secondary"
+                       ? "border-success bg-success text-primary hover:bg-success"
                       : "border-accent bg-accent-soft text-foreground hover:bg-accent-soft"
                   }`}
                 >
@@ -295,7 +295,7 @@ export function SeasonPotPanel({
         <section className="app-card p-5 sm:p-6" aria-labelledby="season-pot-calculation-heading">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 id="season-pot-calculation-heading" className="text-xl font-semibold">Season pot</h2>
+               <h2 id="season-pot-calculation-heading" className="font-display text-3xl font-semibold">Season pot</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {league.season_pot_auto ? "Updates as season payments are marked paid." : "Using a manual amount."}
               </p>
@@ -304,7 +304,7 @@ export function SeasonPotPanel({
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-md border border-border p-3">
+             <div className="rounded-lg border border-border-strong p-3">
               <div className="text-xs text-faint">Season pot</div>
               <div className="font-display text-lg font-medium">
                 {money(league.season_pot_auto ? seasonPotFor(league, rows) : Number(league.season_pot) || 0)}
@@ -315,7 +315,7 @@ export function SeasonPotPanel({
                   : "No payments yet"}
               </div>
             </div>
-            <div className="rounded-md border border-border p-3">
+             <div className="rounded-lg border border-border-strong p-3">
               <div className="text-xs text-faint">Held in league bank</div>
               <div className="font-display text-lg font-medium">{money(heldInBank)}</div>
             </div>
@@ -331,7 +331,7 @@ export function SeasonPotPanel({
                 inputMode="decimal"
                 value={seasonFee}
                 onChange={(event) => setSeasonFee(event.target.value)}
-                className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                 className="min-h-12 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
               <Button
                 type="button"
@@ -348,7 +348,7 @@ export function SeasonPotPanel({
           <label className="mt-5 flex min-h-12 cursor-pointer items-center gap-3 border-t border-border pt-4 text-sm font-medium">
             <input
               type="checkbox"
-              className="h-5 w-5 accent-primary"
+               className="h-5 w-5 accent-success"
               checked={league.season_pot_auto}
               disabled={setAuto.isPending}
               onChange={(event) => setAuto.mutate(event.target.checked)}
@@ -367,7 +367,7 @@ export function SeasonPotPanel({
                   inputMode="decimal"
                   value={manualSeason}
                   onChange={(event) => setManualSeason(event.target.value)}
-                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                   className="min-h-12 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
               <Button

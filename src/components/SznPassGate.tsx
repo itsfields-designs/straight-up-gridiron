@@ -46,11 +46,11 @@ export function SznPassGate({ what }: { what: string }) {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-5 text-center">
+    <section className="rounded-xl border border-accent bg-card p-5 text-center">
       <span className="mx-auto grid size-11 place-items-center rounded-full bg-accent-soft text-accent-soft-foreground">
         <Lock size={18} />
       </span>
-      <h2 className="mt-3 font-display text-lg font-semibold">{SZN_PASS.name} required</h2>
+      <h2 className="mt-3 font-display text-3xl font-semibold">{SZN_PASS.name} required</h2>
       <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
         {what} is for pass holders. Get {SZN_PASS.name} — {SZN_PASS.priceLabel} — and you're in for
         the whole season.
