@@ -366,14 +366,17 @@ function DuelsPage() {
           <>
             <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
               <p className="flex items-center gap-2 font-display text-base font-semibold uppercase text-accent">
-                <Zap size={19} /> Week {data?.weekNum} · bragging rights
+                <Zap size={19} /> {SPORT_LABEL[sport]} · Week {data?.weekNum} · bragging rights
               </p>
               <h2 className="mt-4 font-display text-3xl font-semibold sm:mt-5 sm:text-4xl">
                 Face The Gods
               </h2>
               <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">
-                One week of NFL picks, one on one. Beat the house, or get beat by it.
+                {sport === "cfb"
+                  ? "One week of Top 25 college picks, one on one. Beat the house, or get beat by it."
+                  : "One week of NFL picks, one on one. Beat the house, or get beat by it."}
               </p>
+
               <div className="mt-6 grid gap-2">
                 <Button
                   disabled={gated || data?.locked || create.isPending}
