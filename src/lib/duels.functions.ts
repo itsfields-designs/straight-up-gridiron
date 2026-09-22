@@ -87,20 +87,23 @@ export const createDuel = createServerFn({ method: "POST" })
       .object({
         vsGods: z.boolean().default(false),
         opponentId: z.string().uuid().nullable().optional(),
+        sport: sportSchema,
       })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     const { assertEntitled } = await import("@/lib/membership.functions");
     await assertEntitled(context.userId, context.claims as Record<string, unknown>);
-    const { currentNflWeek, weekGames, weekLocked, buildGodsPicks } = await import(
+    const { currentDuelWeek, weekGames, weekLocked, buildGodsPicks } = await import(
       "@/lib/duels.server"
     );
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const weekNum = await currentNflWeek();
-    const games = await weekGames(weekNum);
-    if (games.length === 0) throw new Error("There is no NFL slate to duel over right now.");
+    const sport = data.sport;
+    const label = sport === "cfb" ? "college" : "NFL";
+    const weekNum = await currentDuelWeek(sport);
+    const games = await weekGames(weekNum, sport);
+    if (games.length === 0) throw new Error(`There is no ${label} slate to duel over right now.`);
     if (weekLocked(games)) throw new Error("This week has already kicked off. Try again next week.");
     if (data.opponentId === context.userId) throw new Error("You cannot challenge yourself.");
 
@@ -108,6 +111,7 @@ export const createDuel = createServerFn({ method: "POST" })
       .from("duels")
       .insert({
         week_num: weekNum,
+        sport,
         challenger_id: context.userId,
         opponent_id: data.vsGods ? null : (data.opponentId ?? null),
         vs_gods: data.vsGods,
@@ -118,7 +122,7 @@ export const createDuel = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     if (data.vsGods) {
-      const gods = await buildGodsPicks(weekNum, games);
+      const gods = await buildGodsPicks(weekNum, games, sport);
       await supabaseAdmin.from("duel_picks").insert({
         duel_id: duel.id,
         user_id: null,
@@ -126,8 +130,9 @@ export const createDuel = createServerFn({ method: "POST" })
         reasoning: gods.reasoning,
       });
     }
-    return { duelId: duel.id, weekNum };
+    return { duelId: duel.id, weekNum, sport };
   });
+
 
 export const respondToDuel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
