@@ -43,6 +43,10 @@ export const Route = createFileRoute("/_authenticated/duels")({
 });
 
 type Tab = "duels" | "leaderboard";
+type Sport = "nfl" | "cfb";
+
+const SPORT_LABEL: Record<Sport, string> = { nfl: "NFL", cfb: "College" };
+
 
 const AVATAR_STYLES = [
   "bg-destructive text-destructive-foreground",
