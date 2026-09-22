@@ -236,6 +236,7 @@ export type Database = {
           id: string
           picks: Json
           reasoning: Json
+          tiebreaker: number | null
           updated_at: string
           user_id: string | null
         }
@@ -245,6 +246,7 @@ export type Database = {
           id?: string
           picks?: Json
           reasoning?: Json
+          tiebreaker?: number | null
           updated_at?: string
           user_id?: string | null
         }
@@ -254,6 +256,7 @@ export type Database = {
           id?: string
           picks?: Json
           reasoning?: Json
+          tiebreaker?: number | null
           updated_at?: string
           user_id?: string | null
         }
