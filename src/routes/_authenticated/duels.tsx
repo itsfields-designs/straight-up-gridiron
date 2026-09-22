@@ -186,9 +186,14 @@ function DuelsPage() {
             : "Locked in"
           : "Pending";
 
-  const startEditing = (duelId: string, picks: Record<string, Side>) => {
+  const startEditing = (
+    duelId: string,
+    picks: Record<string, Side>,
+    savedTiebreaker?: number | null,
+  ) => {
     setOpenDuelId(duelId);
     setDraft(picks);
+    setTiebreaker(savedTiebreaker != null ? String(savedTiebreaker) : "");
   };
 
   if (board.isLoading) return <LoadingState label="Loading duels" />;
