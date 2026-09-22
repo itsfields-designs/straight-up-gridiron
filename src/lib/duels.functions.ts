@@ -60,10 +60,15 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       godsWins: r.gods_wins,
     }));
 
+    const tbGame = tiebreakerGame(games);
+
     return {
       sport,
       weekNum,
       games,
+      tiebreakerGameId: tbGame?.id ?? null,
+      tiebreakerLabel: tbGame ? `${tbGame.away} at ${tbGame.home}` : null,
+      tiebreakerTotal: tiebreakerTotal(games),
       locked: weekLocked(games),
       lockAt: lockLabel(games),
       duels,
