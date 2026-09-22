@@ -205,6 +205,23 @@ function DuelsPage() {
       </header>
 
       <div className="grid gap-5 px-4 py-4 sm:gap-7 sm:px-8">
+        <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border-strong bg-secondary p-1">
+          {(["nfl", "cfb"] as Sport[]).map((id) => (
+            <Button
+              key={id}
+              variant={sport === id ? "default" : "ghost"}
+              onClick={() => {
+                setSport(id);
+                setOpenDuelId(null);
+                setDraft({});
+              }}
+              className="min-h-12 rounded-xl font-display text-base"
+            >
+              {SPORT_LABEL[id]}
+            </Button>
+          ))}
+        </div>
+
         {featuredDuel && tab === "duels" && (
           <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
             <div className="flex items-center justify-between gap-3">
