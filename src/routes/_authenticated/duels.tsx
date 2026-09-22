@@ -556,7 +556,7 @@ function DuelsPage() {
 
                       <div className="mt-3 flex gap-2">
                         <Button
-                          onClick={() => startEditing(d.id, me.picks)}
+                          onClick={() => startEditing(d.id, me.picks, me.tiebreaker)}
                           className="min-h-11 flex-1 rounded-xl"
                         >
                           {data?.locked || d.status === "final" ? "View picks" : "Make picks"}
