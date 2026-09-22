@@ -4,24 +4,30 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const sideSchema = z.union([z.literal("home"), z.literal("away")]);
+const sportSchema = z.union([z.literal("nfl"), z.literal("cfb")]).default("nfl");
 
 /** The whole Face The Gods screen in one call: slate, duels, record and leaderboard. */
 export const getDuelBoard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ weekNum: z.number().int().min(1).max(18).nullable().optional() }).parse(input ?? {}),
+    z
+      .object({
+        weekNum: z.number().int().min(1).max(18).nullable().optional(),
+        sport: sportSchema,
+      })
+      .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { currentNflWeek, weekGames, weekLocked, lockLabel, settleWeek, duelViews } = await import(
-      "@/lib/duels.server"
-    );
+    const { currentDuelWeek, weekGames, weekLocked, lockLabel, settleWeek, duelViews } =
+      await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const weekNum = data.weekNum ?? (await currentNflWeek());
-    await settleWeek(weekNum);
+    const sport = data.sport;
+    const weekNum = data.weekNum ?? (await currentDuelWeek(sport));
+    await settleWeek(weekNum, sport);
 
-    const games = await weekGames(weekNum);
-    const duels = await duelViews(context.userId, weekNum);
+    const games = await weekGames(weekNum, sport);
+    const duels = await duelViews(context.userId, weekNum, sport);
 
     const { data: records } = await supabaseAdmin
       .from("duel_records")
@@ -47,6 +53,7 @@ export const getDuelBoard = createServerFn({ method: "GET" })
     }));
 
     return {
+      sport,
       weekNum,
       games,
       locked: weekLocked(games),
@@ -56,6 +63,7 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       leaderboard,
     };
   });
+
 
 /** Players you can challenge directly. */
 export const searchDuelOpponents = createServerFn({ method: "GET" })
