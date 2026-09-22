@@ -72,6 +72,7 @@ function DuelsPage() {
   const [sport, setSport] = useState<Sport>("nfl");
   const [openDuelId, setOpenDuelId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, Side>>({});
+  const [tiebreaker, setTiebreaker] = useState("");
   const [search, setSearch] = useState("");
 
   const loadBoard = useServerFn(getDuelBoard);
