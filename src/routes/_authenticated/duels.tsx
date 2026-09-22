@@ -318,7 +318,7 @@ function DuelsPage() {
                 }
                 className="min-w-36"
               >
-                Make picks
+                {data?.locked || featuredDuel.status === "final" ? "View picks" : "Make picks"}
               </Button>
             </div>
           </section>
