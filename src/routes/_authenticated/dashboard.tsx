@@ -148,25 +148,21 @@ function DashboardPage() {
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-2xl bg-primary p-5 text-primary-foreground">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-          Week {week}
-        </p>
-        <h1 className="mt-1.5 font-display text-2xl font-semibold">
-          {left ? `${left} until kickoff` : "Games are underway"}
-        </h1>
+      <section className="rounded-xl border border-accent/55 bg-primary p-5 text-primary-foreground">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="min-w-0">
+            <h1 className="font-display text-4xl font-semibold">Week {week}</h1>
+            <p className="mt-3 font-display text-4xl font-semibold text-accent">
+              {left ?? "Live now"}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-primary-foreground/15 px-3 py-2 text-xs font-semibold">
+            {left ? "Picks open" : "In progress"}
+          </span>
+        </div>
         <p className="mt-1 text-sm text-primary-foreground/80">
-          {nextLabel ? `Next game ${nextLabel}.` : "Scores update on their own as games finish."}
+          {nextLabel ? `until ${nextLabel}` : "Scores update as games finish."}
         </p>
-        {leagues.data?.[0] && (
-          <Link
-            to="/leagues/$leagueId"
-            params={{ leagueId: leagues.data[0].id }}
-            className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-accent px-4 text-sm font-semibold text-accent-foreground"
-          >
-            Open picks
-          </Link>
-        )}
       </section>
 
 
@@ -192,7 +188,7 @@ function DashboardPage() {
       {(leagues.data?.length ?? 0) > 0 && (
         <section className="grid gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold">Your leagues</h2>
+            <h2 className="font-display text-2xl font-semibold">Your leagues</h2>
             <Link to="/leagues" className="text-sm font-medium text-primary">
               Manage
             </Link>
@@ -210,16 +206,16 @@ function DashboardPage() {
             const made = myPicks ? Object.keys(myPicks.picks ?? {}).length : 0;
             const pct = games.length ? Math.round((made / games.length) * 100) : 0;
             return (
-              <article key={league.id} className="rounded-2xl border border-border bg-card p-4">
+              <article key={league.id} className="rounded-xl border border-border-strong bg-card p-4">
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate font-display text-base font-semibold">{league.name}</h3>
+                    <h3 className="truncate font-display text-2xl font-semibold">{league.name}</h3>
                     <p className="mt-0.5 flex items-center gap-1 text-xs text-faint">
                       <Users size={12} /> {rows.length || 0} sets ranked
                       {leader ? ` · led by ${leader.username}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-xs font-semibold tabular-nums">
+                   <span className="shrink-0 font-display text-3xl font-semibold tabular-nums">
                     {me ? `#${me.rank}` : "—"}
                   </span>
                 </div>
@@ -233,7 +229,7 @@ function DashboardPage() {
                   </div>
                   <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-secondary">
                     <div
-                      className="h-full rounded-full bg-accent transition-[width]"
+                       className="h-full rounded-full bg-success transition-[width]"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -243,14 +239,14 @@ function DashboardPage() {
                   <Link
                     to="/leagues/$leagueId"
                     params={{ leagueId: league.id }}
-                    className="flex min-h-11 items-center justify-center rounded-xl bg-accent text-sm font-semibold text-accent-foreground"
+                    className="flex min-h-12 items-center justify-center rounded-xl bg-accent text-sm font-semibold text-accent-foreground"
                   >
                     Open picks
                   </Link>
                   <Link
                     to="/leagues/$leagueId"
                     params={{ leagueId: league.id }}
-                    className="flex min-h-11 items-center justify-center rounded-xl border border-border-strong text-sm font-medium"
+                    className="flex min-h-12 items-center justify-center rounded-xl border border-border-strong text-sm font-semibold"
                   >
                     Standings
                   </Link>
@@ -262,13 +258,14 @@ function DashboardPage() {
       )}
 
       {upNext.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card p-4">
-          <h2 className="font-display text-lg font-semibold">Up next</h2>
+        <section>
+          <h2 className="font-display text-2xl font-semibold">Up next</h2>
+          <div className="mt-3 overflow-hidden rounded-xl border border-border-strong bg-card">
           <ul className="mt-3 grid gap-2.5">
             {upNext.map((g) => {
               const winner = gradeGame(g);
               return (
-                <li key={g.id} className="flex items-center gap-3">
+                <li key={g.id} className="flex items-center gap-3 border-b border-border px-4 pb-3 last:border-b-0">
                   <div className="flex shrink-0 items-center -space-x-1.5">
                     <TeamBadge name={g.away} size={28} />
                     <TeamBadge name={g.home} size={28} />
@@ -288,6 +285,7 @@ function DashboardPage() {
               );
             })}
           </ul>
+          </div>
         </section>
       )}
 

@@ -41,10 +41,10 @@ export function InviteFriends({
   }
 
   return (
-    <div className="rounded-lg border border-accent bg-accent-soft p-4">
+    <section className="rounded-xl border border-accent bg-accent-soft p-4">
       <div className="flex items-center gap-2">
         <Gift size={16} />
-        <h2 className="text-sm font-semibold">Invite Friends</h2>
+        <h2 className="font-display text-2xl font-semibold">Invite friends</h2>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
         Bring your friends into this league. You both get $5 SZN Credit when they join.
@@ -56,7 +56,7 @@ export function InviteFriends({
           onClick={copy}
           disabled={!link}
           aria-live="polite"
-          className="flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground disabled:opacity-40"
+           className="flex min-h-12 items-center justify-center gap-1.5 rounded-lg bg-card px-4 text-sm font-semibold text-foreground disabled:opacity-40"
         >
           {copied ? <Check size={15} /> : <Copy size={15} />}
           {copied ? "Link copied" : "Copy Invite Link"}
@@ -65,7 +65,7 @@ export function InviteFriends({
           type="button"
           onClick={share}
           disabled={!link}
-          className="flex min-h-12 items-center justify-center gap-1.5 rounded-md border border-border-strong bg-card px-4 text-sm font-medium transition-colors hover:bg-secondary disabled:opacity-40"
+           className="flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-card px-4 text-sm font-semibold transition-colors hover:bg-secondary disabled:opacity-40"
         >
           <Share2 size={15} /> {shared || "Share"}
         </button>
@@ -102,6 +102,6 @@ export function InviteFriends({
           <span className="font-display tracking-widest">{leagueCode}</span>
         </p>
       )}
-    </div>
+    </section>
   );
 }
