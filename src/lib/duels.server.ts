@@ -409,6 +409,7 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
         isGods: d.vs_gods,
         // The Gods only talk once the slate is locked, so nobody can copy them.
         reasoning: d.vs_gods && reveal ? reasoningOf(d.id) : ({} as Record<string, string>),
+        tiebreaker: reveal || mine === "opponent" ? opponentTb : null,
       },
       winnerId: d.winner_id,
       godsWon: d.gods_won,
