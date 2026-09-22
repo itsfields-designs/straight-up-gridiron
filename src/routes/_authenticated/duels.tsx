@@ -524,7 +524,7 @@ function DuelsPage() {
                             You vs {them.username}
                           </p>
                           <p className="text-xs text-faint">
-                            Week {d.weekNum} ·{" "}
+                            {SPORT_LABEL[d.sport] ?? "NFL"} · Week {d.weekNum} ·{" "}
                             {d.status === "open"
                               ? "waiting for an opponent"
                               : d.status === "final"
