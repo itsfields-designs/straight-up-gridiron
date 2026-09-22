@@ -313,6 +313,7 @@ export type Database = {
           opponent_correct: number
           opponent_id: string | null
           settled_at: string | null
+          sport: string
           status: string
           updated_at: string
           vs_gods: boolean
@@ -328,6 +329,7 @@ export type Database = {
           opponent_correct?: number
           opponent_id?: string | null
           settled_at?: string | null
+          sport?: string
           status?: string
           updated_at?: string
           vs_gods?: boolean
@@ -343,6 +345,7 @@ export type Database = {
           opponent_correct?: number
           opponent_id?: string | null
           settled_at?: string | null
+          sport?: string
           status?: string
           updated_at?: string
           vs_gods?: boolean

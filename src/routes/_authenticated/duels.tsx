@@ -43,6 +43,10 @@ export const Route = createFileRoute("/_authenticated/duels")({
 });
 
 type Tab = "duels" | "leaderboard";
+type Sport = "nfl" | "cfb";
+
+const SPORT_LABEL: Record<Sport, string> = { nfl: "NFL", cfb: "College" };
+
 
 const AVATAR_STYLES = [
   "bg-destructive text-destructive-foreground",
@@ -65,6 +69,7 @@ function DuelsPage() {
   const queryClient = useQueryClient();
   const { entitled, loading: entitlementLoading } = useEntitled();
   const [tab, setTab] = useState<Tab>("duels");
+  const [sport, setSport] = useState<Sport>("nfl");
   const [openDuelId, setOpenDuelId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, Side>>({});
   const [search, setSearch] = useState("");
@@ -76,8 +81,8 @@ function DuelsPage() {
   const runSave = useServerFn(saveDuelPicks);
 
   const board = useQuery({
-    queryKey: ["duel-board"],
-    queryFn: () => loadBoard({ data: {} }),
+    queryKey: ["duel-board", sport],
+    queryFn: () => loadBoard({ data: { sport } }),
     refetchInterval: 30_000,
   });
 
@@ -90,7 +95,8 @@ function DuelsPage() {
 
   const create = useMutation({
     mutationFn: (vars: { vsGods: boolean; opponentId?: string | null }) =>
-      runCreate({ data: vars }),
+      runCreate({ data: { ...vars, sport } }),
+
     onSuccess: (res) => {
       toast.success("Challenge created. Make your picks.");
       setOpenDuelId(res.duelId);
@@ -199,6 +205,23 @@ function DuelsPage() {
       </header>
 
       <div className="grid gap-5 px-4 py-4 sm:gap-7 sm:px-8">
+        <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border-strong bg-secondary p-1">
+          {(["nfl", "cfb"] as Sport[]).map((id) => (
+            <Button
+              key={id}
+              variant={sport === id ? "default" : "ghost"}
+              onClick={() => {
+                setSport(id);
+                setOpenDuelId(null);
+                setDraft({});
+              }}
+              className="min-h-12 rounded-xl font-display text-base"
+            >
+              {SPORT_LABEL[id]}
+            </Button>
+          ))}
+        </div>
+
         {featuredDuel && tab === "duels" && (
           <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
             <div className="flex items-center justify-between gap-3">
@@ -343,14 +366,17 @@ function DuelsPage() {
           <>
             <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
               <p className="flex items-center gap-2 font-display text-base font-semibold uppercase text-accent">
-                <Zap size={19} /> Week {data?.weekNum} · bragging rights
+                <Zap size={19} /> {SPORT_LABEL[sport]} · Week {data?.weekNum} · bragging rights
               </p>
               <h2 className="mt-4 font-display text-3xl font-semibold sm:mt-5 sm:text-4xl">
                 Face The Gods
               </h2>
               <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">
-                One week of NFL picks, one on one. Beat the house, or get beat by it.
+                {sport === "cfb"
+                  ? "One week of Top 25 college picks, one on one. Beat the house, or get beat by it."
+                  : "One week of NFL picks, one on one. Beat the house, or get beat by it."}
               </p>
+
               <div className="mt-6 grid gap-2">
                 <Button
                   disabled={gated || data?.locked || create.isPending}
@@ -498,7 +524,7 @@ function DuelsPage() {
                             You vs {them.username}
                           </p>
                           <p className="text-xs text-faint">
-                            Week {d.weekNum} ·{" "}
+                            {SPORT_LABEL[d.sport] ?? "NFL"} · Week {d.weekNum} ·{" "}
                             {d.status === "open"
                               ? "waiting for an opponent"
                               : d.status === "final"
@@ -530,11 +556,14 @@ function DuelsPage() {
                             const myPick = draft[g.id] ?? me.picks[g.id];
                             const theirPick = them.picks[g.id];
                             const editable = !gated && !data?.locked && d.status !== "final";
+                            const godTalk = them.isGods ? them.reasoning?.[g.id] : undefined;
                             return (
                               <div key={g.id} className="rounded-xl border border-border p-2.5">
                                 <div className="grid grid-cols-2 gap-2">
                                   {(["away", "home"] as Side[]).map((side) => {
                                     const team = side === "away" ? g.away : g.home;
+                                    const rank = side === "away" ? g.away_rank : g.home_rank;
+                                    const logo = side === "away" ? g.away_logo : g.home_logo;
                                     const chosen = myPick === side;
                                     return (
                                       <Button
@@ -546,7 +575,20 @@ function DuelsPage() {
                                           chosen ? "border-accent bg-accent-soft" : "border-border"
                                         } disabled:opacity-80`}
                                       >
-                                        <TeamBadge name={team} size={24} />
+                                        {logo ? (
+                                          <img
+                                            src={logo}
+                                            alt=""
+                                            className="size-6 shrink-0 object-contain"
+                                          />
+                                        ) : (
+                                          <TeamBadge name={team} size={24} />
+                                        )}
+                                        {rank ? (
+                                          <span className="shrink-0 text-xs font-bold text-accent-soft-foreground">
+                                            #{rank}
+                                          </span>
+                                        ) : null}
                                         <span className="min-w-0 truncate font-medium">{team}</span>
                                       </Button>
                                     );
@@ -560,9 +602,18 @@ function DuelsPage() {
                                     ? ` · ${g.away_score}–${g.home_score}`
                                     : ""}
                                 </p>
+                                {godTalk && (
+                                  <p className="mt-2 rounded-lg border-l-4 border-accent bg-accent-soft px-3 py-2 text-xs italic leading-relaxed text-accent-soft-foreground">
+                                    <span className="mr-1 font-display font-bold not-italic uppercase">
+                                      The Gods:
+                                    </span>
+                                    “{godTalk}”
+                                  </p>
+                                )}
                               </div>
                             );
                           })}
+
 
                           {!gated && !data?.locked && d.status !== "final" && (
                             <Button
