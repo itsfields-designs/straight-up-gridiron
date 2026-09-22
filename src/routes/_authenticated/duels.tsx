@@ -9,6 +9,7 @@ import { EmptyState, LoadingState } from "@/components/ui/feedback";
 import { Button } from "@/components/ui/button";
 import { SznPassGate, useEntitled } from "@/components/SznPassGate";
 import { TeamBadge } from "@/components/pool/TeamBadge";
+import { LiveScoreboard } from "@/components/pool/LiveScoreboard";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 import {
   createDuel,
@@ -78,7 +79,7 @@ function DuelsPage() {
   const board = useQuery({
     queryKey: ["duel-board"],
     queryFn: () => loadBoard({ data: {} }),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
   });
 
   const opponents = useQuery({
