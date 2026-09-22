@@ -25,3 +25,11 @@
 - [x] Automatic refresh every five minutes during the season
 - [x] Top 25 pick'em promoted as a free platform-wide board for every user, league or not
 - [x] Visible weekly NCAA pick deadlines, live countdowns, and consistent locked states
+
+# Platform-wide visual redesign
+
+- [ ] Apply the black, cream, gold, and green reference system across every user-facing screen
+- [ ] Match public home and authentication composition
+- [ ] Match signed-in shell, dashboard, leagues, picks, standings, and supporting sections
+- [ ] Restyle College, Duels, Profile, Leaderboard, and Commissioner screens
+- [ ] Verify mobile and desktop journeys, overflow, metadata, and preview health
