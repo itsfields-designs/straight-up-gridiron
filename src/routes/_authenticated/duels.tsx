@@ -243,19 +243,21 @@ function DuelsPage() {
                     ? featuredDuel.opponent.username
                     : featuredDuel.challenger.username}
                 </p>
-                <p className="font-display text-3xl font-bold">
-                  {featuredDuel.mySide === "challenger"
-                    ? featuredDuel.opponent.correct
-                    : featuredDuel.challenger.correct}
-                </p>
+                <p className="font-display text-3xl font-bold tabular-nums">{theirScore}</p>
               </div>
             </div>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-primary-foreground/20">
-              <div className="h-full w-[58%] bg-accent" />
+              <div
+                className="h-full bg-accent transition-all duration-500"
+                style={{ width: `${sharePct}%` }}
+              />
             </div>
             <div className="mt-2 flex justify-between text-xs text-primary-foreground/50">
-              <span>You’re ahead</span>
+              <span>{leadLabel}</span>
               <span>{Math.max(games.length - decidedGames, 0)} games left</span>
+            </div>
+            <div className="mt-5">
+              <LiveScoreboard league="nfl" limit={16} />
             </div>
             <div className="mt-5 flex items-center justify-between border-t border-accent/40 pt-4">
               <span className="flex items-center gap-2 text-sm text-primary-foreground/55">
