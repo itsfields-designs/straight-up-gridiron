@@ -1,0 +1,1 @@
+ALTER TABLE public.duel_picks ADD COLUMN IF NOT EXISTS tiebreaker integer;

@@ -47,7 +47,6 @@ type Sport = "nfl" | "cfb";
 
 const SPORT_LABEL: Record<Sport, string> = { nfl: "NFL", cfb: "College" };
 
-
 const AVATAR_STYLES = [
   "bg-destructive text-destructive-foreground",
   "bg-success text-primary-foreground",
@@ -72,6 +71,7 @@ function DuelsPage() {
   const [sport, setSport] = useState<Sport>("nfl");
   const [openDuelId, setOpenDuelId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, Side>>({});
+  const [tiebreaker, setTiebreaker] = useState("");
   const [search, setSearch] = useState("");
 
   const loadBoard = useServerFn(getDuelBoard);
@@ -116,7 +116,11 @@ function DuelsPage() {
   });
 
   const save = useMutation({
-    mutationFn: (vars: { duelId: string; picks: Record<string, Side> }) => runSave({ data: vars }),
+    mutationFn: (vars: {
+      duelId: string;
+      picks: Record<string, Side>;
+      tiebreaker: number | null;
+    }) => runSave({ data: vars }),
     onSuccess: () => {
       toast.success("Picks saved.");
       void invalidate();
@@ -181,9 +185,14 @@ function DuelsPage() {
             : "Locked in"
           : "Pending";
 
-  const startEditing = (duelId: string, picks: Record<string, Side>) => {
+  const startEditing = (
+    duelId: string,
+    picks: Record<string, Side>,
+    savedTiebreaker?: number | null,
+  ) => {
     setOpenDuelId(duelId);
     setDraft(picks);
+    setTiebreaker(savedTiebreaker != null ? String(savedTiebreaker) : "");
   };
 
   if (board.isLoading) return <LoadingState label="Loading duels" />;
@@ -296,6 +305,9 @@ function DuelsPage() {
                     featuredDuel.mySide === "challenger"
                       ? featuredDuel.challenger.picks
                       : featuredDuel.opponent.picks,
+                    featuredDuel.mySide === "challenger"
+                      ? featuredDuel.challenger.tiebreaker
+                      : featuredDuel.opponent.tiebreaker,
                   )
                 }
                 className="min-w-36"
@@ -543,7 +555,7 @@ function DuelsPage() {
 
                       <div className="mt-3 flex gap-2">
                         <Button
-                          onClick={() => startEditing(d.id, me.picks)}
+                          onClick={() => startEditing(d.id, me.picks, me.tiebreaker)}
                           className="min-h-11 flex-1 rounded-xl"
                         >
                           {data?.locked || d.status === "final" ? "View picks" : "Make picks"}
@@ -614,11 +626,43 @@ function DuelsPage() {
                             );
                           })}
 
+                          <div className="rounded-xl border-2 border-accent bg-accent-soft p-3">
+                            <p className="font-display text-sm font-bold uppercase text-accent-soft-foreground">
+                              Tiebreaker
+                            </p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              Combined score of {d.tiebreakerLabel ?? "the final game"} — closest
+                              guess wins if you are level on picks.
+                            </p>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              min={0}
+                              max={300}
+                              value={tiebreaker}
+                              disabled={gated || data?.locked || d.status === "final"}
+                              onChange={(e) => setTiebreaker(e.target.value)}
+                              placeholder="Total points"
+                              className="mt-2 min-h-12 w-full rounded-lg border border-border-strong bg-background px-3 text-base"
+                            />
+                            <p className="mt-1.5 text-xs text-faint">
+                              {them.tiebreaker != null
+                                ? `${them.username}: ${them.tiebreaker}`
+                                : "Their guess is hidden until kickoff"}
+                              {d.tiebreakerTotal != null ? ` · actual ${d.tiebreakerTotal}` : ""}
+                            </p>
+                          </div>
 
                           {!gated && !data?.locked && d.status !== "final" && (
                             <Button
                               disabled={save.isPending}
-                              onClick={() => save.mutate({ duelId: d.id, picks: draft })}
+                              onClick={() =>
+                                save.mutate({
+                                  duelId: d.id,
+                                  picks: draft,
+                                  tiebreaker: tiebreaker === "" ? null : Number(tiebreaker),
+                                })
+                              }
                               className="min-h-12 rounded-xl bg-success text-primary"
                             >
                               Save {Object.keys(draft).length} of {games.length} picks

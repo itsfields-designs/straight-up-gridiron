@@ -18,8 +18,16 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { currentDuelWeek, weekGames, weekLocked, lockLabel, settleWeek, duelViews } =
-      await import("@/lib/duels.server");
+    const {
+      currentDuelWeek,
+      weekGames,
+      weekLocked,
+      lockLabel,
+      settleWeek,
+      duelViews,
+      tiebreakerGame,
+      tiebreakerTotal,
+    } = await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const sport = data.sport;
@@ -52,10 +60,15 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       godsWins: r.gods_wins,
     }));
 
+    const tbGame = tiebreakerGame(games);
+
     return {
       sport,
       weekNum,
       games,
+      tiebreakerGameId: tbGame?.id ?? null,
+      tiebreakerLabel: tbGame ? `${tbGame.away} at ${tbGame.home}` : null,
+      tiebreakerTotal: tiebreakerTotal(games),
       locked: weekLocked(games),
       lockAt: lockLabel(games),
       duels,
@@ -63,7 +76,6 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       leaderboard,
     };
   });
-
 
 /** Players you can challenge directly. */
 export const searchDuelOpponents = createServerFn({ method: "GET" })
@@ -94,9 +106,8 @@ export const createDuel = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { assertEntitled } = await import("@/lib/membership.functions");
     await assertEntitled(context.userId, context.claims as Record<string, unknown>);
-    const { currentDuelWeek, weekGames, weekLocked, buildGodsPicks } = await import(
-      "@/lib/duels.server"
-    );
+    const { currentDuelWeek, weekGames, weekLocked, buildGodsPicks } =
+      await import("@/lib/duels.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const sport = data.sport;
@@ -104,7 +115,8 @@ export const createDuel = createServerFn({ method: "POST" })
     const weekNum = await currentDuelWeek(sport);
     const games = await weekGames(weekNum, sport);
     if (games.length === 0) throw new Error(`There is no ${label} slate to duel over right now.`);
-    if (weekLocked(games)) throw new Error("This week has already kicked off. Try again next week.");
+    if (weekLocked(games))
+      throw new Error("This week has already kicked off. Try again next week.");
     if (data.opponentId === context.userId) throw new Error("You cannot challenge yourself.");
 
     const { data: duel, error } = await supabaseAdmin
@@ -128,18 +140,16 @@ export const createDuel = createServerFn({ method: "POST" })
         user_id: null,
         picks: gods.picks,
         reasoning: gods.reasoning,
+        tiebreaker: gods.tiebreaker,
       });
     }
     return { duelId: duel.id, weekNum, sport };
   });
 
-
 export const respondToDuel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ duelId: z.string().uuid(), accept: z.boolean() })
-      .parse(input),
+    z.object({ duelId: z.string().uuid(), accept: z.boolean() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     if (data.accept) {
@@ -156,13 +166,13 @@ export const respondToDuel = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!duel || duel.status !== "open") throw new Error("That challenge is no longer open.");
-    if (duel.challenger_id === context.userId) throw new Error("You cannot accept your own challenge.");
+    if (duel.challenger_id === context.userId)
+      throw new Error("You cannot accept your own challenge.");
     if (duel.opponent_id && duel.opponent_id !== context.userId)
       throw new Error("That challenge was sent to someone else.");
 
     const games = await weekGames(duel.week_num, duel.sport === "cfb" ? "cfb" : "nfl");
     if (weekLocked(games)) throw new Error("This week has already kicked off.");
-
 
     if (!data.accept) {
       if (!duel.opponent_id) throw new Error("Only the invited player can decline.");
@@ -183,7 +193,11 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ duelId: z.string().uuid(), picks: z.record(z.string(), sideSchema) })
+      .object({
+        duelId: z.string().uuid(),
+        picks: z.record(z.string(), sideSchema),
+        tiebreaker: z.number().int().min(0).max(300).nullable().optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -206,7 +220,6 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
     const games = await weekGames(duel.week_num, duel.sport === "cfb" ? "cfb" : "nfl");
     if (weekLocked(games)) throw new Error("Picks are locked for this week.");
 
-
     const valid = new Set(games.map((g) => g.id));
     const picks: Record<string, "home" | "away"> = {};
     for (const [gameId, side] of Object.entries(data.picks)) {
@@ -221,11 +234,12 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .maybeSingle();
 
+    const tiebreaker = data.tiebreaker ?? null;
     const { error } = existing
-      ? await supabaseAdmin.from("duel_picks").update({ picks }).eq("id", existing.id)
+      ? await supabaseAdmin.from("duel_picks").update({ picks, tiebreaker }).eq("id", existing.id)
       : await supabaseAdmin
           .from("duel_picks")
-          .insert({ duel_id: duel.id, user_id: context.userId, picks });
+          .insert({ duel_id: duel.id, user_id: context.userId, picks, tiebreaker });
     if (error) throw new Error(error.message);
     return { saved: Object.keys(picks).length };
   });
