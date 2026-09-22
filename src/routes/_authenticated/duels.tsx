@@ -306,6 +306,9 @@ function DuelsPage() {
                     featuredDuel.mySide === "challenger"
                       ? featuredDuel.challenger.picks
                       : featuredDuel.opponent.picks,
+                    featuredDuel.mySide === "challenger"
+                      ? featuredDuel.challenger.tiebreaker
+                      : featuredDuel.opponent.tiebreaker,
                   )
                 }
                 className="min-w-36"
