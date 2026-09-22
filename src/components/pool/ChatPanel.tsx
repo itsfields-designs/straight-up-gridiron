@@ -103,7 +103,7 @@ export function ChatPanel({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-medium text-muted-foreground">League chat</h2>
+          <h2 className="font-display text-3xl font-semibold">League chat</h2>
           <p className="text-xs text-faint">
             Talk picks and results with everyone in {league.name}.
           </p>
@@ -112,7 +112,7 @@ export function ChatPanel({
           <button
             onClick={() => lock.mutate()}
             disabled={lock.isPending}
-            className="flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-sm font-medium disabled:opacity-60"
+            className="flex min-h-11 items-center gap-1.5 rounded-lg border border-border-strong bg-card px-3 text-sm font-semibold disabled:opacity-60"
           >
             {league.chat_locked ? <Unlock size={14} /> : <Lock size={14} />}
             {league.chat_locked ? "Unlock chat" : "Lock chat"}
@@ -121,7 +121,7 @@ export function ChatPanel({
       </div>
 
       {pinned.length > 0 && (
-        <div className="rounded-lg border border-border bg-secondary p-3">
+        <div className="rounded-xl border border-accent bg-accent-soft p-3">
           <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <Pin size={12} /> Pinned
           </div>
@@ -134,7 +134,7 @@ export function ChatPanel({
         </div>
       )}
 
-      <div className="max-h-[28rem] space-y-3 overflow-y-auto rounded-lg border border-border bg-card p-4">
+      <div className="max-h-[28rem] space-y-3 overflow-y-auto rounded-xl border border-border-strong bg-card p-4">
         {messages.isLoading && <p role="status" className="text-sm text-muted-foreground">Loading messages…</p>}
         {!messages.isLoading && list.length === 0 && (
           <p className="py-6 text-center text-sm text-faint">No messages yet. Say something.</p>
@@ -161,8 +161,8 @@ export function ChatPanel({
                   {m.pinned && <Pin size={11} />}
                 </div>
                 <div
-                  className={`rounded-lg px-3 py-2 text-sm ${
-                    mine ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground"
+                   className={`rounded-xl px-3 py-2 text-sm ${
+                     mine ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
                   }`}
                 >
                   {m.body}
@@ -210,13 +210,13 @@ export function ChatPanel({
             placeholder={
               league.chat_locked ? "Chat is locked for members" : "Share your picks or trash talk…"
             }
-            className="min-h-[2.75rem] flex-1 resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="min-h-[3rem] flex-1 resize-none rounded-lg border border-input bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <button
             onClick={() => post.mutate()}
             disabled={post.isPending}
             aria-label="Send message"
-            className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+            className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-lg bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
           >
             <Send size={16} /> <span className="hidden sm:inline">Send</span>
           </button>

@@ -88,11 +88,11 @@ function CollegePage() {
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-2xl bg-primary p-5 text-primary-foreground">
+      <section className="rounded-xl border border-accent/50 bg-primary p-5 text-primary-foreground">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
           College football
         </p>
-        <h1 className="mt-1.5 font-display text-2xl font-semibold">AP Top 25</h1>
+        <h1 className="mt-1.5 font-display text-4xl font-semibold">AP Top 25</h1>
         <p className="mt-1 text-sm text-primary-foreground/80">
           Every game with a ranked team, plus the Top 25 pick'em — one free board open to every
           player on Gridiron Gods, league or not.
@@ -107,13 +107,13 @@ function CollegePage() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-border bg-card p-4">
+      <section className="rounded-xl border border-border-strong bg-card p-4">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-accent-soft-foreground">
               <Globe size={13} aria-hidden="true" /> Open to everyone
             </p>
-            <h2 className="mt-1 font-display text-lg font-semibold">Top 25 pick&rsquo;em</h2>
+             <h2 className="mt-1 font-display text-2xl font-semibold">Top 25 pick&rsquo;em</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">
               One board, every player on Gridiron Gods. No league, no entry fee — just bragging
               rights.
@@ -157,7 +157,7 @@ function CollegePage() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={`min-h-11 rounded-lg text-sm font-medium transition-colors ${
-              tab === t.id ? "bg-card font-semibold text-foreground shadow-sm" : "text-muted-foreground"
+               tab === t.id ? "bg-accent font-semibold text-accent-foreground" : "text-muted-foreground"
             }`}
           >
             {t.label}
@@ -182,10 +182,10 @@ function WeekPicker({ week, onChange }: { week: number; onChange: (w: number) =>
           key={w}
           onClick={() => onChange(w)}
           aria-current={w === week}
-          className={`min-h-9 shrink-0 rounded-full px-3.5 text-sm font-medium ${
+           className={`min-h-11 shrink-0 rounded-lg border px-3.5 font-display text-sm font-semibold ${
             w === week
-              ? "bg-primary text-primary-foreground"
-              : "border border-border-strong text-muted-foreground"
+               ? "border-accent bg-accent text-accent-foreground"
+               : "border-border-strong bg-card text-muted-foreground"
           }`}
         >
           W{w}
@@ -208,7 +208,7 @@ function RankingsTab() {
     );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="overflow-hidden rounded-xl border border-border-strong bg-card">
       {rankings.data.map((r, i) => (
         <div
           key={r.rank}
@@ -326,7 +326,7 @@ function PicksTab({
               const winner = gradeCfbGame(g);
               const pick = draft[g.id];
               return (
-                <article key={g.id} className="rounded-2xl border border-border bg-card p-3">
+                 <article key={g.id} className="rounded-xl border border-border-strong bg-card p-3">
                   <div className="flex items-center justify-between text-xs text-faint">
                     <span className="flex items-center gap-2">
                       {g.slot}
@@ -408,7 +408,7 @@ function PicksTab({
             disabled={!dirty || saving || locked}
             className={`sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] min-h-12 rounded-xl px-4 text-sm font-semibold ${
               dirty && !locked
-                ? "bg-accent text-accent-foreground"
+                 ? "bg-success text-primary"
                 : "bg-secondary text-muted-foreground"
             }`}
           >
@@ -446,7 +446,7 @@ function LeaderboardTab({
 
   return (
     <div className="grid gap-3">
-      <div className="rounded-2xl bg-accent-soft px-4 py-3">
+         <div className="rounded-xl border border-accent bg-accent-soft px-4 py-3">
         <p className="text-sm font-semibold text-accent-soft-foreground">
           Everyone on Gridiron Gods plays this board
         </p>
@@ -466,7 +466,7 @@ function LeaderboardTab({
             onClick={() => setScope(s)}
             aria-pressed={scope === s}
             className={`min-h-11 rounded-lg text-sm ${
-              scope === s ? "bg-card font-semibold shadow-sm" : "text-muted-foreground"
+               scope === s ? "bg-accent font-semibold text-accent-foreground" : "text-muted-foreground"
             }`}
           >
             {s === "week" ? `Week ${week}` : "Season"}
@@ -483,7 +483,7 @@ function LeaderboardTab({
           description="Make your Top 25 picks — the board fills in as ranked games go final."
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+         <div className="overflow-hidden rounded-xl border border-border-strong bg-card">
           {standings.data.map((row, i) => (
             <div
               key={`${row.userId}-${row.weekNum}`}

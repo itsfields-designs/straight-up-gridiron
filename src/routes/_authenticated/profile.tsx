@@ -50,7 +50,7 @@ function ProfilePage() {
   return (
     <div className="grid gap-4">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Profile</h1>
+        <h1 className="font-display text-4xl font-semibold">Profile</h1>
         <p className="mt-1 truncate text-sm text-muted-foreground">{user.email}</p>
       </div>
 
@@ -60,7 +60,7 @@ function ProfilePage() {
         <InviteFriends leagueCode={leagues.data[0].code} leagueName={leagues.data[0].name} />
       ) : null}
 
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="overflow-hidden rounded-xl border border-border-strong bg-card">
         {links.map((l) => (
           <Link
             key={l.to}

@@ -234,7 +234,7 @@ export function PicksPanel({
     <div>
       <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
         <div
-          className="flex shrink-0 gap-1 rounded-full bg-secondary p-1"
+          className="flex shrink-0 gap-1 rounded-xl bg-secondary p-1"
           role="tablist"
           aria-label="Pick sets"
         >
@@ -245,8 +245,8 @@ export function PicksPanel({
               role="tab"
               aria-selected={activeEntry === n}
               onClick={() => setActiveEntry(n)}
-              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold ${
-                activeEntry === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+               className={`min-h-10 shrink-0 rounded-lg px-4 text-sm font-semibold ${
+                 activeEntry === n ? "bg-accent text-accent-foreground" : "text-muted-foreground"
               }`}
             >
               Set {n}
@@ -280,7 +280,7 @@ export function PicksPanel({
           </p>
         </>
       ) : (
-        <div className="mb-4 rounded-2xl border border-border bg-card p-4" aria-live="polite">
+         <div className="mb-4 rounded-xl border border-border-strong bg-card p-4" aria-live="polite">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="font-display text-base font-semibold">
@@ -296,7 +296,7 @@ export function PicksPanel({
           </div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
             <div
-              className="h-full rounded-full bg-accent transition-[width]"
+               className="h-full rounded-full bg-success transition-[width]"
               style={{ width: `${games.length ? (picked / games.length) * 100 : 0}%` }}
             />
           </div>
@@ -312,7 +312,7 @@ export function PicksPanel({
       <div className="space-y-5">
         {groups.map((group) => (
           <section key={group.label}>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-faint">
+             <h3 className="mb-2 font-display text-2xl font-semibold text-foreground">
               {group.label}
             </h3>
             <div className="space-y-2.5">
@@ -348,7 +348,7 @@ export function PicksPanel({
                 const unpicked = !picks[game.id];
                 if (isCollege) {
                   return (
-                    <article key={game.id} className="rounded-2xl border border-border bg-card p-3">
+                     <article key={game.id} className="rounded-xl border border-border-strong bg-card p-3">
                       <div className="flex items-center justify-between text-xs text-faint">
                         <span className="flex items-center gap-2">
                           {game.slot}
@@ -438,7 +438,7 @@ export function PicksPanel({
                 return (
                   <div
                     key={game.id}
-                    className={`rounded-2xl bg-card p-3 ${
+                     className={`rounded-xl bg-card p-3 ${
                       unpicked && !locked
                         ? "border border-dashed border-border-strong"
                         : "border border-border"
@@ -519,13 +519,13 @@ export function PicksPanel({
         ))}
       </div>
 
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-2xl bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
+       <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-xl bg-background/95 py-2 backdrop-blur md:static md:bottom-auto md:bg-transparent md:py-0 md:backdrop-blur-none">
         <button
           onClick={() => save.mutate()}
           disabled={!canSubmit || locked || save.isPending || !isDirty}
           className={`min-h-13 w-full rounded-xl px-4 py-3.5 text-sm font-semibold shadow-lg transition-opacity md:w-auto ${
-            isDirty && canSubmit && !locked
-              ? "bg-accent text-accent-foreground hover:opacity-85 md:shadow-none"
+             isDirty && canSubmit && !locked
+               ? "bg-success text-primary hover:opacity-85 md:shadow-none"
               : "bg-secondary text-muted-foreground md:shadow-none"
           } ${save.isPending || !canSubmit || !isDirty || locked ? "opacity-60" : ""}`}
         >

@@ -169,7 +169,7 @@ function CommissionerPage() {
     <div>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <h1 className="flex items-center gap-2 text-xl font-semibold sm:text-2xl">
+          <h1 className="flex items-center gap-2 font-display text-4xl font-semibold">
             <ShieldCheck size={20} className="shrink-0 text-accent" /> Commissioner
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -216,7 +216,7 @@ function CommissionerPage() {
 
       <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-lg border border-border bg-card p-3 sm:p-3.5">
+          <div key={s.label} className="rounded-xl border border-border-strong bg-card p-3 sm:p-3.5">
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="mt-1 text-base font-semibold sm:text-lg">{s.value}</p>
             {s.hint && <p className="text-xs text-muted-foreground">{s.hint}</p>}
@@ -224,8 +224,8 @@ function CommissionerPage() {
         ))}
       </div>
 
-      <div className="sticky top-[3.4rem] z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
-        <div className="no-scrollbar flex snap-x gap-1 overflow-x-auto" role="tablist" aria-label="Commissioner sections">
+       <div className="sticky top-16 z-20 -mx-4 mb-5 border-b border-border bg-background/95 px-4 backdrop-blur sm:static sm:mx-0 sm:mb-6 sm:px-0 sm:backdrop-blur-none">
+         <div className="no-scrollbar flex snap-x gap-2 overflow-x-auto py-2" role="tablist" aria-label="Commissioner sections">
           {SECTIONS.map((s) => (
             <button
               key={s.id}
@@ -233,8 +233,8 @@ function CommissionerPage() {
               role="tab"
               aria-selected={section === s.id}
               onClick={() => setSection(s.id)}
-              className={`-mb-px flex min-h-12 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium sm:px-3.5 ${
-                section === s.id ? "border-accent text-foreground" : "border-transparent text-faint"
+               className={`flex min-h-11 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-semibold ${
+                 section === s.id ? "bg-accent text-accent-foreground" : "border border-border-strong bg-card text-muted-foreground"
               }`}
             >
               <s.icon size={15} /> {s.label}

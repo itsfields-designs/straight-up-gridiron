@@ -131,54 +131,56 @@ function LeaguePage() {
 
   return (
     <div>
-      <section className="-mx-4 -mt-4 mb-4 bg-primary px-4 pb-4 pt-3 text-primary-foreground sm:mx-0 sm:mt-0 sm:rounded-2xl sm:pt-4">
-        <Link
-          to="/leagues"
-          className="inline-flex min-h-9 items-center gap-1.5 text-xs font-medium text-primary-foreground/75"
-        >
-          <ArrowLeft size={14} /> All leagues
-        </Link>
-        <h1 className="mt-1 font-display text-2xl font-semibold">{league.data.name}</h1>
-        <p className="mt-1 max-w-xl text-sm text-primary-foreground/75">{league.data.rules}</p>
+      <section className="-mx-4 -mt-5 bg-primary px-4 pt-4 text-primary-foreground sm:mx-0 sm:mt-0 sm:rounded-t-xl">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+          <Link to="/leagues" aria-label="All leagues" className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:bg-primary-foreground/10">
+            <ArrowLeft size={22} />
+          </Link>
+          <div className="min-w-0">
+            <h1 className="truncate font-display text-2xl font-semibold">{league.data.name}</h1>
+            <p className="truncate text-sm text-primary-foreground/65">
+              {members.data?.length ?? 0} members · Week {activeWeek}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-primary-foreground/15 px-3 py-2 text-sm font-semibold">
+            Week {activeWeek}
+          </span>
+        </div>
 
-        <div
-          className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4"
-          role="group"
-          aria-label="Week"
-        >
-          {Array.from({ length: totalWeeksFor(sport) }, (_, i) => i + 1).map((w) => (
+        <div className="no-scrollbar mt-4 flex overflow-x-auto" role="tablist" aria-label="League sections">
+          {TABS.map((t) => (
             <button
-              key={w}
+              key={t.id}
               type="button"
-              aria-pressed={activeWeek === w}
-              onClick={() => setWeek(w)}
-              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold ${
-                activeWeek === w
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-primary-foreground/10 text-primary-foreground/80"
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => setTab(t.id)}
+              className={`min-h-14 shrink-0 border-b-4 px-5 text-sm font-semibold ${
+                tab === t.id
+                  ? "border-accent text-primary-foreground"
+                  : "border-transparent text-primary-foreground/60"
               }`}
             >
-              W{w}
+              {t.label}
             </button>
           ))}
         </div>
       </section>
 
-      <div className="no-scrollbar sticky top-[3.5rem] z-20 -mx-4 mb-4 flex gap-2 overflow-x-auto bg-background/95 px-4 py-2 backdrop-blur">
-        {TABS.map((t) => (
+      <div className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto border-b border-border bg-background px-4 py-3" role="group" aria-label="Week">
+        {Array.from({ length: totalWeeksFor(sport) }, (_, i) => i + 1).map((w) => (
           <button
-            key={t.id}
+            key={w}
             type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-sm font-medium ${
-              tab === t.id
-                ? "bg-primary text-primary-foreground"
-                : "border border-border bg-card text-muted-foreground"
+            aria-pressed={activeWeek === w}
+            onClick={() => setWeek(w)}
+            className={`min-h-11 shrink-0 rounded-lg border px-4 font-display text-base font-semibold ${
+              activeWeek === w
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-border-strong bg-card text-muted-foreground"
             }`}
           >
-            <t.icon size={15} /> {t.label}
+            W{w}
           </button>
         ))}
       </div>

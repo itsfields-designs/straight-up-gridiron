@@ -28,8 +28,8 @@
 
 # Platform-wide visual redesign
 
-- [ ] Apply the black, cream, gold, and green reference system across every user-facing screen
-- [ ] Match public home and authentication composition
-- [ ] Match signed-in shell, dashboard, leagues, picks, standings, and supporting sections
-- [ ] Restyle College, Duels, Profile, Leaderboard, and Commissioner screens
-- [ ] Verify mobile and desktop journeys, overflow, metadata, and preview health
+- [x] Apply the black, cream, gold, and green reference system across every user-facing screen
+- [x] Match public home and authentication composition
+- [x] Match signed-in shell, dashboard, leagues, picks, standings, and supporting sections
+- [x] Restyle College, Duels, Profile, Leaderboard, and Commissioner screens
+- [x] Verify mobile and desktop journeys, overflow, metadata, and preview health

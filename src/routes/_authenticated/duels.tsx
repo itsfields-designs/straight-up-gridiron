@@ -122,11 +122,11 @@ function DuelsPage() {
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-2xl bg-primary p-5 text-primary-foreground">
+      <section className="rounded-xl border border-accent/50 bg-primary p-5 text-primary-foreground">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
           Week {data?.weekNum} · bragging rights
         </p>
-        <h1 className="mt-1.5 flex items-center gap-2 font-display text-2xl font-semibold">
+        <h1 className="mt-1.5 flex items-center gap-2 font-display text-4xl font-semibold">
           <Swords size={22} /> Face The Gods
         </h1>
         <p className="mt-1 text-sm text-primary-foreground/80">
@@ -155,7 +155,7 @@ function DuelsPage() {
             type="button"
             onClick={() => setTab(id)}
             className={`min-h-11 rounded-lg text-sm font-semibold capitalize ${
-              tab === id ? "bg-card shadow-sm" : "text-muted-foreground"
+               tab === id ? "bg-accent text-accent-foreground" : "text-muted-foreground"
             }`}
           >
             {id === "duels" ? "Duels" : "Leaderboard"}
@@ -164,7 +164,7 @@ function DuelsPage() {
       </div>
 
       {tab === "leaderboard" ? (
-        <section className="rounded-2xl border border-border bg-card p-4">
+        <section className="rounded-xl border border-border-strong bg-card p-4">
           <h2 className="font-display text-lg font-semibold">Duel leaderboard</h2>
           {(data?.leaderboard ?? []).length === 0 ? (
             <p className="mt-2 text-sm text-muted-foreground">
@@ -204,7 +204,7 @@ function DuelsPage() {
         </section>
       ) : (
         <>
-          <section className="rounded-2xl border border-border bg-card p-4">
+          <section className="rounded-xl border border-border-strong bg-card p-4">
             <h2 className="font-display text-lg font-semibold">Start a duel</h2>
             <div className="mt-3 grid gap-2">
               <button
@@ -260,7 +260,7 @@ function DuelsPage() {
               {openSeats.map((d) => (
                 <article
                   key={d.id}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4"
+                  className="flex items-center gap-3 rounded-xl border border-border-strong bg-card p-4"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{d.challenger.username}</p>
@@ -305,7 +305,7 @@ function DuelsPage() {
                 const won = d.status === "final" && d.winnerId === user.id;
                 const lost = d.status === "final" && !won && (d.winnerId || d.godsWon);
                 return (
-                  <article key={d.id} className="rounded-2xl border border-border bg-card p-4">
+                  <article key={d.id} className="rounded-xl border border-border-strong bg-card p-4">
                     <div className="flex items-center gap-3">
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-display text-base font-semibold">
@@ -384,7 +384,7 @@ function DuelsPage() {
                             type="button"
                             disabled={save.isPending}
                             onClick={() => save.mutate({ duelId: d.id, picks: draft })}
-                            className="min-h-12 rounded-xl bg-accent text-sm font-semibold text-accent-foreground disabled:opacity-60"
+                            className="min-h-12 rounded-xl bg-success text-sm font-semibold text-primary disabled:opacity-60"
                           >
                             Save {Object.keys(draft).length} of {games.length} picks
                           </button>

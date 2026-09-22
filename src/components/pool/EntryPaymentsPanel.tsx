@@ -205,7 +205,7 @@ export function EntryPaymentsPanel({
   return (
     <div className="space-y-4">
       <section className="app-card p-5 sm:p-6" aria-labelledby="entries-summary-heading">
-        <h2 id="entries-summary-heading" className="text-2xl font-semibold">Entries</h2>
+        <h2 id="entries-summary-heading" className="font-display text-3xl font-semibold">Entries</h2>
         <div className="mt-4 flex items-baseline gap-2">
           <span className="font-display text-5xl font-semibold leading-none">{paidCount}</span>
           <span className="text-lg text-muted-foreground">of {totalSets} paid</span>
@@ -222,7 +222,7 @@ export function EntryPaymentsPanel({
       </section>
 
       <section className="app-card p-5 sm:p-6" aria-labelledby="paid-heading">
-        <h2 id="paid-heading" className="text-2xl font-semibold">Who’s paid</h2>
+        <h2 id="paid-heading" className="font-display text-3xl font-semibold">Who’s paid</h2>
 
         <div className="mt-4 divide-y divide-border">
           {visibleEntries.map(({ member, entryNo, paid }) => {
@@ -239,9 +239,9 @@ export function EntryPaymentsPanel({
                   aria-pressed={paid}
                   aria-label={`Mark ${member.username} set ${entryNo} ${paid ? "unpaid" : "paid"}`}
                   onClick={() => toggle.mutate({ userId: member.user_id, entryNo, paid: !paid })}
-                  className={`h-11 min-w-28 rounded-full border-2 px-5 text-base shadow-none ${
+                   className={`h-11 min-w-28 rounded-lg border-2 px-5 text-base shadow-none ${
                     paid
-                      ? "border-success bg-secondary text-foreground hover:bg-secondary"
+                       ? "border-success bg-success text-primary hover:bg-success"
                       : "border-accent bg-accent-soft text-foreground hover:bg-accent-soft"
                   }`}
                 >
@@ -303,7 +303,7 @@ export function EntryPaymentsPanel({
         <section className="app-card p-5 sm:p-6" aria-labelledby="pot-calculation-heading">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 id="pot-calculation-heading" className="text-xl font-semibold">Week {week} pot</h2>
+               <h2 id="pot-calculation-heading" className="font-display text-3xl font-semibold">Week {week} pot</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {league.pots_auto ? "Updates as payments are marked paid." : "Using a manual amount."}
               </p>
@@ -314,7 +314,7 @@ export function EntryPaymentsPanel({
           <label className="mt-5 flex min-h-12 cursor-pointer items-center gap-3 border-t border-border pt-4 text-sm font-medium">
             <input
               type="checkbox"
-              className="h-5 w-5 accent-primary"
+               className="h-5 w-5 accent-success"
               checked={league.pots_auto}
               disabled={setAuto.isPending}
               onChange={(event) => setAuto.mutate(event.target.checked)}
@@ -333,7 +333,7 @@ export function EntryPaymentsPanel({
                   inputMode="decimal"
                   value={manualWeekly}
                   onChange={(event) => setManualWeekly(event.target.value)}
-                  className="min-h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                   className="min-h-12 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </label>
               <Button

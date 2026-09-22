@@ -55,10 +55,10 @@ export function StandingsPanel({
   return (
     <div>
       {league && (
-        <div className="mb-4 rounded-2xl bg-primary p-4 text-primary-foreground">
+        <div className="mb-4 rounded-xl border border-accent/50 bg-card p-4 text-card-foreground">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
+               <p className="text-sm text-muted-foreground">
                 Week {week} pot
               </p>
               <p className="font-display text-2xl font-semibold">
@@ -66,7 +66,7 @@ export function StandingsPanel({
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
+               <p className="text-sm text-muted-foreground">
                 Season pot
               </p>
               <p className="font-display text-2xl font-semibold">
@@ -74,7 +74,7 @@ export function StandingsPanel({
               </p>
             </div>
           </div>
-          <p className="mt-2 text-xs text-primary-foreground/75">
+           <p className="mt-3 border-t border-border pt-3 text-sm text-muted-foreground">
             Entry {money(league.entry_fee)} for weekly pot or {money(league.season_entry_fee)} for
             season pot.{" "}
             {league.sport === "ncaa"
@@ -84,7 +84,7 @@ export function StandingsPanel({
         </div>
       )}
 
-      <div className="mb-4 grid grid-cols-2 gap-1 rounded-full bg-secondary p-1" role="tablist" aria-label="Standings period">
+      <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-secondary p-1" role="tablist" aria-label="Standings period">
         {(["week", "season"] as const).map((m) => (
           <button
             key={m}
@@ -92,8 +92,8 @@ export function StandingsPanel({
             role="tab"
             aria-selected={mode === m}
             onClick={() => setMode(m)}
-            className={`min-h-10 rounded-full px-3.5 text-sm font-semibold ${
-              mode === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+             className={`min-h-11 rounded-lg px-3.5 text-sm font-semibold ${
+               mode === m ? "bg-accent text-accent-foreground" : "text-muted-foreground"
             }`}
           >
             {m === "season" ? "Season" : `Week ${week}`}
@@ -109,7 +109,7 @@ export function StandingsPanel({
             {rows.map((r) => (
               <li
                 key={`${r.userId}-${r.entryNo}`}
-                className="rounded-2xl border border-border bg-card p-3"
+                 className="border-b border-border py-4 last:border-b-0"
               >
                 <div className="flex items-center gap-3">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-sm font-semibold tabular-nums">
@@ -130,7 +130,7 @@ export function StandingsPanel({
                 </div>
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
                   <div
-                    className="h-full rounded-full bg-accent"
+                     className="h-full rounded-full bg-success"
                     style={{ width: `${Math.round((r.correct / best) * 100)}%` }}
                   />
                 </div>
