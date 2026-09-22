@@ -194,7 +194,7 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
 
     const { data: duel } = await supabaseAdmin
       .from("duels")
-      .select("id, week_num, challenger_id, opponent_id, status")
+      .select("id, week_num, sport, challenger_id, opponent_id, status")
       .eq("id", data.duelId)
       .maybeSingle();
     if (!duel) throw new Error("Duel not found.");
@@ -203,8 +203,9 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
     if (duel.status === "final" || duel.status === "declined")
       throw new Error("This duel is over.");
 
-    const games = await weekGames(duel.week_num);
+    const games = await weekGames(duel.week_num, duel.sport === "cfb" ? "cfb" : "nfl");
     if (weekLocked(games)) throw new Error("Picks are locked for this week.");
+
 
     const valid = new Set(games.map((g) => g.id));
     const picks: Record<string, "home" | "away"> = {};
