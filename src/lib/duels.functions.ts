@@ -239,11 +239,15 @@ export const saveDuelPicks = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .maybeSingle();
 
+    const tiebreaker = data.tiebreaker ?? null;
     const { error } = existing
-      ? await supabaseAdmin.from("duel_picks").update({ picks }).eq("id", existing.id)
+      ? await supabaseAdmin
+          .from("duel_picks")
+          .update({ picks, tiebreaker })
+          .eq("id", existing.id)
       : await supabaseAdmin
           .from("duel_picks")
-          .insert({ duel_id: duel.id, user_id: context.userId, picks });
+          .insert({ duel_id: duel.id, user_id: context.userId, picks, tiebreaker });
     if (error) throw new Error(error.message);
     return { saved: Object.keys(picks).length };
   });
