@@ -69,6 +69,7 @@ function DuelsPage() {
   const queryClient = useQueryClient();
   const { entitled, loading: entitlementLoading } = useEntitled();
   const [tab, setTab] = useState<Tab>("duels");
+  const [sport, setSport] = useState<Sport>("nfl");
   const [openDuelId, setOpenDuelId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, Side>>({});
   const [search, setSearch] = useState("");
@@ -80,8 +81,8 @@ function DuelsPage() {
   const runSave = useServerFn(saveDuelPicks);
 
   const board = useQuery({
-    queryKey: ["duel-board"],
-    queryFn: () => loadBoard({ data: {} }),
+    queryKey: ["duel-board", sport],
+    queryFn: () => loadBoard({ data: { sport } }),
     refetchInterval: 30_000,
   });
 
@@ -94,7 +95,8 @@ function DuelsPage() {
 
   const create = useMutation({
     mutationFn: (vars: { vsGods: boolean; opponentId?: string | null }) =>
-      runCreate({ data: vars }),
+      runCreate({ data: { ...vars, sport } }),
+
     onSuccess: (res) => {
       toast.success("Challenge created. Make your picks.");
       setOpenDuelId(res.duelId);
