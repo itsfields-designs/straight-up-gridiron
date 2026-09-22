@@ -28,9 +28,6 @@ function AuthedLayout() {
   const { pathname } = useLocation();
   const isDuels = pathname === "/duels";
   const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
-  const nav = isDuels
-    ? NAV.filter((item) => ["/dashboard", "/leagues", "/duels"].includes(item.to))
-    : NAV;
 
   return (
     <div className="min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))]">
@@ -66,8 +63,8 @@ function AuthedLayout() {
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-accent/35 bg-primary text-primary-foreground pb-[env(safe-area-inset-bottom)]"
       >
-        <div className={`mx-auto grid max-w-3xl ${isDuels ? "grid-cols-3" : "grid-cols-5"}`}>
-          {nav.map((item) => (
+        <div className="mx-auto grid max-w-3xl grid-cols-5">
+          {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
