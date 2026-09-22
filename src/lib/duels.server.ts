@@ -106,6 +106,24 @@ export function lockLabel(games: GameRow[]): string | null {
   return times[0] ? new Date(times[0]).toISOString() : null;
 }
 
+/** The tiebreaker is the last game of the week by kickoff. */
+export function tiebreakerGame(games: GameRow[]): GameRow | null {
+  const sorted = [...games].sort((a, b) => {
+    const ak = a.kickoff ? new Date(a.kickoff).getTime() : 0;
+    const bk = b.kickoff ? new Date(b.kickoff).getTime() : 0;
+    if (ak !== bk) return ak - bk;
+    return a.sort_order - b.sort_order;
+  });
+  return sorted[sorted.length - 1] ?? null;
+}
+
+/** Combined score of the tiebreaker game once it is final. */
+export function tiebreakerTotal(games: GameRow[]): number | null {
+  const g = tiebreakerGame(games);
+  if (!g || g.state !== "post" || g.home_score == null || g.away_score == null) return null;
+  return g.home_score + g.away_score;
+}
+
 function winnerOf(g: GameRow): Side | "tie" | null {
   if (g.home_score == null || g.away_score == null || g.state !== "post") return null;
   if (g.home_score === g.away_score) return "tie";
