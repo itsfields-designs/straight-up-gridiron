@@ -110,8 +110,7 @@ function DuelsPage() {
   });
 
   const save = useMutation({
-    mutationFn: (vars: { duelId: string; picks: Record<string, Side> }) =>
-      runSave({ data: vars }),
+    mutationFn: (vars: { duelId: string; picks: Record<string, Side> }) => runSave({ data: vars }),
     onSuccess: () => {
       toast.success("Picks saved.");
       void invalidate();
@@ -126,10 +125,16 @@ function DuelsPage() {
 
   const mine = duels.filter((d) => d.mySide !== null && d.status !== "declined");
   const openSeats = duels.filter(
-    (d) => d.status === "open" && d.mySide === null && (!d.opponent.userId || d.opponent.userId === user.id),
+    (d) =>
+      d.status === "open" &&
+      d.mySide === null &&
+      (!d.opponent.userId || d.opponent.userId === user.id),
   );
 
-  const activeDuel = useMemo(() => duels.find((d) => d.id === openDuelId) ?? null, [duels, openDuelId]);
+  const activeDuel = useMemo(
+    () => duels.find((d) => d.id === openDuelId) ?? null,
+    [duels, openDuelId],
+  );
   const featuredDuel = mine.find((d) => d.status === "active") ?? mine[0] ?? null;
   const recordByUser = new Map((data?.leaderboard ?? []).map((row) => [row.userId, row]));
   const decidedGames = games.filter((game) => game.state === "post").length;
@@ -154,274 +159,382 @@ function DuelsPage() {
       </header>
 
       <div className="grid gap-7 px-6 py-4 sm:px-8">
-      {featuredDuel && tab === "duels" && (
-        <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
-          <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-destructive-soft px-4 py-2 text-xs font-bold uppercase text-destructive">
-              <span className="size-2.5 rounded-full bg-destructive" /> {featuredDuel.status === "final" ? "Final" : "Live"}
-            </span>
-            <span className="text-sm font-semibold text-primary-foreground/45">
-              Week {featuredDuel.weekNum} · {decidedGames} of {games.length} decided
-            </span>
-          </div>
-          <div className="mt-7 grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center">
-            <div>
-              <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-accent/75 bg-accent font-display text-2xl font-bold text-accent-foreground">{initials(featuredDuel.mySide === "challenger" ? featuredDuel.challenger.username : featuredDuel.opponent.username)}</span>
-              <p className="mt-3 font-display text-xl font-semibold text-accent">You</p>
-              <p className="font-display text-3xl font-bold">{featuredDuel.mySide === "challenger" ? featuredDuel.challenger.correct : featuredDuel.opponent.correct}</p>
-            </div>
-            <div><p className="font-display text-xl font-bold text-accent">VS</p><p className="mt-1 text-xs text-primary-foreground/50">bragging rights</p></div>
-            <div>
-              <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-destructive/70 bg-destructive font-display text-2xl font-bold text-destructive-foreground">{initials(featuredDuel.mySide === "challenger" ? featuredDuel.opponent.username : featuredDuel.challenger.username)}</span>
-              <p className="mt-3 truncate font-display text-xl font-semibold">{featuredDuel.mySide === "challenger" ? featuredDuel.opponent.username : featuredDuel.challenger.username}</p>
-              <p className="font-display text-3xl font-bold">{featuredDuel.mySide === "challenger" ? featuredDuel.opponent.correct : featuredDuel.challenger.correct}</p>
-            </div>
-          </div>
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-primary-foreground/20"><div className="h-full w-[58%] bg-accent" /></div>
-          <div className="mt-2 flex justify-between text-xs text-primary-foreground/50"><span>You’re ahead</span><span>{Math.max(games.length - decidedGames, 0)} games left</span></div>
-          <div className="mt-5 flex items-center justify-between border-t border-accent/40 pt-4">
-            <span className="flex items-center gap-2 text-sm text-primary-foreground/55"><Flame size={18} /> {data?.myRecord?.streak ?? 0}-pick streak</span>
-            <Button onClick={() => startEditing(featuredDuel.id, featuredDuel.mySide === "challenger" ? featuredDuel.challenger.picks : featuredDuel.opponent.picks)} className="min-w-36">Make picks</Button>
-          </div>
-        </section>
-      )}
-
-      {gated && !entitlementLoading && <SznPassGate what="Starting or joining a duel" />}
-
-      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-secondary p-1">
-        {(["duels", "leaderboard"] as Tab[]).map((id) => (
-          <Button
-            key={id}
-            variant={tab === id ? "default" : "ghost"}
-            onClick={() => setTab(id)}
-            className="min-h-14 rounded-xl font-display text-lg capitalize"
-          >
-            {id === "duels" ? "Duels" : "Leaderboard"}
-          </Button>
-        ))}
-      </div>
-
-      {tab === "leaderboard" ? (
-        <section>
-          <h2 className="font-display text-3xl font-semibold">Duel leaderboard</h2>
-          {(data?.leaderboard ?? []).length === 0 ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              No duels settled yet. Be the first name on the board.
-            </p>
-          ) : (
-            <ul className="mt-3 grid gap-2">
-              {(data?.leaderboard ?? []).map((row, i) => (
-                <li
-                  key={row.userId}
-                  className={`flex items-center gap-3 rounded-xl border border-border px-3 py-3 ${
-                    row.userId === user.id ? "bg-accent-soft" : "bg-secondary"
-                  }`}
-                >
-                  <span className="w-6 shrink-0 text-sm font-semibold tabular-nums text-muted-foreground">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold">{row.username}</span>
-                  {row.godsWins > 0 && (
-                    <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-accent-soft-foreground">
-                      <Zap size={12} /> {row.godsWins}
-                    </span>
-                  )}
-                  {row.bestStreak > 1 && (
-                    <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                      <Flame size={12} /> {row.bestStreak}
-                    </span>
-                  )}
-                  <span className="shrink-0 text-sm font-semibold tabular-nums">
-                    {row.wins}-{row.losses}
-                    {row.ties ? `-${row.ties}` : ""}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      ) : (
-        <>
+        {featuredDuel && tab === "duels" && (
           <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
-            <p className="flex items-center gap-2 font-display text-base font-semibold uppercase text-accent"><Zap size={19} /> Week {data?.weekNum} · bragging rights</p>
-            <h2 className="mt-5 font-display text-4xl font-semibold">Face The Gods</h2>
-            <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">One week of NFL picks, one on one. Beat the house, or get beat by it.</p>
-            <div className="mt-6 grid gap-2">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-destructive-soft px-4 py-2 text-xs font-bold uppercase text-destructive">
+                <span className="size-2.5 rounded-full bg-destructive" />{" "}
+                {featuredDuel.status === "final" ? "Final" : "Live"}
+              </span>
+              <span className="text-sm font-semibold text-primary-foreground/45">
+                Week {featuredDuel.weekNum} · {decidedGames} of {games.length} decided
+              </span>
+            </div>
+            <div className="mt-7 grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center">
+              <div>
+                <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-accent/75 bg-accent font-display text-2xl font-bold text-accent-foreground">
+                  {initials(
+                    featuredDuel.mySide === "challenger"
+                      ? featuredDuel.challenger.username
+                      : featuredDuel.opponent.username,
+                  )}
+                </span>
+                <p className="mt-3 font-display text-xl font-semibold text-accent">You</p>
+                <p className="font-display text-3xl font-bold">
+                  {featuredDuel.mySide === "challenger"
+                    ? featuredDuel.challenger.correct
+                    : featuredDuel.opponent.correct}
+                </p>
+              </div>
+              <div>
+                <p className="font-display text-xl font-bold text-accent">VS</p>
+                <p className="mt-1 text-xs text-primary-foreground/50">bragging rights</p>
+              </div>
+              <div>
+                <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-destructive/70 bg-destructive font-display text-2xl font-bold text-destructive-foreground">
+                  {initials(
+                    featuredDuel.mySide === "challenger"
+                      ? featuredDuel.opponent.username
+                      : featuredDuel.challenger.username,
+                  )}
+                </span>
+                <p className="mt-3 truncate font-display text-xl font-semibold">
+                  {featuredDuel.mySide === "challenger"
+                    ? featuredDuel.opponent.username
+                    : featuredDuel.challenger.username}
+                </p>
+                <p className="font-display text-3xl font-bold">
+                  {featuredDuel.mySide === "challenger"
+                    ? featuredDuel.opponent.correct
+                    : featuredDuel.challenger.correct}
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 h-2 overflow-hidden rounded-full bg-primary-foreground/20">
+              <div className="h-full w-[58%] bg-accent" />
+            </div>
+            <div className="mt-2 flex justify-between text-xs text-primary-foreground/50">
+              <span>You’re ahead</span>
+              <span>{Math.max(games.length - decidedGames, 0)} games left</span>
+            </div>
+            <div className="mt-5 flex items-center justify-between border-t border-accent/40 pt-4">
+              <span className="flex items-center gap-2 text-sm text-primary-foreground/55">
+                <Flame size={18} /> {data?.myRecord?.streak ?? 0}-pick streak
+              </span>
               <Button
-                disabled={gated || data?.locked || create.isPending}
-                onClick={() => create.mutate({ vsGods: true })}
-                className="min-h-16 rounded-2xl font-display text-xl"
+                onClick={() =>
+                  startEditing(
+                    featuredDuel.id,
+                    featuredDuel.mySide === "challenger"
+                      ? featuredDuel.challenger.picks
+                      : featuredDuel.opponent.picks,
+                  )
+                }
+                className="min-w-36"
               >
-                <Zap size={16} /> Face The Gods
+                Make picks
               </Button>
+            </div>
+          </section>
+        )}
+
+        {gated && !entitlementLoading && <SznPassGate what="Starting or joining a duel" />}
+
+        <div className="grid grid-cols-2 gap-1 rounded-2xl bg-secondary p-1">
+          {(["duels", "leaderboard"] as Tab[]).map((id) => (
+            <Button
+              key={id}
+              variant={tab === id ? "default" : "ghost"}
+              onClick={() => setTab(id)}
+              className="min-h-14 rounded-xl font-display text-lg capitalize"
+            >
+              {id === "duels" ? "Duels" : "Leaderboard"}
+            </Button>
+          ))}
+        </div>
+
+        {tab === "leaderboard" ? (
+          <section>
+            <h2 className="font-display text-3xl font-semibold">Duel leaderboard</h2>
+            {(data?.leaderboard ?? []).length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                No duels settled yet. Be the first name on the board.
+              </p>
+            ) : (
+              <ul className="mt-3 grid gap-2">
+                {(data?.leaderboard ?? []).map((row, i) => (
+                  <li
+                    key={row.userId}
+                    className={`flex items-center gap-3 rounded-xl border border-border px-3 py-3 ${
+                      row.userId === user.id ? "bg-accent-soft" : "bg-secondary"
+                    }`}
+                  >
+                    <span className="w-6 shrink-0 text-sm font-semibold tabular-nums text-muted-foreground">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                      {row.username}
+                    </span>
+                    {row.godsWins > 0 && (
+                      <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-accent-soft-foreground">
+                        <Zap size={12} /> {row.godsWins}
+                      </span>
+                    )}
+                    {row.bestStreak > 1 && (
+                      <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                        <Flame size={12} /> {row.bestStreak}
+                      </span>
+                    )}
+                    <span className="shrink-0 text-sm font-semibold tabular-nums">
+                      {row.wins}-{row.losses}
+                      {row.ties ? `-${row.ties}` : ""}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ) : (
+          <>
+            <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
+              <p className="flex items-center gap-2 font-display text-base font-semibold uppercase text-accent">
+                <Zap size={19} /> Week {data?.weekNum} · bragging rights
+              </p>
+              <h2 className="mt-5 font-display text-4xl font-semibold">Face The Gods</h2>
+              <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">
+                One week of NFL picks, one on one. Beat the house, or get beat by it.
+              </p>
+              <div className="mt-6 grid gap-2">
+                <Button
+                  disabled={gated || data?.locked || create.isPending}
+                  onClick={() => create.mutate({ vsGods: true })}
+                  className="min-h-16 rounded-2xl font-display text-xl"
+                >
+                  <Zap size={16} /> Face The Gods
+                </Button>
+                <Button
+                  variant="ghost"
+                  disabled={gated || data?.locked || create.isPending}
+                  onClick={() => create.mutate({ vsGods: false, opponentId: null })}
+                  className="text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                >
+                  Post an open challenge
+                </Button>
+              </div>
+            </section>
+
+            {openSeats.length > 0 && (
+              <section className="grid gap-3">
+                <div className="flex items-end justify-between gap-3">
+                  <h2 className="font-display text-3xl font-semibold">Open challenges</h2>
+                  <p className="text-sm text-muted-foreground">Anyone can take a seat</p>
+                </div>
+                {openSeats.map((d) => (
+                  <article
+                    key={d.id}
+                    className="rounded-2xl border border-dashed border-accent bg-card p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-destructive/70 bg-destructive font-display font-semibold text-destructive-foreground">
+                        {initials(d.challenger.username)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-base font-semibold">
+                          {d.challenger.username}’s open seat
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {d.opponent.userId
+                            ? "Challenged you directly"
+                            : "Open seat · anyone can take it"}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      disabled={gated}
+                      onClick={() => respond.mutate({ duelId: d.id, accept: true })}
+                      className="mt-4 min-h-14 w-full rounded-2xl font-display text-lg"
+                    >
+                      Accept
+                    </Button>
+                    {d.opponent.userId && (
+                      <Button
+                        variant="ghost"
+                        onClick={() => respond.mutate({ duelId: d.id, accept: false })}
+                        className="mt-1 w-full"
+                      >
+                        Decline
+                      </Button>
+                    )}
+                  </article>
+                ))}
+              </section>
+            )}
+
+            <section>
+              <h2 className="font-display text-3xl font-semibold">Challenge a player</h2>
+              <div className="relative mt-4">
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  size={22}
+                />
+                <input
+                  id="duel-search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by username"
+                  className="min-h-14 w-full rounded-2xl border border-border-strong bg-background pl-12 pr-4 text-base"
+                />
+              </div>
+              <ul className="mt-3 grid gap-3">
+                {(opponents.data ?? []).slice(0, 8).map((o, index) => {
+                  const record = recordByUser.get(o.userId);
+                  return (
+                    <li
+                      key={o.userId}
+                      className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4"
+                    >
+                      <span
+                        className={`grid size-12 shrink-0 place-items-center rounded-full border-2 border-primary-foreground/30 font-display font-semibold ${AVATAR_STYLES[index % AVATAR_STYLES.length]}`}
+                      >
+                        {initials(o.username)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-base font-semibold">{o.username}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {record ? `${record.wins}-${record.losses} this season` : "Ready to duel"}
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        disabled={gated || data?.locked || create.isPending}
+                        onClick={() => create.mutate({ vsGods: false, opponentId: o.userId })}
+                        className="shrink-0 border-accent text-accent-soft-foreground"
+                      >
+                        Challenge
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
               <Button
                 variant="ghost"
                 disabled={gated || data?.locked || create.isPending}
                 onClick={() => create.mutate({ vsGods: false, opponentId: null })}
-                className="text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="mt-4 min-h-16 w-full rounded-2xl border border-dashed border-border-strong text-muted-foreground"
               >
-                Post an open challenge
+                Or post an open seat anyone can accept.
               </Button>
-            </div>
-          </section>
-
-          {openSeats.length > 0 && (
-            <section className="grid gap-3">
-              <div className="flex items-end justify-between gap-3"><h2 className="font-display text-3xl font-semibold">Open challenges</h2><p className="text-sm text-muted-foreground">Anyone can take a seat</p></div>
-              {openSeats.map((d) => (
-                <article
-                  key={d.id}
-                  className="rounded-2xl border border-dashed border-accent bg-card p-4"
-                >
-                  <div className="flex items-center gap-3"><span className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-destructive/70 bg-destructive font-display font-semibold text-destructive-foreground">{initials(d.challenger.username)}</span><div className="min-w-0 flex-1">
-                    <p className="truncate text-base font-semibold">{d.challenger.username}’s open seat</p>
-                    <p className="text-sm text-muted-foreground">
-                      {d.opponent.userId ? "Challenged you directly" : "Open seat · anyone can take it"}
-                    </p>
-                  </div></div>
-                  <Button
-                    disabled={gated}
-                    onClick={() => respond.mutate({ duelId: d.id, accept: true })}
-                    className="mt-4 min-h-14 w-full rounded-2xl font-display text-lg"
-                  >
-                    Accept
-                  </Button>
-                  {d.opponent.userId && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => respond.mutate({ duelId: d.id, accept: false })}
-                      className="mt-1 w-full"
-                    >
-                      Decline
-                    </Button>
-                  )}
-                </article>
-              ))}
             </section>
-          )}
 
-          <section>
-            <h2 className="font-display text-3xl font-semibold">Challenge a player</h2>
-            <div className="relative mt-4"><Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={22} /><input id="duel-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by username" className="min-h-14 w-full rounded-2xl border border-border-strong bg-background pl-12 pr-4 text-base" /></div>
-            <ul className="mt-3 grid gap-3">
-              {(opponents.data ?? []).slice(0, 8).map((o, index) => {
-                const record = recordByUser.get(o.userId);
-                return <li key={o.userId} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-                  <span className={`grid size-12 shrink-0 place-items-center rounded-full border-2 border-primary-foreground/30 font-display font-semibold ${AVATAR_STYLES[index % AVATAR_STYLES.length]}`}>{initials(o.username)}</span>
-                  <div className="min-w-0 flex-1"><p className="truncate text-base font-semibold">{o.username}</p><p className="text-sm text-muted-foreground">{record ? `${record.wins}-${record.losses} this season` : "Ready to duel"}</p></div>
-                  <Button variant="outline" disabled={gated || data?.locked || create.isPending} onClick={() => create.mutate({ vsGods: false, opponentId: o.userId })} className="shrink-0 border-accent text-accent-soft-foreground">Challenge</Button>
-                </li>;
-              })}
-            </ul>
-            <Button variant="ghost" disabled={gated || data?.locked || create.isPending} onClick={() => create.mutate({ vsGods: false, opponentId: null })} className="mt-4 min-h-16 w-full rounded-2xl border border-dashed border-border-strong text-muted-foreground">Or post an open seat anyone can accept.</Button>
-          </section>
-
-          <section className="grid gap-2">
-            <h2 className="font-display text-3xl font-semibold">Your duels</h2>
-            {mine.length === 0 ? (
-              <EmptyState
-                icon={Swords}
-                title="No duels yet"
-                description="Take on the Gods or challenge a friend — winner takes the bragging rights."
-              />
-            ) : (
-              mine.map((d) => {
-                const me = d.mySide === "challenger" ? d.challenger : d.opponent;
-                const them = d.mySide === "challenger" ? d.opponent : d.challenger;
-                const won = d.status === "final" && d.winnerId === user.id;
-                const lost = d.status === "final" && !won && (d.winnerId || d.godsWon);
-                return (
-                  <article key={d.id} className="rounded-xl border border-border-strong bg-card p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-display text-base font-semibold">
-                          You vs {them.username}
-                        </p>
-                        <p className="text-xs text-faint">
-                          Week {d.weekNum} ·{" "}
-                          {d.status === "open"
-                            ? "waiting for an opponent"
-                            : d.status === "final"
-                              ? won
-                                ? "you won"
-                                : lost
-                                  ? "you lost"
-                                  : "tied"
-                              : "live"}
-                        </p>
+            <section className="grid gap-2">
+              <h2 className="font-display text-3xl font-semibold">Your duels</h2>
+              {mine.length === 0 ? (
+                <EmptyState
+                  icon={Swords}
+                  title="No duels yet"
+                  description="Take on the Gods or challenge a friend — winner takes the bragging rights."
+                />
+              ) : (
+                mine.map((d) => {
+                  const me = d.mySide === "challenger" ? d.challenger : d.opponent;
+                  const them = d.mySide === "challenger" ? d.opponent : d.challenger;
+                  const won = d.status === "final" && d.winnerId === user.id;
+                  const lost = d.status === "final" && !won && (d.winnerId || d.godsWon);
+                  return (
+                    <article
+                      key={d.id}
+                      className="rounded-xl border border-border-strong bg-card p-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-display text-base font-semibold">
+                            You vs {them.username}
+                          </p>
+                          <p className="text-xs text-faint">
+                            Week {d.weekNum} ·{" "}
+                            {d.status === "open"
+                              ? "waiting for an opponent"
+                              : d.status === "final"
+                                ? won
+                                  ? "you won"
+                                  : lost
+                                    ? "you lost"
+                                    : "tied"
+                                : "live"}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-sm font-semibold tabular-nums">
+                          {me.correct}–{them.correct}
+                        </span>
                       </div>
-                      <span className="shrink-0 rounded-lg bg-secondary px-2.5 py-1 text-sm font-semibold tabular-nums">
-                        {me.correct}–{them.correct}
-                      </span>
-                    </div>
 
-                    <div className="mt-3 flex gap-2">
-                      <Button
-                        onClick={() => startEditing(d.id, me.picks)}
-                        className="min-h-11 flex-1 rounded-xl"
-                      >
-                        {data?.locked || d.status === "final" ? "View picks" : "Make picks"}
-                      </Button>
-                    </div>
+                      <div className="mt-3 flex gap-2">
+                        <Button
+                          onClick={() => startEditing(d.id, me.picks)}
+                          className="min-h-11 flex-1 rounded-xl"
+                        >
+                          {data?.locked || d.status === "final" ? "View picks" : "Make picks"}
+                        </Button>
+                      </div>
 
-                    {openDuelId === d.id && (
-                      <div className="mt-3 grid gap-2">
-                        {games.map((g) => {
-                          const myPick = draft[g.id] ?? me.picks[g.id];
-                          const theirPick = them.picks[g.id];
-                          const editable = !gated && !data?.locked && d.status !== "final";
-                          return (
-                            <div key={g.id} className="rounded-xl border border-border p-2.5">
-                              <div className="grid grid-cols-2 gap-2">
-                                {(["away", "home"] as Side[]).map((side) => {
-                                  const team = side === "away" ? g.away : g.home;
-                                  const chosen = myPick === side;
-                                  return (
-                                    <Button
-                                      key={side}
-                                      variant="outline"
-                                      disabled={!editable}
-                                      onClick={() => setDraft((p) => ({ ...p, [g.id]: side }))}
-                                      className={`flex min-h-12 items-center gap-2 rounded-lg border-2 px-2 text-left text-sm ${
-                                        chosen ? "border-accent bg-accent-soft" : "border-border"
-                                      } disabled:opacity-80`}
-                                    >
-                                      <TeamBadge name={team} size={24} />
-                                      <span className="min-w-0 truncate font-medium">{team}</span>
-                                    </Button>
-                                  );
-                                })}
+                      {openDuelId === d.id && (
+                        <div className="mt-3 grid gap-2">
+                          {games.map((g) => {
+                            const myPick = draft[g.id] ?? me.picks[g.id];
+                            const theirPick = them.picks[g.id];
+                            const editable = !gated && !data?.locked && d.status !== "final";
+                            return (
+                              <div key={g.id} className="rounded-xl border border-border p-2.5">
+                                <div className="grid grid-cols-2 gap-2">
+                                  {(["away", "home"] as Side[]).map((side) => {
+                                    const team = side === "away" ? g.away : g.home;
+                                    const chosen = myPick === side;
+                                    return (
+                                      <Button
+                                        key={side}
+                                        variant="outline"
+                                        disabled={!editable}
+                                        onClick={() => setDraft((p) => ({ ...p, [g.id]: side }))}
+                                        className={`flex min-h-12 items-center gap-2 rounded-lg border-2 px-2 text-left text-sm ${
+                                          chosen ? "border-accent bg-accent-soft" : "border-border"
+                                        } disabled:opacity-80`}
+                                      >
+                                        <TeamBadge name={team} size={24} />
+                                        <span className="min-w-0 truncate font-medium">{team}</span>
+                                      </Button>
+                                    );
+                                  })}
+                                </div>
+                                <p className="mt-1.5 text-xs text-faint">
+                                  {theirPick
+                                    ? `${them.username}: ${theirPick === "home" ? g.home : g.away}`
+                                    : `Hidden until kickoff`}
+                                  {g.away_score != null && g.home_score != null
+                                    ? ` · ${g.away_score}–${g.home_score}`
+                                    : ""}
+                                </p>
                               </div>
-                              <p className="mt-1.5 text-xs text-faint">
-                                {theirPick
-                                  ? `${them.username}: ${theirPick === "home" ? g.home : g.away}`
-                                  : `Hidden until kickoff`}
-                                {g.away_score != null && g.home_score != null
-                                  ? ` · ${g.away_score}–${g.home_score}`
-                                  : ""}
-                              </p>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
 
-                        {!gated && !data?.locked && d.status !== "final" && (
-                          <Button
-                            disabled={save.isPending}
-                            onClick={() => save.mutate({ duelId: d.id, picks: draft })}
-                            className="min-h-12 rounded-xl bg-success text-primary"
-                          >
-                            Save {Object.keys(draft).length} of {games.length} picks
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </article>
-                );
-              })
-            )}
-          </section>
-        </>
-      )}
+                          {!gated && !data?.locked && d.status !== "final" && (
+                            <Button
+                              disabled={save.isPending}
+                              onClick={() => save.mutate({ duelId: d.id, picks: draft })}
+                              className="min-h-12 rounded-xl bg-success text-primary"
+                            >
+                              Save {Object.keys(draft).length} of {games.length} picks
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </article>
+                  );
+                })
+              )}
+            </section>
+          </>
+        )}
       </div>
     </div>
   );

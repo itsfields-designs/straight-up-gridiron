@@ -28,31 +28,35 @@ function AuthedLayout() {
   const { pathname } = useLocation();
   const isDuels = pathname === "/duels";
   const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
-  const nav = isDuels ? NAV.filter((item) => ["/dashboard", "/leagues", "/duels"].includes(item.to)) : NAV;
+  const nav = isDuels
+    ? NAV.filter((item) => ["/dashboard", "/leagues", "/duels"].includes(item.to))
+    : NAV;
 
   return (
     <div className="min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))]">
-      {!isDuels && <header className="sticky top-0 z-30 border-b border-accent/50 bg-primary text-primary-foreground">
-        <div className="mx-auto flex min-h-16 max-w-3xl items-center gap-3 px-4 py-2.5">
-          <Link to="/dashboard" className="flex min-w-0 flex-1 items-center gap-2.5">
-            <img
-              src={logoAsset.url}
-              alt="Gridiron Gods"
-              className="h-10 w-10 shrink-0 rounded-lg object-cover"
-            />
-            <span className="truncate font-display text-xl font-semibold uppercase">
-              Gridiron Gods
-            </span>
-          </Link>
-          <Link
-            to="/profile"
-            aria-label="Your profile"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-accent/70 bg-primary text-sm font-semibold"
-          >
-            {initials}
-          </Link>
-        </div>
-      </header>}
+      {!isDuels && (
+        <header className="sticky top-0 z-30 border-b border-accent/50 bg-primary text-primary-foreground">
+          <div className="mx-auto flex min-h-16 max-w-3xl items-center gap-3 px-4 py-2.5">
+            <Link to="/dashboard" className="flex min-w-0 flex-1 items-center gap-2.5">
+              <img
+                src={logoAsset.url}
+                alt="Gridiron Gods"
+                className="h-10 w-10 shrink-0 rounded-lg object-cover"
+              />
+              <span className="truncate font-display text-xl font-semibold uppercase">
+                Gridiron Gods
+              </span>
+            </Link>
+            <Link
+              to="/profile"
+              aria-label="Your profile"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-accent/70 bg-primary text-sm font-semibold"
+            >
+              {initials}
+            </Link>
+          </div>
+        </header>
+      )}
 
       <main className={`mx-auto max-w-3xl px-4 ${isDuels ? "py-0" : "py-5 sm:py-7"}`}>
         <Outlet />
