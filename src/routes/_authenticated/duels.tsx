@@ -9,7 +9,6 @@ import { EmptyState, LoadingState } from "@/components/ui/feedback";
 import { Button } from "@/components/ui/button";
 import { SznPassGate, useEntitled } from "@/components/SznPassGate";
 import { TeamBadge } from "@/components/pool/TeamBadge";
-import { LiveScoreboard } from "@/components/pool/LiveScoreboard";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 import {
   createDuel,
@@ -185,19 +184,23 @@ function DuelsPage() {
 
   return (
     <div className="-mx-4 min-h-screen border-x border-border-strong bg-background sm:mx-0">
-      <header className="flex min-h-[7rem] items-center gap-3 border-b border-accent bg-primary px-6 text-primary-foreground">
-        <img src={logoAsset.url} alt="Gridiron Gods" className="size-14 rounded-xl object-cover" />
-        <h1 className="font-display text-4xl font-bold uppercase">Duels</h1>
+      <header className="flex min-h-20 items-center gap-3 border-b border-accent bg-primary px-4 text-primary-foreground sm:min-h-[7rem] sm:px-6">
+        <img
+          src={logoAsset.url}
+          alt="Gridiron Gods"
+          className="size-11 shrink-0 rounded-xl object-cover sm:size-14"
+        />
+        <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">Duels</h1>
         {data?.myRecord && (
-          <span className="ml-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-accent-soft px-5 font-display text-lg font-semibold text-accent-soft-foreground">
+          <span className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-accent-soft px-4 font-display text-base font-semibold text-accent-soft-foreground sm:min-h-12 sm:px-5 sm:text-lg">
             <Swords size={18} /> {data.myRecord.wins}-{data.myRecord.losses}
           </span>
         )}
       </header>
 
-      <div className="grid gap-7 px-6 py-4 sm:px-8">
+      <div className="grid gap-5 px-4 py-4 sm:gap-7 sm:px-8">
         {featuredDuel && tab === "duels" && (
-          <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
+          <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
             <div className="flex items-center justify-between gap-3">
               <span
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase ${
@@ -215,31 +218,33 @@ function DuelsPage() {
                 Week {featuredDuel.weekNum} · {decidedGames} of {games.length} decided
               </span>
             </div>
-            <div className="mt-7 grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center">
+            <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center sm:mt-7 sm:gap-4">
               <div>
-                <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-accent/75 bg-accent font-display text-2xl font-bold text-accent-foreground">
+                <span className="mx-auto grid size-16 place-items-center rounded-full border-4 border-accent/75 bg-accent font-display text-xl font-bold text-accent-foreground sm:size-20 sm:text-2xl">
                   {initials(
                     featuredDuel.mySide === "challenger"
                       ? featuredDuel.challenger.username
                       : featuredDuel.opponent.username,
                   )}
                 </span>
-                <p className="mt-3 font-display text-xl font-semibold text-accent">You</p>
+                <p className="mt-2 font-display text-lg font-semibold text-accent sm:mt-3 sm:text-xl">
+                  You
+                </p>
                 <p className="font-display text-3xl font-bold tabular-nums">{myScore}</p>
               </div>
               <div>
-                <p className="font-display text-xl font-bold text-accent">VS</p>
+                <p className="font-display text-lg font-bold text-accent sm:text-xl">VS</p>
                 <p className="mt-1 text-xs text-primary-foreground/50">bragging rights</p>
               </div>
               <div>
-                <span className="mx-auto grid size-20 place-items-center rounded-full border-4 border-destructive/70 bg-destructive font-display text-2xl font-bold text-destructive-foreground">
+                <span className="mx-auto grid size-16 place-items-center rounded-full border-4 border-destructive/70 bg-destructive font-display text-xl font-bold text-destructive-foreground sm:size-20 sm:text-2xl">
                   {initials(
                     featuredDuel.mySide === "challenger"
                       ? featuredDuel.opponent.username
                       : featuredDuel.challenger.username,
                   )}
                 </span>
-                <p className="mt-3 truncate font-display text-xl font-semibold">
+                <p className="mt-2 truncate font-display text-lg font-semibold sm:mt-3 sm:text-xl">
                   {featuredDuel.mySide === "challenger"
                     ? featuredDuel.opponent.username
                     : featuredDuel.challenger.username}
@@ -256,9 +261,6 @@ function DuelsPage() {
             <div className="mt-2 flex justify-between text-xs text-primary-foreground/50">
               <span>{leadLabel}</span>
               <span>{Math.max(games.length - decidedGames, 0)} games left</span>
-            </div>
-            <div className="mt-5">
-              <LiveScoreboard league="nfl" limit={16} />
             </div>
             <div className="mt-5 flex items-center justify-between border-t border-accent/40 pt-4">
               <span className="flex items-center gap-2 text-sm text-primary-foreground/55">
@@ -339,11 +341,13 @@ function DuelsPage() {
           </section>
         ) : (
           <>
-            <section className="rounded-[1.9rem] border border-accent bg-primary p-7 text-primary-foreground">
+            <section className="rounded-[1.9rem] border border-accent bg-primary p-5 text-primary-foreground sm:p-7">
               <p className="flex items-center gap-2 font-display text-base font-semibold uppercase text-accent">
                 <Zap size={19} /> Week {data?.weekNum} · bragging rights
               </p>
-              <h2 className="mt-5 font-display text-4xl font-semibold">Face The Gods</h2>
+              <h2 className="mt-4 font-display text-3xl font-semibold sm:mt-5 sm:text-4xl">
+                Face The Gods
+              </h2>
               <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">
                 One week of NFL picks, one on one. Beat the house, or get beat by it.
               </p>
