@@ -6,7 +6,7 @@
 
 /*
  * Gridiron Gods design system.
- * Cream paper, deep field green, sideline amber. All colors are oklch tokens.
+ * Stadium black, warm playbook cream, trophy gold, and field green.
  */
 
 @theme inline {
@@ -55,42 +55,42 @@
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.965 0.01 95);
-  --foreground: oklch(0.24 0.02 165);
+  --radius: 0.625rem;
+  --background: oklch(0.952 0.014 91);
+  --foreground: oklch(0.16 0.012 85);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.02 165);
+  --card-foreground: oklch(0.16 0.012 85);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.02 165);
-  --primary: oklch(0.4 0.077 160);
-  --primary-foreground: oklch(0.99 0.005 95);
-  --secondary: oklch(0.943 0.014 160);
-  --secondary-foreground: oklch(0.29 0.06 160);
-  --muted: oklch(0.943 0.014 160);
-  --muted-foreground: oklch(0.45 0.015 165);
-  --faint: oklch(0.61 0.014 165);
-  --accent: oklch(0.585 0.125 70);
-  --accent-foreground: oklch(0.99 0.005 95);
-  --accent-soft: oklch(0.95 0.035 85);
-  --accent-soft-foreground: oklch(0.43 0.09 70);
-  --success: oklch(0.5 0.1 155);
+  --popover-foreground: oklch(0.16 0.012 85);
+  --primary: oklch(0.105 0.008 85);
+  --primary-foreground: oklch(0.985 0.006 92);
+  --secondary: oklch(0.91 0.018 91);
+  --secondary-foreground: oklch(0.23 0.015 85);
+  --muted: oklch(0.925 0.014 91);
+  --muted-foreground: oklch(0.46 0.018 85);
+  --faint: oklch(0.57 0.016 85);
+  --accent: oklch(0.79 0.16 82);
+  --accent-foreground: oklch(0.13 0.01 85);
+  --accent-soft: oklch(0.94 0.065 86);
+  --accent-soft-foreground: oklch(0.4 0.095 75);
+  --success: oklch(0.64 0.16 154);
   --destructive: oklch(0.5 0.13 30);
   --destructive-foreground: oklch(0.99 0.005 95);
   --destructive-soft: oklch(0.93 0.025 30);
-  --border: oklch(0.884 0.019 95);
-  --border-strong: oklch(0.8 0.026 95);
-  --input: oklch(0.8 0.026 95);
-  --ring: oklch(0.585 0.125 70);
-  --sidebar: oklch(0.943 0.014 160);
-  --sidebar-foreground: oklch(0.24 0.02 165);
-  --sidebar-primary: oklch(0.4 0.077 160);
+  --border: oklch(0.84 0.026 87);
+  --border-strong: oklch(0.72 0.055 80);
+  --input: oklch(0.82 0.028 88);
+  --ring: oklch(0.79 0.16 82);
+  --sidebar: oklch(0.105 0.008 85);
+  --sidebar-foreground: oklch(0.985 0.006 92);
+  --sidebar-primary: oklch(0.79 0.16 82);
   --sidebar-primary-foreground: oklch(0.99 0.005 95);
-  --sidebar-accent: oklch(0.95 0.035 85);
-  --sidebar-accent-foreground: oklch(0.43 0.09 70);
-  --sidebar-border: oklch(0.884 0.019 95);
-  --sidebar-ring: oklch(0.585 0.125 70);
-  --chart-1: oklch(0.585 0.125 70);
-  --chart-2: oklch(0.4 0.077 160);
+  --sidebar-accent: oklch(0.2 0.012 85);
+  --sidebar-accent-foreground: oklch(0.79 0.16 82);
+  --sidebar-border: oklch(0.3 0.02 85);
+  --sidebar-ring: oklch(0.79 0.16 82);
+  --chart-1: oklch(0.79 0.16 82);
+  --chart-2: oklch(0.64 0.16 154);
   --chart-3: oklch(0.55 0.11 30);
   --chart-4: oklch(0.52 0.09 250);
   --chart-5: oklch(0.55 0.1 320);
@@ -116,6 +116,7 @@
     font-family: var(--font-sans);
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0;
   }
 
   :focus-visible {
@@ -157,7 +158,8 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
+    font-weight: 600;
   }
 }
 
@@ -191,8 +193,20 @@
 }
 
 @utility app-card {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-lg);
   background-color: var(--color-card);
-  box-shadow: 0 1px 2px color-mix(in oklch, var(--color-foreground) 6%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--color-foreground) 5%, transparent);
+}
+
+@utility sports-card {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-card);
+}
+
+@utility sports-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.05;
 }
