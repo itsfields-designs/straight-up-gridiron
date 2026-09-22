@@ -357,7 +357,7 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
 
   const { data: pickRows } = await db
     .from("duel_picks")
-    .select("duel_id, user_id, picks, reasoning")
+    .select("duel_id, user_id, picks, reasoning, tiebreaker")
     .in("duel_id", rows.length ? rows.map((d) => d.id) : ["none"]);
 
   const rowFor = (duelId: string, uid: string | null) =>
