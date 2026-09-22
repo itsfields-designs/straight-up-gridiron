@@ -193,6 +193,7 @@ async function usernames(ids: string[]): Promise<Map<string, string>> {
 export type DuelRow = {
   id: string;
   week_num: number;
+  sport: string;
   challenger_id: string;
   opponent_id: string | null;
   vs_gods: boolean;
@@ -203,22 +204,25 @@ export type DuelRow = {
   opponent_correct: number;
 };
 
+const DUEL_COLS =
+  "id, week_num, sport, challenger_id, opponent_id, vs_gods, status, winner_id, gods_won, challenger_correct, opponent_correct";
+
 /** Grades every finished duel for a week and updates head-to-head records. */
-export async function settleWeek(weekNum: number) {
+export async function settleWeek(weekNum: number, sport: DuelSport = "nfl") {
   const db = await admin();
-  const games = await weekGames(weekNum);
+  const games = await weekGames(weekNum, sport);
   if (games.length === 0) return;
   const allFinal = games.every((g) => g.state === "post");
   if (!allFinal) return;
 
   const { data: duels } = await db
     .from("duels")
-    .select(
-      "id, week_num, challenger_id, opponent_id, vs_gods, status, winner_id, gods_won, challenger_correct, opponent_correct",
-    )
+    .select(DUEL_COLS)
     .eq("week_num", weekNum)
+    .eq("sport", sport)
     .eq("status", "active");
   if (!duels || duels.length === 0) return;
+
 
   for (const duel of duels as DuelRow[]) {
     const { data: rows } = await db
