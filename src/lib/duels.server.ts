@@ -196,7 +196,16 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: D
       reasoning[g.id] = `A coin flip the mortals will agonise over. The Gods take ${chosen}.`;
     }
   }
-  return { picks, reasoning };
+  // The Gods guess the tiebreaker from the average combined score so far.
+  const totals = (data ?? [])
+    .filter((g) => g.home_score != null && g.away_score != null)
+    .map((g) => (g.home_score as number) + (g.away_score as number));
+  const fallback = sport === "cfb" ? 55 : 45;
+  const tiebreaker = totals.length
+    ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length)
+    : fallback;
+
+  return { picks, reasoning, tiebreaker };
 }
 
 
