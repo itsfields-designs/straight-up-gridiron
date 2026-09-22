@@ -117,7 +117,11 @@ function DuelsPage() {
   });
 
   const save = useMutation({
-    mutationFn: (vars: { duelId: string; picks: Record<string, Side> }) => runSave({ data: vars }),
+    mutationFn: (vars: {
+      duelId: string;
+      picks: Record<string, Side>;
+      tiebreaker: number | null;
+    }) => runSave({ data: vars }),
     onSuccess: () => {
       toast.success("Picks saved.");
       void invalidate();
