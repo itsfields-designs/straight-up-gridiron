@@ -391,8 +391,8 @@ function DuelsPage() {
               </h2>
               <p className="mt-2 text-base leading-relaxed text-primary-foreground/75">
                 {sport === "cfb"
-                  ? "One week of Top 25 college picks, one on one. Beat the house, or get beat by it."
-                  : "One week of NFL picks, one on one. Beat the house, or get beat by it."}
+                  ? "One week of Top 25 college picks, one on one. Can you beat The Gods?"
+                  : "One week of NFL picks, one on one. Can you beat The Gods?"}
               </p>
 
               <div className="mt-6 grid gap-2">
