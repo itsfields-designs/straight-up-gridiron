@@ -7,7 +7,7 @@ import { render } from "@react-email/render";
  */
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
-export const EMAIL_FROM = "Gridiron Gods <noreply@duels.gridirongods.app>";
+export const EMAIL_FROM = "Gridiron Gods <notifications@gridirongods.app>";
 
 export type SendEmailInput = {
   to: string | string[];
