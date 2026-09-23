@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Copy, Gift, Share2 } from "lucide-react";
+import { Check, Copy, Gift, Mail, Share2 } from "lucide-react";
 
 import { getReferralInfo } from "@/lib/referrals.functions";
+import { emailLeagueInvite } from "@/lib/email.functions";
 import { inviteLink, shareInvite } from "@/lib/invite";
 
 /**
