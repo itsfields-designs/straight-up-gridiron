@@ -57,7 +57,11 @@ function ProfilePage() {
       <UsernameEditor userId={user.id} />
       <MembershipCard />
       {leagues.data?.[0] ? (
-        <InviteFriends leagueCode={leagues.data[0].code} leagueName={leagues.data[0].name} />
+        <InviteFriends
+          leagueId={leagues.data[0].id}
+          leagueCode={leagues.data[0].code}
+          leagueName={leagues.data[0].name}
+        />
       ) : null}
 
       <div className="overflow-hidden rounded-xl border border-border-strong bg-card">

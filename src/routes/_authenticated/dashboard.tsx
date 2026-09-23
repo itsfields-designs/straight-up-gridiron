@@ -290,7 +290,12 @@ function DashboardPage() {
       )}
 
       {leagues.data?.[0] ? (
-        <InviteFriends leagueCode={leagues.data[0].code} leagueName={leagues.data[0].name} compact />
+        <InviteFriends
+          leagueId={leagues.data[0].id}
+          leagueCode={leagues.data[0].code}
+          leagueName={leagues.data[0].name}
+          compact
+        />
       ) : null}
 
       <Link

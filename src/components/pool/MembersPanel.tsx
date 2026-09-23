@@ -123,7 +123,7 @@ export function MembersPanel({
 
   return (
     <div className="space-y-6">
-      <InviteFriends leagueCode={league.code} leagueName={league.name} />
+      <InviteFriends leagueId={league.id} leagueCode={league.code} leagueName={league.name} />
 
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
