@@ -79,12 +79,12 @@ function Index() {
                alt="Gridiron Gods"
                className="mx-auto h-48 w-48 object-contain sm:h-56 sm:w-56"
              />
-             <h1 className="mx-auto mt-3 max-w-[610px] font-display text-[3.4rem] font-semibold leading-[1.02] sm:text-[4.75rem]">
-              NFL pick’em for your league.
-            </h1>
-             <p className="mt-5 font-display text-2xl font-medium text-accent sm:text-3xl">
-               Real games. Real people. Real prizes.
-             </p>
+              <h1 className="mx-auto mt-3 max-w-[610px] font-display text-[3.4rem] font-semibold leading-[1.02] sm:text-[4.75rem]">
+                Football pick’em for your league.
+              </h1>
+              <p className="mt-5 font-display text-2xl font-medium text-accent sm:text-3xl">
+                Real games. Real bragging rights.
+              </p>
              <p className="mx-auto mt-3 max-w-[590px] text-base leading-7 text-primary-foreground/70 sm:text-xl">
               Pick winners straight up. No spreads, no points. A Monday-night total breaks ties.
             </p>
