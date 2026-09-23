@@ -598,7 +598,9 @@ function DuelsPage() {
                           <p className="text-xs text-faint">
                             {SPORT_LABEL[d.sport] ?? "NFL"} · Week {d.weekNum} ·{" "}
                             {d.status === "open"
-                              ? "waiting for an opponent"
+                              ? them.userId
+                                ? `waiting for ${them.username} to accept`
+                                : "waiting for an opponent"
                               : d.status === "final"
                                 ? won
                                   ? "you won"
