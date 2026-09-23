@@ -92,6 +92,19 @@ export const searchDuelOpponents = createServerFn({ method: "GET" })
     return (rows ?? []).map((r) => ({ userId: r.id, username: r.username }));
   });
 
+/** How many direct challenges are waiting for this player to accept. */
+export const countPendingDuelChallenges = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { count } = await supabaseAdmin
+      .from("duels")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "open")
+      .eq("opponent_id", context.userId);
+    return { pending: count ?? 0 };
+  });
+
 export const createDuel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>

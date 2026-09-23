@@ -1,7 +1,10 @@
 import { createFileRoute, Outlet, redirect, Link, useLocation } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { GraduationCap, Home, ListOrdered, Swords, User } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { countPendingDuelChallenges } from "@/lib/duels.functions";
 import logoAsset from "@/assets/gridiron-gods-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -28,6 +31,15 @@ function AuthedLayout() {
   const { pathname } = useLocation();
   const isDuels = pathname === "/duels";
   const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
+
+  // Pending head-to-head challenges waiting on this player.
+  const loadPending = useServerFn(countPendingDuelChallenges);
+  const pending = useQuery({
+    queryKey: ["duel-pending"],
+    queryFn: () => loadPending(),
+    refetchInterval: 60_000,
+  });
+  const pendingCount = pending.data?.pending ?? 0;
 
   return (
     <div className="min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))]">
@@ -64,17 +76,30 @@ function AuthedLayout() {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-accent/35 bg-primary text-primary-foreground pb-[env(safe-area-inset-bottom)]"
       >
         <div className="mx-auto grid max-w-3xl grid-cols-5">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="flex min-h-[4.5rem] flex-col items-center justify-center gap-1 text-xs font-medium text-primary-foreground/55"
-              activeProps={{ className: "text-accent font-semibold" }}
-            >
-              <item.icon size={22} />
-              {item.label}
-            </Link>
-          ))}
+          {NAV.map((item) => {
+            const badge = item.to === "/duels" ? pendingCount : 0;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="flex min-h-[4.5rem] flex-col items-center justify-center gap-1 text-xs font-medium text-primary-foreground/55"
+                activeProps={{ className: "text-accent font-semibold" }}
+              >
+                <span className="relative">
+                  <item.icon size={22} />
+                  {badge > 0 && (
+                    <span
+                      aria-label={`${badge} pending duel challenges`}
+                      className="absolute -right-2.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 text-[0.65rem] font-bold leading-5 text-destructive-foreground"
+                    >
+                      {badge}
+                    </span>
+                  )}
+                </span>
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </div>
