@@ -419,6 +419,54 @@ function DuelsPage() {
               </div>
             </section>
 
+            {incoming.length > 0 && (
+              <section className="grid gap-3">
+                <div className="flex items-end justify-between gap-3">
+                  <h2 className="font-display text-3xl font-semibold">Challenges for you</h2>
+                  <span className="rounded-full bg-destructive px-3 py-1 text-sm font-semibold text-destructive-foreground">
+                    {incoming.length} new
+                  </span>
+                </div>
+                {incoming.map((d) => (
+                  <article
+                    key={d.id}
+                    className="rounded-2xl border-2 border-accent bg-accent-soft p-4 text-accent-soft-foreground"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-destructive/70 bg-destructive font-display font-semibold text-destructive-foreground">
+                        {initials(d.challenger.username)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-display text-base font-semibold">
+                          {d.challenger.username} challenged you to a duel
+                        </p>
+                        <p className="text-sm opacity-80">
+                          {SPORT_LABEL[d.sport] ?? "NFL"} · Week {d.weekNum} · head to head
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        disabled={gated || respond.isPending}
+                        onClick={() => respond.mutate({ duelId: d.id, accept: true })}
+                        className="min-h-14 flex-1 rounded-2xl font-display text-lg"
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={respond.isPending}
+                        onClick={() => respond.mutate({ duelId: d.id, accept: false })}
+                        className="min-h-14 rounded-2xl"
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  </article>
+                ))}
+              </section>
+            )}
+
             {openSeats.length > 0 && (
               <section className="grid gap-3">
                 <div className="flex items-end justify-between gap-3">
