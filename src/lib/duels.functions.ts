@@ -31,8 +31,31 @@ export const getDuelBoard = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const sport = data.sport;
-    const weekNum = data.weekNum ?? (await currentDuelWeek(sport));
-    await settleWeek(weekNum, sport);
+
+    // Grade every week that still has active duels (games may have finished
+    // after the board moved on), so results/records are never skipped.
+    const { data: pendingWeeks } = await supabaseAdmin
+      .from("duels")
+      .select("week_num")
+      .eq("sport", sport)
+      .eq("status", "active");
+    for (const w of new Set((pendingWeeks ?? []).map((r) => r.week_num as number))) {
+      await settleWeek(w, sport);
+    }
+
+    // Keep an in-progress week on the board until all its games are final;
+    // only then advance to the next upcoming week.
+    let weekNum = data.weekNum ?? null;
+    if (weekNum == null) {
+      const { data: live } = await supabaseAdmin
+        .from(sport === "cfb" ? "cfb_games" : "games")
+        .select("week_num")
+        .neq("state", "post")
+        .lte("kickoff", new Date().toISOString())
+        .order("week_num", { ascending: true })
+        .limit(1);
+      weekNum = (live?.[0]?.week_num as number | undefined) ?? (await currentDuelWeek(sport));
+    }
 
     const games = await weekGames(weekNum, sport);
     const duels = await duelViews(context.userId, weekNum, sport);
