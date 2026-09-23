@@ -12,20 +12,42 @@ import { inviteLink, shareInvite } from "@/lib/invite";
  * and the inviter, worth $5 SZN Credit to both of them.
  */
 export function InviteFriends({
+  leagueId,
   leagueCode,
   leagueName,
   compact = false,
 }: {
+  leagueId?: string;
   leagueCode: string;
   leagueName: string;
   compact?: boolean;
 }) {
   const info = useQuery({ queryKey: ["referral-info"], queryFn: () => getReferralInfo() });
+  const sendInvite = useServerFn(emailLeagueInvite);
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState("");
   const [showCode, setShowCode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [emailStatus, setEmailStatus] = useState("");
 
   const link = info.data ? inviteLink(leagueCode, info.data.refId) : "";
+
+  async function emailInvite() {
+    if (!link || !leagueId || !email.trim()) return;
+    setSending(true);
+    setEmailStatus("");
+    try {
+      await sendInvite({ data: { leagueId, to: email.trim(), link } });
+      setEmail("");
+      setEmailStatus("Invite sent");
+    } catch {
+      setEmailStatus("Could not send that invite");
+    } finally {
+      setSending(false);
+      setTimeout(() => setEmailStatus(""), 2600);
+    }
+  }
 
   async function copy() {
     if (!link) return;
