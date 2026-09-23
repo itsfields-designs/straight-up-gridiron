@@ -94,6 +94,34 @@ export function InviteFriends({
         </button>
       </div>
 
+      {leagueId && (
+        <div className="mt-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="email"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="friend@email.com"
+              className="min-h-12 flex-1 rounded-lg border border-border-strong bg-card px-3 text-sm"
+            />
+            <button
+              type="button"
+              onClick={emailInvite}
+              disabled={!link || sending || !email.trim()}
+              className="flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-card px-4 text-sm font-semibold transition-colors hover:bg-secondary disabled:opacity-40"
+            >
+              <Mail size={15} /> {sending ? "Sending…" : "Email invite"}
+            </button>
+          </div>
+          {emailStatus && (
+            <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
+              {emailStatus}
+            </p>
+          )}
+        </div>
+      )}
+
       {!compact && info.data && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {[
