@@ -91,7 +91,10 @@ function DuelsPage() {
     queryFn: () => loadOpponents({ data: { query: search || undefined } }),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["duel-board"] });
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: ["duel-board"] });
+    void queryClient.invalidateQueries({ queryKey: ["duel-pending"] });
+  };
 
   const create = useMutation({
     mutationFn: (vars: { vsGods: boolean; opponentId?: string | null }) =>
