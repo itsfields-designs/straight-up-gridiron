@@ -133,12 +133,17 @@ function DuelsPage() {
   const games = data?.games ?? [];
   const duels = data?.duels ?? [];
 
-  const mine = duels.filter((d) => d.mySide !== null && d.status !== "declined");
-  const openSeats = duels.filter(
+  // Direct challenges sent to me that I have not accepted or declined yet.
+  const incoming = duels.filter(
+    (d) => d.status === "open" && d.mySide === "opponent" && d.opponent.userId === user.id,
+  );
+  const mine = duels.filter(
     (d) =>
-      d.status === "open" &&
-      d.mySide === null &&
-      (!d.opponent.userId || d.opponent.userId === user.id),
+      d.mySide !== null && d.status !== "declined" && !incoming.some((pend) => pend.id === d.id),
+  );
+  // Public seats anyone can take.
+  const openSeats = duels.filter(
+    (d) => d.status === "open" && d.mySide === null && !d.opponent.userId,
   );
 
   const activeDuel = useMemo(
