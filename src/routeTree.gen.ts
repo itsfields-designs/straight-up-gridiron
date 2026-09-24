@@ -25,6 +25,9 @@ import { Route as AuthenticatedLeaguesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_authenticated/leagues.$leagueId'
 import { Route as ApiPublicCfbSyncRouteImport } from './routes/api/public/cfb-sync'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
+import { Route as ApiPublicRorkDuelsRouteImport } from './routes/api/public/rork-duels'
+import { Route as ApiPublicRorkLeaguesRouteImport } from './routes/api/public/rork-leagues'
+import { Route as ApiPublicRorkPicksRouteImport } from './routes/api/public/rork-picks'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicSznMembershipSyncRouteImport } from './routes/api/public/szn-membership-sync'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -113,6 +116,21 @@ const ApiPublicNflSyncRoute = ApiPublicNflSyncRouteImport.update({
   path: '/api/public/nfl-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRorkDuelsRoute = ApiPublicRorkDuelsRouteImport.update({
+  id: '/api/public/rork-duels',
+  path: '/api/public/rork-duels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRorkLeaguesRoute = ApiPublicRorkLeaguesRouteImport.update({
+  id: '/api/public/rork-leagues',
+  path: '/api/public/rork-leagues',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRorkPicksRoute = ApiPublicRorkPicksRouteImport.update({
+  id: '/api/public/rork-picks',
+  path: '/api/public/rork-picks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
   path: '/api/public/stripe-webhook',
@@ -150,6 +168,9 @@ export interface FileRoutesByFullPath {
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/rork-duels': typeof ApiPublicRorkDuelsRoute
+  '/api/public/rork-leagues': typeof ApiPublicRorkLeaguesRoute
+  '/api/public/rork-picks': typeof ApiPublicRorkPicksRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -171,6 +192,9 @@ export interface FileRoutesByTo {
   '/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/rork-duels': typeof ApiPublicRorkDuelsRoute
+  '/api/public/rork-leagues': typeof ApiPublicRorkLeaguesRoute
+  '/api/public/rork-picks': typeof ApiPublicRorkPicksRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
@@ -194,6 +218,9 @@ export interface FileRoutesById {
   '/_authenticated/leagues/$leagueId': typeof AuthenticatedLeaguesLeagueIdRoute
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
+  '/api/public/rork-duels': typeof ApiPublicRorkDuelsRoute
+  '/api/public/rork-leagues': typeof ApiPublicRorkLeaguesRoute
+  '/api/public/rork-picks': typeof ApiPublicRorkPicksRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
@@ -217,6 +244,9 @@ export interface FileRouteTypes {
     | '/leagues/$leagueId'
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
+    | '/api/public/rork-duels'
+    | '/api/public/rork-leagues'
+    | '/api/public/rork-picks'
     | '/api/public/stripe-webhook'
     | '/api/public/szn-membership-sync'
     | '/leagues/'
@@ -238,6 +268,9 @@ export interface FileRouteTypes {
     | '/leagues/$leagueId'
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
+    | '/api/public/rork-duels'
+    | '/api/public/rork-leagues'
+    | '/api/public/rork-picks'
     | '/api/public/stripe-webhook'
     | '/api/public/szn-membership-sync'
     | '/leagues'
@@ -260,6 +293,9 @@ export interface FileRouteTypes {
     | '/_authenticated/leagues/$leagueId'
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
+    | '/api/public/rork-duels'
+    | '/api/public/rork-leagues'
+    | '/api/public/rork-picks'
     | '/api/public/stripe-webhook'
     | '/api/public/szn-membership-sync'
     | '/_authenticated/leagues/'
@@ -276,6 +312,9 @@ export interface RootRouteChildren {
   JoinCodeRoute: typeof JoinCodeRoute
   ApiPublicCfbSyncRoute: typeof ApiPublicCfbSyncRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
+  ApiPublicRorkDuelsRoute: typeof ApiPublicRorkDuelsRoute
+  ApiPublicRorkLeaguesRoute: typeof ApiPublicRorkLeaguesRoute
+  ApiPublicRorkPicksRoute: typeof ApiPublicRorkPicksRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSznMembershipSyncRoute: typeof ApiPublicSznMembershipSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -396,6 +435,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNflSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/rork-duels': {
+      id: '/api/public/rork-duels'
+      path: '/api/public/rork-duels'
+      fullPath: '/api/public/rork-duels'
+      preLoaderRoute: typeof ApiPublicRorkDuelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/rork-leagues': {
+      id: '/api/public/rork-leagues'
+      path: '/api/public/rork-leagues'
+      fullPath: '/api/public/rork-leagues'
+      preLoaderRoute: typeof ApiPublicRorkLeaguesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/rork-picks': {
+      id: '/api/public/rork-picks'
+      path: '/api/public/rork-picks'
+      fullPath: '/api/public/rork-picks'
+      preLoaderRoute: typeof ApiPublicRorkPicksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
       path: '/api/public/stripe-webhook'
@@ -461,6 +521,9 @@ const rootRouteChildren: RootRouteChildren = {
   JoinCodeRoute: JoinCodeRoute,
   ApiPublicCfbSyncRoute: ApiPublicCfbSyncRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
+  ApiPublicRorkDuelsRoute: ApiPublicRorkDuelsRoute,
+  ApiPublicRorkLeaguesRoute: ApiPublicRorkLeaguesRoute,
+  ApiPublicRorkPicksRoute: ApiPublicRorkPicksRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSznMembershipSyncRoute: ApiPublicSznMembershipSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
