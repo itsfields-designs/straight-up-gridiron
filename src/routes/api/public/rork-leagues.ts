@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/rork-leagues")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin
           .from("league_members")
-          .select("league_id, role, leagues(id, name, sport, code, owner_id)")
+          .select("league_id, leagues(id, name, sport, code, owner_id)")
           .eq("user_id", userId);
         if (error) {
           console.error("[rork-leagues] read failed", error);
