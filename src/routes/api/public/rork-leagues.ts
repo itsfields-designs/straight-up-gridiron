@@ -1,12 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import {
-  assertRorkEntitled,
-  authorizeRork,
-  errorResponse,
-  readJson,
-} from "@/lib/rork-sync.server";
+import { assertRorkEntitled, authorizeRork, errorResponse, readJson } from "@/lib/rork-sync.server";
 
 /**
  * League creation and joining for the external Rork backend.

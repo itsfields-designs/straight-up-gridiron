@@ -1,12 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import {
-  assertRorkEntitled,
-  authorizeRork,
-  errorResponse,
-  readJson,
-} from "@/lib/rork-sync.server";
+import { assertRorkEntitled, authorizeRork, errorResponse, readJson } from "@/lib/rork-sync.server";
 
 /**
  * Duel actions for the external Rork backend: create, accept/decline and save
@@ -61,9 +56,8 @@ export const Route = createFileRoute("/api/public/rork-duels")({
         const { currentDuelWeek, weekGames, weekLocked, lockLabel, duelViews, tiebreakerGame } =
           await import("@/lib/duels.server");
 
-        const weekNum = Number.isFinite(weekParam) && weekParam > 0
-          ? weekParam
-          : await currentDuelWeek(sport);
+        const weekNum =
+          Number.isFinite(weekParam) && weekParam > 0 ? weekParam : await currentDuelWeek(sport);
         const games = await weekGames(weekNum, sport);
         const duels = await duelViews(userId, weekNum, sport);
         const tb = tiebreakerGame(games);
@@ -100,9 +94,8 @@ export const Route = createFileRoute("/api/public/rork-duels")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { currentDuelWeek, weekGames, weekLocked, buildGodsPicks } = await import(
-          "@/lib/duels.server"
-        );
+        const { currentDuelWeek, weekGames, weekLocked, buildGodsPicks } =
+          await import("@/lib/duels.server");
 
         try {
           if (parsed.action === "create") {
