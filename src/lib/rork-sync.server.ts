@@ -116,6 +116,12 @@ export function rorkJson(body: unknown, status = 200): Response {
 /** Turns any thrown value into the JSON error envelope Rork expects. */
 export function rorkError(err: unknown): Response {
   if (err instanceof RorkError) return rorkJson({ error: err.message }, err.status);
+  if (err && typeof err === "object" && "issues" in err) {
+    const issues = (err as { issues: { path: (string | number)[]; message: string }[] }).issues;
+    const first = issues[0];
+    const where = first?.path?.length ? `${first.path.join(".")}: ` : "";
+    return rorkJson({ error: `${where}${first?.message ?? "Invalid request"}` }, 400);
+  }
   const message = err instanceof Error ? err.message : "Request failed";
   return rorkJson({ error: message }, 400);
 }
