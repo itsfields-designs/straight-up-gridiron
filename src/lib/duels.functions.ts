@@ -45,20 +45,31 @@ export const getDuelBoard = createServerFn({ method: "GET" })
 
     // Keep an in-progress week on the board until all its games are final;
     // only then advance to the next upcoming week.
+    // New duels are always filed under the upcoming week (currentDuelWeek).
+    const upcomingWeek = await currentDuelWeek(sport);
     let weekNum = data.weekNum ?? null;
     if (weekNum == null) {
+      // Only consider games that kicked off recently, so a stray unfinished
+      // row from an old week can't pin the board to a stale slate.
+      const since = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
       const { data: live } = await supabaseAdmin
         .from(sport === "cfb" ? "cfb_games" : "games")
         .select("week_num")
         .neq("state", "post")
         .lte("kickoff", new Date().toISOString())
-        .order("week_num", { ascending: true })
+        .gte("kickoff", since)
+        .order("week_num", { ascending: false })
         .limit(1);
-      weekNum = (live?.[0]?.week_num as number | undefined) ?? (await currentDuelWeek(sport));
+      weekNum = (live?.[0]?.week_num as number | undefined) ?? upcomingWeek;
     }
 
     const games = await weekGames(weekNum, sport);
-    const duels = await duelViews(context.userId, weekNum, sport);
+    let duels = await duelViews(context.userId, weekNum, sport);
+    // While a week is in progress, also list duels already created for the
+    // upcoming week so fresh challenges never vanish from the board.
+    if (data.weekNum == null && upcomingWeek !== weekNum) {
+      duels = [...duels, ...(await duelViews(context.userId, upcomingWeek, sport))];
+    }
 
     const { data: records } = await supabaseAdmin
       .from("duel_records")
