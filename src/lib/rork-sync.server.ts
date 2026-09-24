@@ -95,3 +95,40 @@ export async function assertRorkEntitled(userId: string): Promise<void> {
 
   throw new Error("The SZN Pass is required for this action.");
 }
+
+/** A rule error with the HTTP status the Rork backend should receive. */
+export class RorkError extends Error {
+  status: number;
+  constructor(message: string, status = 400) {
+    super(message);
+    this.status = status;
+  }
+}
+
+/** JSON body helper that always sets the application/json content type. */
+export function rorkJson(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
+/** Turns any thrown value into the JSON error envelope Rork expects. */
+export function rorkError(err: unknown): Response {
+  if (err instanceof RorkError) return rorkJson({ error: err.message }, err.status);
+  if (err && typeof err === "object" && "issues" in err) {
+    const issues = (err as { issues: { path: (string | number)[]; message: string }[] }).issues;
+    const first = issues[0];
+    const where = first?.path?.length ? `${first.path.join(".")}: ` : "";
+    return rorkJson({ error: `${where}${first?.message ?? "Invalid request"}` }, 400);
+  }
+  const message = err instanceof Error ? err.message : "Request failed";
+  return rorkJson({ error: message }, 400);
+}
+
+/** Confirms the account exists in auth. Rork has already verified the identity. */
+export async function assertRorkUserExists(userId: string): Promise<void> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId);
+  if (error || !data?.user) throw new RorkError("Account not found.", 404);
+}
