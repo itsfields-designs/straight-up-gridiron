@@ -26,6 +26,7 @@ import { Route as AuthenticatedLeaguesLeagueIdRouteImport } from './routes/_auth
 import { Route as ApiPublicCfbSyncRouteImport } from './routes/api/public/cfb-sync'
 import { Route as ApiPublicNflSyncRouteImport } from './routes/api/public/nfl-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
+import { Route as ApiPublicSznMembershipSyncRouteImport } from './routes/api/public/szn-membership-sync'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 
@@ -117,6 +118,12 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSznMembershipSyncRoute =
+  ApiPublicSznMembershipSyncRouteImport.update({
+    id: '/api/public/szn-membership-sync',
+    path: '/api/public/szn-membership-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/leagues/': typeof AuthenticatedLeaguesIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -164,6 +172,7 @@ export interface FileRoutesByTo {
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/leagues': typeof AuthenticatedLeaguesIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -186,6 +195,7 @@ export interface FileRoutesById {
   '/api/public/cfb-sync': typeof ApiPublicCfbSyncRoute
   '/api/public/nfl-sync': typeof ApiPublicNflSyncRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/szn-membership-sync': typeof ApiPublicSznMembershipSyncRoute
   '/_authenticated/leagues/': typeof AuthenticatedLeaguesIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
+    | '/api/public/szn-membership-sync'
     | '/leagues/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
+    | '/api/public/szn-membership-sync'
     | '/leagues'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -249,6 +261,7 @@ export interface FileRouteTypes {
     | '/api/public/cfb-sync'
     | '/api/public/nfl-sync'
     | '/api/public/stripe-webhook'
+    | '/api/public/szn-membership-sync'
     | '/_authenticated/leagues/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -264,6 +277,7 @@ export interface RootRouteChildren {
   ApiPublicCfbSyncRoute: typeof ApiPublicCfbSyncRoute
   ApiPublicNflSyncRoute: typeof ApiPublicNflSyncRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicSznMembershipSyncRoute: typeof ApiPublicSznMembershipSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
@@ -389,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/szn-membership-sync': {
+      id: '/api/public/szn-membership-sync'
+      path: '/api/public/szn-membership-sync'
+      fullPath: '/api/public/szn-membership-sync'
+      preLoaderRoute: typeof ApiPublicSznMembershipSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -441,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCfbSyncRoute: ApiPublicCfbSyncRoute,
   ApiPublicNflSyncRoute: ApiPublicNflSyncRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicSznMembershipSyncRoute: ApiPublicSznMembershipSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
