@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/rork-leagues")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin
           .from("league_members")
-          .select("league_id, role, leagues(id, name, sport, invite_code, owner_id)")
+          .select("league_id, role, leagues(id, name, sport, code, owner_id)")
           .eq("user_id", userId);
         if (error) {
           console.error("[rork-leagues] read failed", error);
@@ -80,7 +80,7 @@ export const Route = createFileRoute("/api/public/rork-leagues")({
 
           const { data: league } = await supabaseAdmin
             .from("leagues")
-            .select("id, name, sport, invite_code")
+            .select("id, name, sport, code")
             .eq("id", id as string)
             .maybeSingle();
           return Response.json({ ok: true, league_id: id, league });
@@ -94,7 +94,7 @@ export const Route = createFileRoute("/api/public/rork-leagues")({
 
         const { data: league } = await supabaseAdmin
           .from("leagues")
-          .select("id, name, sport, invite_code")
+          .select("id, name, sport, code")
           .eq("id", id as string)
           .maybeSingle();
         return Response.json({ ok: true, league_id: id, league });
