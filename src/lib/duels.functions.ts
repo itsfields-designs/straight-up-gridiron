@@ -56,9 +56,12 @@ export const getDuelBoard = createServerFn({ method: "GET" })
     const games = await weekGames(weekNum, sport);
     let duels = await duelViews(context.userId, weekNum, sport);
     // While a week is in progress, also list duels already created for the
-    // upcoming week so fresh challenges never vanish from the board.
+    // upcoming week so fresh challenges never vanish from the board. Those
+    // duels need their own slate and lock state, not the in-progress week's.
+    let upcomingGames: Awaited<ReturnType<typeof weekGames>> | null = null;
     if (data.weekNum == null && upcomingWeek !== weekNum) {
       duels = [...duels, ...(await duelViews(context.userId, upcomingWeek, sport))];
+      upcomingGames = await weekGames(upcomingWeek, sport);
     }
 
     const { data: records } = await supabaseAdmin
@@ -95,6 +98,9 @@ export const getDuelBoard = createServerFn({ method: "GET" })
       tiebreakerTotal: tiebreakerTotal(games),
       locked: weekLocked(games),
       lockAt: lockLabel(games),
+      upcomingWeekNum: upcomingGames ? upcomingWeek : null,
+      upcomingGames,
+      upcomingLocked: upcomingGames ? weekLocked(upcomingGames) : null,
       duels,
       myRecord: leaderboard.find((r) => r.userId === context.userId) ?? null,
       leaderboard,
