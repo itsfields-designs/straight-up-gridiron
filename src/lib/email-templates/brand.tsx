@@ -138,7 +138,7 @@ export function Shell({
       <Body style={main}>
         <Container style={container}>
           <Section className="gg-frame" style={{ border: `1px solid ${colors.border}`, borderRadius: '24px', overflow: 'hidden', backgroundColor: colors.cream }}>
-          <Section style={{ backgroundColor: colors.green, padding: '28px 40px' }}>
+          <Section style={{ backgroundColor: colors.green, borderBottom: `3px solid ${colors.gold}`, padding: '28px 40px' }}>
             <Row>
               <Column style={{ width: '72px', verticalAlign: 'middle' }}>
                 <Img src={logoUrl} width="64" height="64" alt="Gridiron Gods" style={{ display: 'block', borderRadius: '14px' }} />
