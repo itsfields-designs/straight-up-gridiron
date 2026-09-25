@@ -93,21 +93,19 @@ export const Route = createFileRoute("/api/public/rork-duels-sync")({
             }
 
             let weekNum = body.week_num ?? null;
+            const upcomingWeek = await duelsServer.currentDuelWeek(sport);
             if (weekNum == null) {
-              const { data: live } = await supabaseAdmin
-                .from(sport === "cfb" ? "cfb_games" : "games")
-                .select("week_num")
-                .neq("state", "post")
-                .lte("kickoff", new Date().toISOString())
-                .order("week_num", { ascending: true })
-                .limit(1);
-              weekNum =
-                (live?.[0]?.week_num as number | undefined) ??
-                (await duelsServer.currentDuelWeek(sport));
+              weekNum = (await duelsServer.inProgressWeek(sport)) ?? upcomingWeek;
             }
 
             const games = await duelsServer.weekGames(weekNum, sport);
-            const duels = await duelsServer.duelViews(body.user_id, weekNum, sport);
+            let duels = await duelsServer.duelViews(body.user_id, weekNum, sport);
+            if (body.week_num == null && upcomingWeek !== weekNum) {
+              duels = [
+                ...duels,
+                ...(await duelsServer.duelViews(body.user_id, upcomingWeek, sport)),
+              ];
+            }
 
             const { data: records } = await supabaseAdmin
               .from("duel_records")

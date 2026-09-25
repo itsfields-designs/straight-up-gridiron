@@ -49,18 +49,8 @@ export const getDuelBoard = createServerFn({ method: "GET" })
     const upcomingWeek = await currentDuelWeek(sport);
     let weekNum = data.weekNum ?? null;
     if (weekNum == null) {
-      // Only consider games that kicked off recently, so a stray unfinished
-      // row from an old week can't pin the board to a stale slate.
-      const since = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: live } = await supabaseAdmin
-        .from(sport === "cfb" ? "cfb_games" : "games")
-        .select("week_num")
-        .neq("state", "post")
-        .lte("kickoff", new Date().toISOString())
-        .gte("kickoff", since)
-        .order("week_num", { ascending: false })
-        .limit(1);
-      weekNum = (live?.[0]?.week_num as number | undefined) ?? upcomingWeek;
+      const { inProgressWeek } = await import("@/lib/duels.server");
+      weekNum = (await inProgressWeek(sport)) ?? upcomingWeek;
     }
 
     const games = await weekGames(weekNum, sport);
