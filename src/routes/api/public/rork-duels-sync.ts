@@ -100,11 +100,15 @@ export const Route = createFileRoute("/api/public/rork-duels-sync")({
 
             const games = await duelsServer.weekGames(weekNum, sport);
             let duels = await duelsServer.duelViews(body.user_id, weekNum, sport);
+            // Upcoming-week duels ride along with their own slate and lock
+            // state so the app never shows them the wrong games.
+            let upcomingGames: Awaited<ReturnType<typeof duelsServer.weekGames>> | null = null;
             if (body.week_num == null && upcomingWeek !== weekNum) {
               duels = [
                 ...duels,
                 ...(await duelsServer.duelViews(body.user_id, upcomingWeek, sport)),
               ];
+              upcomingGames = await duelsServer.weekGames(upcomingWeek, sport);
             }
 
             const { data: records } = await supabaseAdmin
@@ -147,6 +151,9 @@ export const Route = createFileRoute("/api/public/rork-duels-sync")({
               tiebreakerTotal: duelsServer.tiebreakerTotal(games),
               locked: duelsServer.weekLocked(games),
               lockAt: duelsServer.lockLabel(games),
+              upcomingWeekNum: upcomingGames ? upcomingWeek : null,
+              upcomingGames,
+              upcomingLocked: upcomingGames ? duelsServer.weekLocked(upcomingGames) : null,
               duels,
               myRecord: leaderboard.find((r) => r.userId === body.user_id) ?? null,
               leaderboard,
