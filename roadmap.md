@@ -33,3 +33,9 @@
 - [x] Match signed-in shell, dashboard, leagues, picks, standings, and supporting sections
 - [x] Restyle College, Duels, Profile, Leaderboard, and Commissioner screens
 - [x] Verify mobile and desktop journeys, overflow, metadata, and preview health
+
+# Face The Gods pick reveal
+
+- [x] Distinguish the player's selection from The Gods' revealed selection
+- [x] Make every proclamation match the stored Gods pick
+- [x] Replace repetitive commentary with varied, larger-than-life lines
