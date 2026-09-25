@@ -60,7 +60,7 @@ export const SignupEmail = ({
       <Section key={step.title} style={{ margin: '0 0 24px' }}>
         <Row>
           <Column style={{ width: '58px', verticalAlign: 'top' }}>
-            <Text style={{ width: '42px', height: '42px', lineHeight: '42px', margin: '0', borderRadius: '999px', backgroundColor: '#F8EAC9', color: colors.goldDark, fontSize: '18px', fontWeight: 700 as const, textAlign: 'center' as const }}>
+            <Text style={{ width: '42px', height: '42px', lineHeight: '42px', margin: '0', borderRadius: '999px', backgroundColor: colors.goldSoft, color: colors.goldSoftText, fontSize: '18px', fontWeight: 700 as const, textAlign: 'center' as const }}>
               {i + 1}
             </Text>
           </Column>

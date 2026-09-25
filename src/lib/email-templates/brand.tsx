@@ -19,15 +19,20 @@ import {
 import logoAsset from '@/assets/gridiron-gods-logo.png.asset.json'
 
 export const colors = {
-  green: '#0E3B2A',
-  greenDark: '#092619',
-  gold: '#D9A441',
-  goldDark: '#B8862B',
-  cream: '#F6F1E4',
+  // Stadium black header / primary surface (matches --primary on the site).
+  green: '#141413',
+  greenDark: '#161715',
+  // Trophy gold accent (matches --accent).
+  gold: '#E5A93B',
+  goldDark: '#D9A441',
+  goldSoft: '#FBF2DC',
+  goldSoftText: '#94681A',
+  // Warm playbook cream background (matches --background).
+  cream: '#F4EFE6',
   ink: '#1C1B18',
-  muted: '#5F6B63',
+  muted: '#555E57',
   card: '#FFFFFF',
-  border: '#E5DFCF',
+  border: '#DDD7C8',
 }
 
 export const main = {
@@ -67,8 +72,8 @@ export const text = {
 
 export const button = {
   display: 'block',
-  backgroundColor: colors.goldDark,
-  color: colors.card,
+  backgroundColor: colors.gold,
+  color: '#151513',
   fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif",
   fontSize: '20px',
   fontWeight: 700 as const,
@@ -108,7 +113,7 @@ export const code = {
 
 const darkModeCss = `
   @media (prefers-color-scheme: dark) {
-    .gg-frame { border-color: #29483A !important; }
+    .gg-frame { border-color: #3A352B !important; }
   }
 `
 
@@ -133,7 +138,7 @@ export function Shell({
       <Body style={main}>
         <Container style={container}>
           <Section className="gg-frame" style={{ border: `1px solid ${colors.border}`, borderRadius: '24px', overflow: 'hidden', backgroundColor: colors.cream }}>
-          <Section style={{ backgroundColor: colors.green, padding: '28px 40px' }}>
+          <Section style={{ backgroundColor: colors.green, borderBottom: `3px solid ${colors.gold}`, padding: '28px 40px' }}>
             <Row>
               <Column style={{ width: '72px', verticalAlign: 'middle' }}>
                 <Img src={logoUrl} width="64" height="64" alt="Gridiron Gods" style={{ display: 'block', borderRadius: '14px' }} />
@@ -167,7 +172,7 @@ export function Fallback({ url }: { url: string }) {
     <Text style={fallbackText}>
       Button not working? Copy and paste this link into your browser:
       <br />
-      <Link href={url} style={{ color: colors.green, textDecoration: 'underline' }}>{url}</Link>
+      <Link href={url} style={{ color: colors.goldSoftText, textDecoration: 'underline' }}>{url}</Link>
     </Text>
   )
 }
