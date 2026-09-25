@@ -113,7 +113,7 @@ export const code = {
 
 const darkModeCss = `
   @media (prefers-color-scheme: dark) {
-    .gg-frame { border-color: #29483A !important; }
+    .gg-frame { border-color: #3A352B !important; }
   }
 `
 
