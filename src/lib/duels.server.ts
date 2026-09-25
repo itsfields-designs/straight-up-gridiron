@@ -70,6 +70,28 @@ export async function currentDuelWeek(sport: DuelSport = "nfl"): Promise<number>
   return fallback?.[0]?.week_num ?? MAX_WEEK[sport];
 }
 
+/**
+ * The week currently being played: its first game has kicked off (within the
+ * last 10 days) but not every game is final. Stays set between game days,
+ * e.g. after Thursday night until Sunday. Null when no week is in progress.
+ */
+export async function inProgressWeek(sport: DuelSport = "nfl"): Promise<number | null> {
+  const db = await admin();
+  const now = new Date().toISOString();
+  const since = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: started } = await db
+    .from(gamesTable(sport))
+    .select("week_num")
+    .lte("kickoff", now)
+    .gte("kickoff", since)
+    .order("week_num", { ascending: false })
+    .limit(1);
+  const week = started?.[0]?.week_num as number | undefined;
+  if (week == null) return null;
+  const games = await weekGames(week, sport);
+  return games.some((g) => g.state !== "post") ? week : null;
+}
+
 /** Kept for callers that only ever duel over the NFL slate. */
 export const currentNflWeek = () => currentDuelWeek("nfl");
 
