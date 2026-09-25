@@ -72,8 +72,8 @@ export const text = {
 
 export const button = {
   display: 'block',
-  backgroundColor: colors.goldDark,
-  color: colors.card,
+  backgroundColor: colors.gold,
+  color: '#151513',
   fontFamily: "'Arial Narrow', Impact, 'Franklin Gothic Condensed', Arial, sans-serif",
   fontSize: '20px',
   fontWeight: 700 as const,
