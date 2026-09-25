@@ -136,6 +136,69 @@ export function scorePicks(games: GameRow[], picks: Record<string, Side>): numbe
   return correct;
 }
 
+function stableVariant(value: string, count: number) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  return hash % count;
+}
+
+function pickLine(lines: readonly string[], gameId: string) {
+  return lines[stableVariant(gameId, lines.length)] ?? lines[0] ?? "The Gods have spoken.";
+}
+
+/** A deterministic proclamation that always names the team The Gods actually picked. */
+export function godsCommentaryForGame(
+  game: GameRow,
+  side: Side,
+  sport: DuelSport = "nfl",
+  gap = 0,
+) {
+  const chosen = side === "home" ? game.home : game.away;
+  const other = side === "home" ? game.away : game.home;
+  const chosenRank = side === "home" ? game.home_rank : game.away_rank;
+  const otherRank = side === "home" ? game.away_rank : game.home_rank;
+  const homeField = side === "home";
+
+  const rankedLines = [
+    `The heavens favor No. ${chosenRank} ${chosen}. ${other} enter the arena beneath a gathering storm.`,
+    `No. ${chosenRank} ${chosen} carry the decree of Olympus. ${other} are standing beneath the thunderbolt.`,
+    `The poll gives No. ${chosenRank} ${chosen} a number. The Gods give them dominion over ${other}.`,
+  ];
+  const upsetLines = [
+    `The rankings bow to no prophecy. ${chosen} will topple No. ${otherRank} ${other} and shake the heavens.`,
+    `Let mortals trust the poll. The Gods summon ${chosen} to bring down No. ${otherRank} ${other}.`,
+    `An upset has been written among the stars: ${chosen} over No. ${otherRank} ${other}.`,
+  ];
+  const commandingLines = [
+    `${chosen} arrive with thunder in their hands. ${other} will hear the gates of Olympus close behind them.`,
+    `The verdict is carved in stone: ${chosen}. ${other} are merely next in the path of the storm.`,
+    `${chosen} have been chosen by the throne. ${other} can plead their case to the echoes.`,
+    `The sky splits for ${chosen}. By nightfall, ${other} will know why mortals fear the Gods.`,
+  ];
+  const closeLines = [
+    `A razor-thin prophecy, but prophecy nonetheless: ${chosen} survive ${other} when the final horn sounds.`,
+    `Chaos clouds this battle. The Gods see one name beyond the smoke: ${chosen}.`,
+    `${other} will make this a war. ${chosen} will make it legend.`,
+    `The scales tremble, then fall toward ${chosen}. Fate denies ${other} by the narrowest measure.`,
+    `No mortal should wager calmly here. The Gods still command: ${chosen}.`,
+  ];
+  const homeLines = [
+    `On their own ground, ${chosen} summon the storm. ${other} have entered the wrong temple.`,
+    `The faithful will roar, the earth will answer, and ${chosen} will cast down ${other}.`,
+    `${chosen} defend sacred ground tonight. ${other} leave with nothing but the lesson.`,
+  ];
+
+  if (sport === "cfb" && chosenRank && otherRank && otherRank < chosenRank) {
+    return pickLine(upsetLines, game.id);
+  }
+  if (sport === "cfb" && chosenRank) {
+    return pickLine(rankedLines, game.id);
+  }
+  if (gap > 0.22) return pickLine(commandingLines, game.id);
+  if (homeField && gap > 0.08) return pickLine(homeLines, game.id);
+  return pickLine(closeLines, game.id);
+}
+
 /** The Gods pick on season form, poll rank and home field, with a line of trash talk. */
 export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: DuelSport = "nfl") {
   const db = await admin();
@@ -174,26 +237,8 @@ export async function buildGodsPicks(weekNum: number, games: GameRow[], sport: D
     const awayScore = rate(g.away) + (sport === "cfb" ? pollWeight(g.away_rank) : 0);
     const side: Side = homeScore >= awayScore ? "home" : "away";
     picks[g.id] = side;
-    const chosen = side === "home" ? g.home : g.away;
-    const other = side === "home" ? g.away : g.home;
-    const chosenRank = side === "home" ? g.home_rank : g.away_rank;
-    const otherRank = side === "home" ? g.away_rank : g.home_rank;
     const gap = Math.abs(homeScore - awayScore);
-
-    if (sport === "cfb" && chosenRank && otherRank && otherRank < chosenRank) {
-      reasoning[g.id] =
-        `The poll says No. ${otherRank} ${other}. The Gods say No. ${chosenRank} ${chosen}. Polls lie.`;
-    } else if (sport === "cfb" && chosenRank && !otherRank) {
-      reasoning[g.id] =
-        `No. ${chosenRank} ${chosen} are ranked for a reason. ${other} are just the opponent on the poster.`;
-    } else if (gap > 0.3) {
-      reasoning[g.id] = `${chosen} are simply the better team right now. ${other} have no answer.`;
-    } else if (gap > 0.1) {
-      reasoning[g.id] =
-        `${chosen} have the form edge${side === "home" ? " and the home crowd" : ""}.`;
-    } else {
-      reasoning[g.id] = `A coin flip the mortals will agonise over. The Gods take ${chosen}.`;
-    }
+    reasoning[g.id] = godsCommentaryForGame(g, side, sport, gap);
   }
   // The Gods guess the tiebreaker from the average combined score so far.
   const totals = (data ?? [])
@@ -361,8 +406,6 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
     (pickRows ?? []).find((r) => r.duel_id === duelId && r.user_id === uid);
   const picksOf = (duelId: string, uid: string | null) =>
     (rowFor(duelId, uid)?.picks ?? {}) as Record<string, Side>;
-  const reasoningOf = (duelId: string) =>
-    (rowFor(duelId, null)?.reasoning ?? {}) as Record<string, string>;
   const tiebreakerOf = (duelId: string, uid: string | null) =>
     (rowFor(duelId, uid)?.tiebreaker ?? null) as number | null;
 
@@ -374,6 +417,16 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
       d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
     const challengerPicks = picksOf(d.id, d.challenger_id);
     const opponentPicks = picksOf(d.id, d.vs_gods ? null : d.opponent_id);
+    // Generate reveal copy from the stored pick itself. This keeps old duels
+    // accurate even if their original commentary was stale or inconsistent.
+    const godsReasoning = d.vs_gods
+      ? Object.fromEntries(
+          games.flatMap((game) => {
+            const side = opponentPicks[game.id];
+            return side ? [[game.id, godsCommentaryForGame(game, side, sport)]] : [];
+          }),
+        )
+      : {};
     const reveal = locked || d.status === "final";
     const challengerTb = tiebreakerOf(d.id, d.challenger_id);
     const opponentTb = tiebreakerOf(d.id, d.vs_gods ? null : d.opponent_id);
@@ -410,7 +463,7 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
         correct: d.status === "final" ? d.opponent_correct : scorePicks(games, opponentPicks),
         isGods: d.vs_gods,
         // The Gods only talk once the slate is locked, so nobody can copy them.
-        reasoning: d.vs_gods && reveal ? reasoningOf(d.id) : ({} as Record<string, string>),
+        reasoning: d.vs_gods && reveal ? godsReasoning : ({} as Record<string, string>),
         tiebreaker: reveal || mine === "opponent" ? opponentTb : null,
       },
       winnerId: d.winner_id,

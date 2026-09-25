@@ -634,6 +634,7 @@ function DuelsPage() {
                             const theirPick = them.picks[g.id];
                             const editable = !gated && !data?.locked && d.status !== "final";
                             const godTalk = them.isGods ? them.reasoning?.[g.id] : undefined;
+                            const godsPick = them.isGods ? theirPick : undefined;
                             return (
                               <div key={g.id} className="rounded-xl border border-border p-2.5">
                                 <div className="grid grid-cols-2 gap-2">
@@ -641,15 +642,20 @@ function DuelsPage() {
                                     const team = side === "away" ? g.away : g.home;
                                     const rank = side === "away" ? g.away_rank : g.home_rank;
                                     const logo = side === "away" ? g.away_logo : g.home_logo;
-                                    const chosen = myPick === side;
+                                    const myChoice = myPick === side;
+                                    const godsChoice = godsPick === side;
                                     return (
                                       <Button
                                         key={side}
                                         variant="outline"
                                         disabled={!editable}
                                         onClick={() => setDraft((p) => ({ ...p, [g.id]: side }))}
-                                        className={`flex min-h-12 items-center gap-2 rounded-lg border-2 px-2 text-left text-sm ${
-                                          chosen ? "border-accent bg-accent-soft" : "border-border"
+                                        className={`relative flex min-h-14 items-center gap-2 rounded-lg border-2 px-2 pb-4 pt-1 text-left text-sm ${
+                                          godsChoice
+                                            ? "border-accent bg-accent-soft"
+                                            : myChoice
+                                              ? "border-success bg-secondary"
+                                              : "border-border"
                                         } disabled:opacity-80`}
                                       >
                                         {logo ? (
@@ -667,13 +673,22 @@ function DuelsPage() {
                                           </span>
                                         ) : null}
                                         <span className="min-w-0 truncate font-medium">{team}</span>
+                                        {(myChoice || godsChoice) && (
+                                          <span className="absolute bottom-0.5 left-2 flex gap-1 text-[9px] font-bold uppercase leading-none">
+                                            {myChoice && <span className="text-success">Your pick</span>}
+                                            {myChoice && godsChoice && <span className="text-faint">·</span>}
+                                            {godsChoice && (
+                                              <span className="text-accent-soft-foreground">Gods pick</span>
+                                            )}
+                                          </span>
+                                        )}
                                       </Button>
                                     );
                                   })}
                                 </div>
                                 <p className="mt-1.5 text-xs text-faint">
                                   {theirPick
-                                    ? `${them.username}: ${theirPick === "home" ? g.home : g.away}`
+                                    ? `${them.isGods ? "The Gods decree" : them.username}: ${theirPick === "home" ? g.home : g.away}`
                                     : `Hidden until kickoff`}
                                   {g.away_score != null && g.home_score != null
                                     ? ` · ${g.away_score}–${g.home_score}`
