@@ -172,7 +172,7 @@ export function Fallback({ url }: { url: string }) {
     <Text style={fallbackText}>
       Button not working? Copy and paste this link into your browser:
       <br />
-      <Link href={url} style={{ color: colors.green, textDecoration: 'underline' }}>{url}</Link>
+      <Link href={url} style={{ color: colors.goldSoftText, textDecoration: 'underline' }}>{url}</Link>
     </Text>
   )
 }
