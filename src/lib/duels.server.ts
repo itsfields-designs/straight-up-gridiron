@@ -142,6 +142,10 @@ function stableVariant(value: string, count: number) {
   return hash % count;
 }
 
+function pickLine(lines: readonly string[], gameId: string) {
+  return lines[stableVariant(gameId, lines.length)] ?? lines[0] ?? "The Gods have spoken.";
+}
+
 /** A deterministic proclamation that always names the team The Gods actually picked. */
 export function godsCommentaryForGame(
   game: GameRow,
@@ -185,14 +189,14 @@ export function godsCommentaryForGame(
   ];
 
   if (sport === "cfb" && chosenRank && otherRank && otherRank < chosenRank) {
-    return upsetLines[stableVariant(game.id, upsetLines.length)];
+    return pickLine(upsetLines, game.id);
   }
   if (sport === "cfb" && chosenRank) {
-    return rankedLines[stableVariant(game.id, rankedLines.length)];
+    return pickLine(rankedLines, game.id);
   }
-  if (gap > 0.22) return commandingLines[stableVariant(game.id, commandingLines.length)];
-  if (homeField && gap > 0.08) return homeLines[stableVariant(game.id, homeLines.length)];
-  return closeLines[stableVariant(game.id, closeLines.length)];
+  if (gap > 0.22) return pickLine(commandingLines, game.id);
+  if (homeField && gap > 0.08) return pickLine(homeLines, game.id);
+  return pickLine(closeLines, game.id);
 }
 
 /** The Gods pick on season form, poll rank and home field, with a line of trash talk. */
