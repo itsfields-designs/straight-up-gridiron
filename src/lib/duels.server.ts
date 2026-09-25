@@ -439,13 +439,18 @@ export async function duelViews(userId: string, weekNum: number, sport: DuelSpor
       d.challenger_id === userId ? "challenger" : d.opponent_id === userId ? "opponent" : null;
     const challengerPicks = picksOf(d.id, d.challenger_id);
     const opponentPicks = picksOf(d.id, d.vs_gods ? null : d.opponent_id);
-    // Generate reveal copy from the stored pick itself. This keeps old duels
-    // accurate even if their original commentary was stale or inconsistent.
+    // Prefer the commentary stored when The Gods made their picks — it was
+    // written with the real strength of each pick. Regenerate only for duels
+    // created before reasoning was stored, so the revealed line still matches
+    // the highlighted selection.
+    const storedReasoning = (rowFor(d.id, null)?.reasoning ?? {}) as Record<string, string>;
     const godsReasoning = d.vs_gods
       ? Object.fromEntries(
           games.flatMap((game) => {
             const side = opponentPicks[game.id];
-            return side ? [[game.id, godsCommentaryForGame(game, side, sport)]] : [];
+            if (!side) return [];
+            const line = storedReasoning[game.id] ?? godsCommentaryForGame(game, side, sport);
+            return [[game.id, line]];
           }),
         )
       : {};
