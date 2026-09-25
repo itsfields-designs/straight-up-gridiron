@@ -587,6 +587,14 @@ function DuelsPage() {
                   const them = d.mySide === "challenger" ? d.opponent : d.challenger;
                   const won = d.status === "final" && d.winnerId === user.id;
                   const lost = d.status === "final" && !won && (d.winnerId || d.godsWon);
+                  // Duels for the upcoming week use their own slate and lock
+                  // state, not the in-progress week's.
+                  const duelGames =
+                    d.weekNum === data?.weekNum ? games : (data?.upcomingGames ?? games);
+                  const duelLocked =
+                    d.weekNum === data?.weekNum
+                      ? (data?.locked ?? false)
+                      : (data?.upcomingLocked ?? false);
                   return (
                     <article
                       key={d.id}
@@ -623,16 +631,16 @@ function DuelsPage() {
                           onClick={() => startEditing(d.id, me.picks, me.tiebreaker)}
                           className="min-h-11 flex-1 rounded-xl"
                         >
-                          {data?.locked || d.status === "final" ? "View picks" : "Make picks"}
+                          {duelLocked || d.status === "final" ? "View picks" : "Make picks"}
                         </Button>
                       </div>
 
                       {openDuelId === d.id && (
                         <div className="mt-3 grid gap-2">
-                          {games.map((g) => {
+                          {duelGames.map((g) => {
                             const myPick = draft[g.id] ?? me.picks[g.id];
                             const theirPick = them.picks[g.id];
-                            const editable = !gated && !data?.locked && d.status !== "final";
+                            const editable = !gated && !duelLocked && d.status !== "final";
                             const godTalk = them.isGods ? them.reasoning?.[g.id] : undefined;
                             const godsPick = them.isGods ? theirPick : undefined;
                             return (
@@ -720,7 +728,7 @@ function DuelsPage() {
                               min={0}
                               max={300}
                               value={tiebreaker}
-                              disabled={gated || data?.locked || d.status === "final"}
+                              disabled={gated || duelLocked || d.status === "final"}
                               onChange={(e) => setTiebreaker(e.target.value)}
                               placeholder="Total points"
                               className="mt-2 min-h-12 w-full rounded-lg border border-border-strong bg-background px-3 text-base"
@@ -733,7 +741,7 @@ function DuelsPage() {
                             </p>
                           </div>
 
-                          {!gated && !data?.locked && d.status !== "final" && (
+                          {!gated && !duelLocked && d.status !== "final" && (
                             <Button
                               disabled={save.isPending}
                               onClick={() =>
@@ -745,7 +753,7 @@ function DuelsPage() {
                               }
                               className="min-h-12 rounded-xl bg-success text-primary"
                             >
-                              Save {Object.keys(draft).length} of {games.length} picks
+                              Save {Object.keys(draft).length} of {duelGames.length} picks
                             </Button>
                           )}
                         </div>
