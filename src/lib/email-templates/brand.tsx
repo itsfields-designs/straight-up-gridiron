@@ -19,15 +19,20 @@ import {
 import logoAsset from '@/assets/gridiron-gods-logo.png.asset.json'
 
 export const colors = {
-  green: '#0E3B2A',
-  greenDark: '#092619',
-  gold: '#D9A441',
-  goldDark: '#B8862B',
-  cream: '#F6F1E4',
+  // Stadium black header / primary surface (matches --primary on the site).
+  green: '#141413',
+  greenDark: '#161715',
+  // Trophy gold accent (matches --accent).
+  gold: '#E5A93B',
+  goldDark: '#D9A441',
+  goldSoft: '#FBF2DC',
+  goldSoftText: '#94681A',
+  // Warm playbook cream background (matches --background).
+  cream: '#F4EFE6',
   ink: '#1C1B18',
-  muted: '#5F6B63',
+  muted: '#555E57',
   card: '#FFFFFF',
-  border: '#E5DFCF',
+  border: '#DDD7C8',
 }
 
 export const main = {
